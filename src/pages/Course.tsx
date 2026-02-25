@@ -1,13 +1,16 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, RotateCcw, Shield } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { courseData, type AgeStream } from "@/data/courseData";
+import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { SearchBar } from "@/components/course/SearchBar";
 import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { Certificate } from "@/components/course/Certificate";
+import { ShieldIcon, CourseIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
+import { useNavigate } from "react-router-dom";
 
 type View =
   | { type: "home" }
@@ -17,16 +20,16 @@ type View =
 
 export default function CoursePage() {
   const [view, setView] = useState<View>({ type: "home" });
-  const [nameInput, setNameInput] = useState("");
+  const { user, profile, signOut } = useAuth();
   const {
     progress,
     completeLesson,
     earnBadge,
-    setLearnerName,
     isLessonComplete,
     getModuleProgress,
     isStreamComplete,
-  } = useProgress();
+  } = useProgress(user?.id);
+  const navigate = useNavigate();
 
   const getStream = (id: string) => courseData.find((s) => s.id === id)!;
 
@@ -49,7 +52,6 @@ export default function CoursePage() {
     (lessonId: string, score: number, moduleId: string) => {
       completeLesson(lessonId, score);
       if (score === 100) earnBadge(`star-${lessonId}`);
-      // Check if module complete
       if (view.type === "lesson") {
         const stream = getStream(view.streamId);
         const mod = stream.modules.find((m) => m.id === moduleId);
@@ -64,20 +66,30 @@ export default function CoursePage() {
     [completeLesson, earnBadge, isLessonComplete, view]
   );
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  const learnerName = profile?.first_name || "Warrior";
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-dark">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur border-b-2 border-border px-4 py-3">
+      <header className="sticky top-0 z-50 glass-overlay border-b border-border/60 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <div className="flex items-center gap-2 shrink-0">
-            <Shield className="w-7 h-7 text-primary" />
-            <span className="font-display font-extrabold text-base text-foreground hidden sm:inline">
-              KikiWarrior
+            <ShieldIcon size={24} className="stroke-primary" />
+            <span className="font-display font-bold text-sm text-foreground uppercase tracking-wider hidden sm:inline">
+              Kiki Warrior
             </span>
           </div>
           <div className="flex-1">
             <SearchBar onNavigate={handleSearchNavigate} />
           </div>
+          <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors p-2">
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
       </header>
 
@@ -94,30 +106,15 @@ export default function CoursePage() {
             >
               {/* Hero */}
               <div className="text-center space-y-3 py-6">
-                <div className="text-5xl float">🛡️</div>
-                <h1 className="font-display text-3xl md:text-4xl font-extrabold text-foreground text-shadow-playful">
-                  Internet Safety Course
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-copper float">
+                  <ShieldIcon size={32} className="stroke-primary-foreground" />
+                </div>
+                <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider">
+                  Internet Safety
                 </h1>
                 <p className="font-body text-muted-foreground max-w-sm mx-auto">
-                  Learn to be safe, smart, and kind online! Choose your age group to begin.
+                  Choose your learning path to begin your journey, {learnerName}.
                 </p>
-              </div>
-
-              {/* Name Input */}
-              <div className="card-playful max-w-sm mx-auto">
-                <label className="font-display text-sm font-bold text-foreground block mb-2">
-                  👋 What's your name?
-                </label>
-                <input
-                  type="text"
-                  value={progress.learnerName || nameInput}
-                  onChange={(e) => {
-                    setNameInput(e.target.value);
-                    setLearnerName(e.target.value);
-                  }}
-                  placeholder="Type your name here..."
-                  className="w-full rounded-xl border-2 border-border bg-background px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
-                />
               </div>
 
               {/* Age Selection */}
@@ -130,27 +127,33 @@ export default function CoursePage() {
                   return (
                     <motion.button
                       key={stream.id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                       onClick={() => setView({ type: "stream", streamId: stream.id })}
-                      className={`${stream.gradient} rounded-3xl p-6 md:p-8 text-left text-primary-foreground shadow-lg relative overflow-hidden`}
+                      className="card-kiki text-left relative overflow-hidden group"
                     >
                       <div className="relative z-10">
-                        <span className="text-4xl md:text-5xl">{stream.emoji}</span>
-                        <h2 className="font-display text-2xl md:text-3xl font-extrabold mt-2">
-                          {stream.label}
-                        </h2>
-                        <p className="font-body text-primary-foreground/80 text-sm mt-1">
-                          {stream.description}
-                        </p>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-12 h-12 rounded-lg gradient-copper flex items-center justify-center">
+                            <CourseIcon name={stream.id === "6-9" ? "shield" : "eye"} size={24} className="stroke-primary-foreground" />
+                          </div>
+                          <div>
+                            <h2 className="font-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-wide">
+                              {stream.label}
+                            </h2>
+                            <p className="font-body text-muted-foreground text-sm">
+                              {stream.description}
+                            </p>
+                          </div>
+                        </div>
                         {prog > 0 && (
-                          <div className="mt-3 max-w-xs">
-                            <ProgressBar progress={prog} label={complete ? "✅ Complete!" : "Your progress"} />
+                          <div className="mt-3">
+                            <ProgressBar progress={prog} label={complete ? "Complete" : "Your progress"} />
                           </div>
                         )}
                       </div>
-                      <div className="absolute -right-6 -bottom-6 text-8xl opacity-20">
-                        {stream.emoji}
+                      <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <CourseIcon name="shield" size={100} className="stroke-foreground" />
                       </div>
                     </motion.button>
                   );
@@ -176,13 +179,13 @@ export default function CoursePage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setView({ type: "home" })}
-                    className="touch-target p-2 rounded-xl hover:bg-muted transition-colors"
+                    className="touch-target p-2 rounded-lg hover:bg-muted transition-colors"
                   >
                     <ArrowLeft className="w-6 h-6 text-foreground" />
                   </button>
                   <div>
-                    <h2 className="font-display text-xl font-extrabold text-foreground">
-                      {stream.emoji} {stream.label}
+                    <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+                      {stream.label}
                     </h2>
                     <p className="text-xs text-muted-foreground font-body">{stream.description}</p>
                   </div>
@@ -216,16 +219,18 @@ export default function CoursePage() {
                     className="space-y-4"
                   >
                     <div className="text-center">
-                      <div className="text-5xl bounce-in mb-2">🏆</div>
-                      <h3 className="font-display text-xl font-extrabold text-foreground">
+                      <div className="bounce-in mb-2">
+                        <CertBadgeIcon size={48} className="stroke-primary mx-auto" />
+                      </div>
+                      <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
                         Congratulations!
                       </h3>
                       <p className="text-sm text-muted-foreground font-body">
-                        You completed all modules! Download your certificate below.
+                        You completed all modules. Download your certificate below.
                       </p>
                     </div>
                     <Certificate
-                      learnerName={progress.learnerName || "Internet Hero"}
+                      learnerName={learnerName}
                       ageGroup={stream.id as "6-9" | "10-13"}
                     />
                   </motion.div>

@@ -1,49 +1,88 @@
 import { useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProgressState {
   completedLessons: string[];
   earnedBadges: string[];
   quizScores: Record<string, number>;
-  learnerName: string;
 }
 
-const STORAGE_KEY = "kiki-warrior-progress";
+export function useProgress(userId: string | undefined) {
+  const [progress, setProgress] = useState<ProgressState>({
+    completedLessons: [],
+    earnedBadges: [],
+    quizScores: {},
+  });
+  const [loading, setLoading] = useState(true);
 
-const getInitialState = (): ProgressState => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return { completedLessons: [], earnedBadges: [], quizScores: {}, learnerName: "" };
-};
-
-export function useProgress() {
-  const [progress, setProgress] = useState<ProgressState>(getInitialState);
-
+  // Fetch from DB on mount
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-  }, [progress]);
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
-  const completeLesson = useCallback((lessonId: string, score: number) => {
+    const fetchProgress = async () => {
+      const [progressRes, badgesRes] = await Promise.all([
+        supabase.from("progress").select("*").eq("user_id", userId),
+        supabase.from("badges").select("*").eq("user_id", userId),
+      ]);
+
+      const completedLessons: string[] = [];
+      const quizScores: Record<string, number> = {};
+
+      if (progressRes.data) {
+        for (const row of progressRes.data as any[]) {
+          completedLessons.push(row.lesson_id);
+          quizScores[row.lesson_id] = row.score;
+        }
+      }
+
+      const earnedBadges = (badgesRes.data as any[] || []).map((b: any) => b.badge_id);
+
+      setProgress({ completedLessons, earnedBadges, quizScores });
+      setLoading(false);
+    };
+
+    fetchProgress();
+  }, [userId]);
+
+  const completeLesson = useCallback(async (lessonId: string, score: number) => {
+    if (!userId) return;
+
+    // Upsert into progress table
+    await supabase.from("progress").upsert(
+      { user_id: userId, lesson_id: lessonId, score } as any,
+      { onConflict: "user_id,lesson_id" }
+    );
+
     setProgress((prev) => ({
       ...prev,
       completedLessons: prev.completedLessons.includes(lessonId)
         ? prev.completedLessons
         : [...prev.completedLessons, lessonId],
-      quizScores: { ...prev.quizScores, [lessonId]: Math.max(prev.quizScores[lessonId] ?? 0, score) },
+      quizScores: {
+        ...prev.quizScores,
+        [lessonId]: Math.max(prev.quizScores[lessonId] ?? 0, score),
+      },
     }));
-  }, []);
+  }, [userId]);
 
-  const earnBadge = useCallback((badgeId: string) => {
+  const earnBadge = useCallback(async (badgeId: string) => {
+    if (!userId) return;
+
+    await supabase.from("badges").upsert(
+      { user_id: userId, badge_id: badgeId } as any,
+      { onConflict: "user_id,badge_id" }
+    );
+
     setProgress((prev) => ({
       ...prev,
-      earnedBadges: prev.earnedBadges.includes(badgeId) ? prev.earnedBadges : [...prev.earnedBadges, badgeId],
+      earnedBadges: prev.earnedBadges.includes(badgeId)
+        ? prev.earnedBadges
+        : [...prev.earnedBadges, badgeId],
     }));
-  }, []);
-
-  const setLearnerName = useCallback((name: string) => {
-    setProgress((prev) => ({ ...prev, learnerName: name }));
-  }, []);
+  }, [userId]);
 
   const isLessonComplete = useCallback(
     (lessonId: string) => progress.completedLessons.includes(lessonId),
@@ -63,18 +102,13 @@ export function useProgress() {
     [progress.completedLessons]
   );
 
-  const resetProgress = useCallback(() => {
-    setProgress({ completedLessons: [], earnedBadges: [], quizScores: {}, learnerName: "" });
-  }, []);
-
   return {
     progress,
+    loading,
     completeLesson,
     earnBadge,
-    setLearnerName,
     isLessonComplete,
     getModuleProgress,
     isStreamComplete,
-    resetProgress,
   };
 }

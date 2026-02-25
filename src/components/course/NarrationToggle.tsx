@@ -32,14 +32,14 @@ export function NarrationToggle({ text }: NarrationToggleProps) {
   return (
     <button
       onClick={speaking ? stop : speak}
-      className={`touch-target inline-flex items-center gap-2 rounded-full px-5 py-3 font-display font-bold text-sm transition-all ${
+      className={`touch-target inline-flex items-center gap-2 rounded-lg px-5 py-3 font-display font-medium text-sm uppercase tracking-wide transition-all ${
         speaking
-          ? "bg-coral text-coral-foreground pulse-glow"
+          ? "bg-accent text-accent-foreground pulse-glow"
           : "bg-primary/10 text-primary hover:bg-primary/20"
       }`}
     >
       {speaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-      {speaking ? "Stop Reading" : "Read to Me 🔊"}
+      {speaking ? "Stop" : "Listen"}
     </button>
   );
 }

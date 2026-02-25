@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 interface ProgressBarProps {
-  progress: number; // 0-1
+  progress: number;
   label?: string;
 }
 
@@ -12,14 +12,13 @@ export function ProgressBar({ progress, label }: ProgressBarProps) {
     <div className="w-full">
       {label && (
         <div className="flex justify-between mb-1">
-          <span className="text-xs font-display font-bold text-muted-foreground">{label}</span>
-          <span className="text-xs font-display font-bold text-primary">{percent}%</span>
+          <span className="text-xs font-display font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
+          <span className="text-xs font-display font-medium text-primary">{percent}%</span>
         </div>
       )}
-      <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
         <motion.div
-          className="h-full rounded-full bg-primary"
-          style={{ background: "linear-gradient(90deg, hsl(205 85% 50%), hsl(160 50% 55%))" }}
+          className="h-full rounded-full gradient-copper"
           initial={{ width: 0 }}
           animate={{ width: `${percent}%` }}
           transition={{ duration: 0.6, ease: "easeOut" }}

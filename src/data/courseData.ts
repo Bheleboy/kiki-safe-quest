@@ -20,6 +20,7 @@ export interface Module {
   id: string;
   title: string;
   emoji: string;
+  icon?: string;
   color: string;
   lessons: Lesson[];
 }
@@ -45,6 +46,7 @@ export const courseData: AgeStream[] = [
         id: "young-m1",
         title: "What is the Internet?",
         emoji: "🌐",
+        icon: "eye",
         color: "primary",
         lessons: [
           {
@@ -82,6 +84,7 @@ export const courseData: AgeStream[] = [
         id: "young-m2",
         title: "SMART Rules",
         emoji: "🛡️",
+        icon: "shield",
         color: "coral",
         lessons: [
           {
@@ -206,6 +209,7 @@ export const courseData: AgeStream[] = [
         id: "young-m3",
         title: "Be Kind Online",
         emoji: "💛",
+        icon: "heart",
         color: "secondary",
         lessons: [
           {
@@ -252,6 +256,7 @@ export const courseData: AgeStream[] = [
         id: "teen-m1",
         title: "Internet Safety 101",
         emoji: "🌐",
+        icon: "shield",
         color: "primary",
         lessons: [
           {
@@ -290,7 +295,8 @@ export const courseData: AgeStream[] = [
         id: "teen-m2",
         title: "Privacy & Passwords",
         emoji: "🔐",
-        color: "mint",
+        icon: "lock",
+        color: "secondary",
         lessons: [
           {
             id: "teen-m2-l1",
@@ -337,7 +343,8 @@ export const courseData: AgeStream[] = [
         id: "teen-m3",
         title: "Protect Your Profile",
         emoji: "👤",
-        color: "purple-fun",
+        icon: "eye",
+        color: "accent",
         lessons: [
           {
             id: "teen-m3-l1",
@@ -383,7 +390,8 @@ export const courseData: AgeStream[] = [
         id: "teen-m4",
         title: "Cyberbullying & Respect",
         emoji: "🤝",
-        color: "coral",
+        icon: "heart",
+        color: "accent",
         lessons: [
           {
             id: "teen-m4-l1",
@@ -420,6 +428,7 @@ export const courseData: AgeStream[] = [
         id: "teen-m5",
         title: "Scams & Phishing",
         emoji: "🎣",
+        icon: "warning",
         color: "secondary",
         lessons: [
           {

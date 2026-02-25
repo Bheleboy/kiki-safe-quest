@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Baloo 2', 'cursive'],
-        body: ['Nunito', 'sans-serif'],
+        display: ['Oswald', 'sans-serif'],
+        body: ['DM Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -59,17 +59,17 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          foreground: "hsl(var(--coral-foreground))",
+        copper: {
+          DEFAULT: "hsl(var(--copper))",
+          foreground: "hsl(var(--copper-foreground))",
         },
-        "purple-fun": {
-          DEFAULT: "hsl(var(--purple-fun))",
-          foreground: "hsl(var(--purple-fun-foreground))",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          foreground: "hsl(var(--gold-foreground))",
         },
-        mint: {
-          DEFAULT: "hsl(var(--mint))",
-          foreground: "hsl(var(--mint-foreground))",
+        clay: {
+          DEFAULT: "hsl(var(--clay))",
+          foreground: "hsl(var(--clay-foreground))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

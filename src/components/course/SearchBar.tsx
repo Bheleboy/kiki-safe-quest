@@ -29,24 +29,24 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="flex items-center gap-2 rounded-full bg-card border-2 border-border px-4 py-2 focus-within:border-primary transition-colors">
-        <Search className="w-5 h-5 text-muted-foreground shrink-0" />
+      <div className="flex items-center gap-2 rounded-lg bg-muted border border-border px-4 py-2 focus-within:border-primary/50 transition-colors">
+        <Search className="w-4 h-4 text-muted-foreground shrink-0" />
         <input
           type="text"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          placeholder="Search topics (privacy, bullying...)"
+          placeholder="Search topics..."
           className="w-full bg-transparent outline-none text-sm font-body text-foreground placeholder:text-muted-foreground"
         />
         {query && (
-          <button onClick={() => { setQuery(""); setOpen(false); }} className="touch-target p-1">
+          <button onClick={() => { setQuery(""); setOpen(false); }} className="p-1">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         )}
       </div>
       {open && results.length > 0 && (
-        <div className="absolute top-full mt-2 w-full bg-card rounded-xl border-2 border-border shadow-lg z-50 max-h-60 overflow-y-auto">
+        <div className="absolute top-full mt-2 w-full bg-card rounded-lg border border-border shadow-xl z-50 max-h-60 overflow-y-auto">
           {results.map((r, i) => (
             <button
               key={i}
@@ -57,17 +57,17 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
               }}
               className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b last:border-b-0 border-border/50"
             >
-              <p className="font-display font-bold text-sm text-foreground">{r!.lesson.title}</p>
-              <p className="text-xs text-muted-foreground">
-                {r!.stream.emoji} {r!.stream.label} → {r!.mod.title}
+              <p className="font-display font-medium text-sm text-foreground uppercase tracking-wide">{r!.lesson.title}</p>
+              <p className="text-xs text-muted-foreground font-body">
+                {r!.stream.label} — {r!.mod.title}
               </p>
             </button>
           ))}
         </div>
       )}
       {open && query.trim().length >= 2 && results.length === 0 && (
-        <div className="absolute top-full mt-2 w-full bg-card rounded-xl border-2 border-border shadow-lg z-50 p-4 text-center">
-          <p className="text-sm text-muted-foreground">No results found for "{query}"</p>
+        <div className="absolute top-full mt-2 w-full bg-card rounded-lg border border-border shadow-xl z-50 p-4 text-center">
+          <p className="text-sm text-muted-foreground font-body">No results for "{query}"</p>
         </div>
       )}
     </div>
