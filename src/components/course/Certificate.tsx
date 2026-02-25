@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import html2canvas from "html2canvas";
+import { ShieldIcon } from "./CourseIcons";
 
 interface CertificateProps {
   learnerName: string;
@@ -11,7 +12,7 @@ export function Certificate({ learnerName, ageGroup }: CertificateProps) {
 
   const download = async () => {
     if (!certRef.current) return;
-    const canvas = await html2canvas(certRef.current, { scale: 2, backgroundColor: "#ffffff" });
+    const canvas = await html2canvas(certRef.current, { scale: 2, backgroundColor: "#1C1C1C" });
     const link = document.createElement("a");
     link.download = `KikiWarrior-Certificate-${learnerName.replace(/\s+/g, "_")}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -28,41 +29,47 @@ export function Certificate({ learnerName, ageGroup }: CertificateProps) {
     <div className="space-y-4">
       <div
         ref={certRef}
-        className="relative bg-card rounded-2xl p-8 md:p-12 border-4 border-secondary text-center"
-        style={{ aspectRatio: "1.4/1", maxWidth: 600, margin: "0 auto" }}
+        className="relative rounded-xl p-8 md:p-12 text-center"
+        style={{
+          aspectRatio: "1.4/1",
+          maxWidth: 600,
+          margin: "0 auto",
+          background: "linear-gradient(180deg, hsl(0 0% 13%) 0%, hsl(0 0% 9%) 100%)",
+          border: "2px solid hsl(25 60% 45%)",
+        }}
       >
-        <div className="absolute inset-4 border-2 border-secondary/40 rounded-xl pointer-events-none" />
+        <div
+          className="absolute inset-3 rounded-lg pointer-events-none"
+          style={{ border: "1px solid hsl(25 60% 45% / 0.3)" }}
+        />
         <div className="relative z-10 flex flex-col items-center justify-center h-full gap-2">
-          <span className="text-3xl md:text-4xl">🏆</span>
-          <h2 className="font-display text-lg md:text-2xl font-extrabold text-primary leading-tight">
-            Certificate of Completion
-          </h2>
-          <p className="text-xs text-muted-foreground font-body">This certifies that</p>
-          <p className="font-display text-xl md:text-3xl font-extrabold text-foreground">
-            {learnerName || "Internet Hero"}
-          </p>
-          <p className="text-xs text-muted-foreground font-body">has successfully completed the</p>
-          <p className="font-display text-base md:text-lg font-bold text-coral">
-            Kiki Warrior Internet Safety Champion
-          </p>
-          <p className="text-xs font-body text-muted-foreground">
-            Ages {ageGroup} Course
-          </p>
-          <div className="flex items-center gap-3 mt-2">
-            <span className="text-xl">⭐</span>
-            <span className="text-xl">🛡️</span>
-            <span className="text-xl">⭐</span>
+          <ShieldIcon size={40} className="stroke-primary opacity-30 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ width: 120, height: 120 }} />
+          <div className="relative">
+            <h2 className="font-display text-lg md:text-2xl font-bold text-primary leading-tight uppercase tracking-wider">
+              Certificate of Completion
+            </h2>
+            <p className="text-xs text-muted-foreground font-body mt-2">This certifies that</p>
+            <p className="font-display text-xl md:text-3xl font-bold text-foreground mt-1 uppercase tracking-wide">
+              {learnerName}
+            </p>
+            <p className="text-xs text-muted-foreground font-body mt-2">has successfully completed the</p>
+            <p className="font-display text-base md:text-lg font-semibold text-accent mt-1 uppercase tracking-wide">
+              Kiki Warrior Internet Safety Champion
+            </p>
+            <p className="text-xs font-body text-muted-foreground mt-1">
+              Ages {ageGroup} Course
+            </p>
+            <p className="text-xs text-muted-foreground font-body mt-3">{dateStr}</p>
+            <p className="text-[10px] text-muted-foreground/50 font-body mt-1">KikiWarrior.com</p>
           </div>
-          <p className="text-xs text-muted-foreground font-body mt-1">{dateStr}</p>
-          <p className="text-[10px] text-muted-foreground/60 font-body">KikiWarrior.com</p>
         </div>
       </div>
       <div className="text-center">
         <button
           onClick={download}
-          className="touch-target inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 font-display font-bold text-primary-foreground text-lg hover:opacity-90 active:scale-95 transition-all"
+          className="touch-target inline-flex items-center gap-2 btn-copper px-8 py-4 text-base uppercase tracking-widest"
         >
-          📥 Download Certificate
+          Download Certificate
         </button>
       </div>
     </div>

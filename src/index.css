@@ -2,66 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 200 30% 97%;
-    --foreground: 220 30% 18%;
+    --background: 0 0% 11%;
+    --foreground: 30 10% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 18%;
+    --card: 0 0% 15%;
+    --card-foreground: 30 10% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 18%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 30 10% 90%;
 
-    --primary: 205 85% 50%;
+    --primary: 25 70% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 95% 60%;
-    --secondary-foreground: 30 60% 20%;
+    --secondary: 40 55% 42%;
+    --secondary-foreground: 40 20% 95%;
 
-    --muted: 200 20% 92%;
-    --muted-foreground: 220 15% 50%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 30 5% 55%;
 
-    --accent: 10 80% 62%;
+    --accent: 15 50% 52%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 45% 45%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 200 20% 88%;
-    --input: 200 20% 88%;
-    --ring: 205 85% 50%;
+    --border: 30 5% 22%;
+    --input: 30 5% 22%;
+    --ring: 25 70% 50%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    --success: 145 65% 45%;
+    --success: 145 40% 38%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 45 95% 55%;
-    --warning-foreground: 30 60% 20%;
+    --warning: 40 55% 42%;
+    --warning-foreground: 40 20% 95%;
 
-    --coral: 10 80% 62%;
-    --coral-foreground: 0 0% 100%;
+    --copper: 25 60% 55%;
+    --copper-foreground: 0 0% 100%;
 
-    --purple-fun: 270 70% 60%;
-    --purple-fun-foreground: 0 0% 100%;
+    --gold: 40 50% 50%;
+    --gold-foreground: 0 0% 10%;
 
-    --mint: 160 50% 55%;
-    --mint-foreground: 0 0% 100%;
+    --clay: 15 40% 45%;
+    --clay-foreground: 0 0% 100%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 13%;
+    --sidebar-foreground: 30 10% 80%;
+    --sidebar-primary: 25 70% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 30 10% 80%;
+    --sidebar-border: 30 5% 22%;
+    --sidebar-ring: 25 70% 50%;
 
-    --font-display: 'Baloo 2', cursive;
-    --font-body: 'Nunito', sans-serif;
+    --font-display: 'Oswald', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
   }
 }
 
@@ -92,28 +92,45 @@
     @apply min-h-[48px] min-w-[48px];
   }
 
-  .card-playful {
-    @apply bg-card rounded-2xl shadow-lg border-2 border-border/50 p-6;
+  .card-kiki {
+    @apply bg-card rounded-xl border border-border/60 p-6;
+    box-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.4);
   }
 
-  .gradient-hero {
-    background: linear-gradient(135deg, hsl(205 85% 50%) 0%, hsl(190 80% 50%) 50%, hsl(160 50% 55%) 100%);
+  .glass-overlay {
+    @apply bg-card/80 backdrop-blur-md border border-border/40 rounded-xl;
   }
 
-  .gradient-warm {
-    background: linear-gradient(135deg, hsl(10 80% 62%) 0%, hsl(45 95% 60%) 100%);
+  .gradient-copper {
+    background: linear-gradient(135deg, hsl(25 70% 50%) 0%, hsl(40 55% 42%) 100%);
   }
 
-  .gradient-young {
-    background: linear-gradient(135deg, hsl(205 85% 55%) 0%, hsl(270 70% 60%) 100%);
+  .gradient-clay {
+    background: linear-gradient(135deg, hsl(15 40% 45%) 0%, hsl(25 60% 55%) 100%);
   }
 
-  .gradient-teen {
-    background: linear-gradient(135deg, hsl(160 50% 55%) 0%, hsl(205 85% 50%) 100%);
+  .gradient-earth {
+    background: linear-gradient(135deg, hsl(25 60% 45%) 0%, hsl(40 50% 50%) 100%);
   }
 
-  .text-shadow-playful {
-    text-shadow: 2px 2px 0px hsl(205 85% 40% / 0.15);
+  .gradient-dark {
+    background: linear-gradient(180deg, hsl(0 0% 13%) 0%, hsl(0 0% 9%) 100%);
+  }
+
+  .btn-copper {
+    @apply bg-primary text-primary-foreground rounded-xl font-display font-semibold tracking-wide;
+    box-shadow: 0 0 20px -4px hsl(25 70% 50% / 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-copper:hover {
+    box-shadow: 0 0 30px -2px hsl(25 70% 50% / 0.5);
+  }
+
+  .icon-stroke {
+    stroke: hsl(25 60% 55%);
+    stroke-width: 1.5;
+    fill: none;
   }
 
   .bounce-in {
@@ -126,23 +143,13 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
-  .wiggle {
-    animation: wiggle 0.6s ease-in-out;
-  }
-
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
-  }
-
   .float {
     animation: float 3s ease-in-out infinite;
   }
 
   @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
   }
 
   .pulse-glow {
@@ -150,7 +157,7 @@
   }
 
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 0 hsl(205 85% 50% / 0.4); }
-    50% { box-shadow: 0 0 20px 10px hsl(205 85% 50% / 0.1); }
+    0%, 100% { box-shadow: 0 0 0 0 hsl(25 70% 50% / 0.3); }
+    50% { box-shadow: 0 0 20px 6px hsl(25 70% 50% / 0.15); }
   }
 }

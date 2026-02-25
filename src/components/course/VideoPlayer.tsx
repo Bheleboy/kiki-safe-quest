@@ -10,7 +10,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title }: VideoPlayerProps) 
   const [error, setError] = useState(false);
 
   return (
-    <div className="w-full rounded-2xl overflow-hidden bg-foreground/5 aspect-video relative">
+    <div className="w-full rounded-xl overflow-hidden bg-muted aspect-video relative border border-border/40">
       {!error ? (
         <iframe
           src={videoUrl}
@@ -22,16 +22,15 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title }: VideoPlayerProps) 
         />
       ) : (
         <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center">
-          <span className="text-4xl">📺</span>
           <p className="font-body text-muted-foreground">Video couldn't load here.</p>
           {fallbackUrl && (
             <a
               href={fallbackUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-target inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-display font-bold text-primary-foreground"
+              className="touch-target inline-flex items-center gap-2 btn-copper px-6 py-3 text-sm uppercase tracking-wide"
             >
-              Watch Video ↗
+              Watch Video
             </a>
           )}
         </div>
