@@ -16,6 +16,7 @@ interface LessonViewProps {
   onNext: () => void;
   onPrev: () => void;
   onBack: () => void;
+  canAdvance: boolean;
 }
 
 export function LessonView({
@@ -28,6 +29,7 @@ export function LessonView({
   onNext,
   onPrev,
   onBack,
+  canAdvance,
 }: LessonViewProps) {
   const [showParentTip, setShowParentTip] = useState(false);
 
@@ -103,7 +105,8 @@ export function LessonView({
         </button>
         <button
           onClick={onNext}
-          className="touch-target flex items-center gap-2 btn-copper px-6 py-3 text-sm uppercase tracking-wide"
+          disabled={!canAdvance}
+          className="touch-target flex items-center gap-2 btn-copper px-6 py-3 text-sm uppercase tracking-wide disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {lessonIndex === totalLessons - 1 ? "Finish" : "Next"} <ArrowRight className="w-4 h-4" />
         </button>
