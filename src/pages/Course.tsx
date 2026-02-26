@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { ArrowLeft, LogOut, Users } from "lucide-react";
 import { courseData, type AgeStream } from "@/data/courseData";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
@@ -49,10 +49,10 @@ export default function CoursePage() {
   }, []);
 
   const handleLessonComplete = useCallback(
-    (lessonId: string, score: number, moduleId: string) => {
+    (lessonId: string, score: number, timeSeconds: number, moduleId: string) => {
       // Only persist if score >= 70%
       if (score < 70) return;
-      completeLesson(lessonId, score);
+      completeLesson(lessonId, score, timeSeconds);
       if (score === 100) earnBadge(`star-${lessonId}`);
       if (view.type === "lesson") {
         const stream = getStream(view.streamId);
@@ -89,6 +89,13 @@ export default function CoursePage() {
           <div className="flex-1">
             <SearchBar onNavigate={handleSearchNavigate} />
           </div>
+          <button
+            onClick={() => navigate("/parent")}
+            className="text-muted-foreground hover:text-foreground transition-colors p-2"
+            title="Parent Dashboard"
+          >
+            <Users className="w-5 h-5" />
+          </button>
           <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors p-2">
             <LogOut className="w-5 h-5" />
           </button>
@@ -269,8 +276,8 @@ export default function CoursePage() {
                   totalLessons={allStreamLessons.length}
                   isComplete={isLessonComplete(current.lesson.id)}
                   canAdvance={isLessonComplete(current.lesson.id)}
-                  onComplete={(score) =>
-                    handleLessonComplete(current.lesson.id, score, current.module.id)
+                  onComplete={(score, timeSeconds) =>
+                    handleLessonComplete(current.lesson.id, score, timeSeconds, current.module.id)
                   }
                   onNext={() => {
                     if (flatIndex < allStreamLessons.length - 1) {
