@@ -50,6 +50,8 @@ export default function CoursePage() {
 
   const handleLessonComplete = useCallback(
     (lessonId: string, score: number, moduleId: string) => {
+      // Only persist if score >= 70%
+      if (score < 70) return;
       completeLesson(lessonId, score);
       if (score === 100) earnBadge(`star-${lessonId}`);
       if (view.type === "lesson") {
@@ -266,6 +268,7 @@ export default function CoursePage() {
                   lessonIndex={flatIndex}
                   totalLessons={allStreamLessons.length}
                   isComplete={isLessonComplete(current.lesson.id)}
+                  canAdvance={isLessonComplete(current.lesson.id)}
                   onComplete={(score) =>
                     handleLessonComplete(current.lesson.id, score, current.module.id)
                   }
