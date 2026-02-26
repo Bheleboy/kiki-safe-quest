@@ -4,7 +4,7 @@ import { VideoPlayer } from "./VideoPlayer";
 import { NarrationToggle } from "./NarrationToggle";
 import { QuizBlock } from "./QuizBlock";
 import type { Lesson, Module } from "@/data/courseData";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface LessonViewProps {
   lesson: Lesson;
@@ -12,7 +12,7 @@ interface LessonViewProps {
   lessonIndex: number;
   totalLessons: number;
   isComplete: boolean;
-  onComplete: (score: number) => void;
+  onComplete: (score: number, timeSeconds: number) => void;
   onNext: () => void;
   onPrev: () => void;
   onBack: () => void;
@@ -32,6 +32,18 @@ export function LessonView({
   canAdvance,
 }: LessonViewProps) {
   const [showParentTip, setShowParentTip] = useState(false);
+  const startTimeRef = useRef(Date.now());
+
+  // Reset timer when lesson changes
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+  }, [lesson.id]);
+
+  const getElapsedSeconds = () => Math.round((Date.now() - startTimeRef.current) / 1000);
+
+  const handleQuizComplete = (score: number) => {
+    onComplete(score, getElapsedSeconds());
+  };
 
   return (
     <motion.div
@@ -88,7 +100,7 @@ export function LessonView({
         <h3 className="font-display text-lg font-bold text-foreground mb-3 uppercase tracking-wide">Quiz Time</h3>
         <QuizBlock
           questions={lesson.quiz}
-          onComplete={onComplete}
+          onComplete={handleQuizComplete}
           lessonId={lesson.id}
           alreadyCompleted={isComplete}
         />

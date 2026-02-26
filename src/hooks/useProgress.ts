@@ -5,6 +5,7 @@ interface ProgressState {
   completedLessons: string[];
   earnedBadges: string[];
   quizScores: Record<string, number>;
+  timeSpent: Record<string, number>;
 }
 
 export function useProgress(userId: string | undefined) {
@@ -12,10 +13,10 @@ export function useProgress(userId: string | undefined) {
     completedLessons: [],
     earnedBadges: [],
     quizScores: {},
+    timeSpent: {},
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch from DB on mount
   useEffect(() => {
     if (!userId) {
       setLoading(false);
@@ -30,29 +31,30 @@ export function useProgress(userId: string | undefined) {
 
       const completedLessons: string[] = [];
       const quizScores: Record<string, number> = {};
+      const timeSpent: Record<string, number> = {};
 
       if (progressRes.data) {
         for (const row of progressRes.data as any[]) {
           completedLessons.push(row.lesson_id);
           quizScores[row.lesson_id] = row.score;
+          timeSpent[row.lesson_id] = row.time_spent_seconds || 0;
         }
       }
 
       const earnedBadges = (badgesRes.data as any[] || []).map((b: any) => b.badge_id);
 
-      setProgress({ completedLessons, earnedBadges, quizScores });
+      setProgress({ completedLessons, earnedBadges, quizScores, timeSpent });
       setLoading(false);
     };
 
     fetchProgress();
   }, [userId]);
 
-  const completeLesson = useCallback(async (lessonId: string, score: number) => {
+  const completeLesson = useCallback(async (lessonId: string, score: number, timeSeconds?: number) => {
     if (!userId) return;
 
-    // Upsert into progress table
     await supabase.from("progress").upsert(
-      { user_id: userId, lesson_id: lessonId, score } as any,
+      { user_id: userId, lesson_id: lessonId, score, time_spent_seconds: timeSeconds || 0 } as any,
       { onConflict: "user_id,lesson_id" }
     );
 
@@ -64,6 +66,10 @@ export function useProgress(userId: string | undefined) {
       quizScores: {
         ...prev.quizScores,
         [lessonId]: Math.max(prev.quizScores[lessonId] ?? 0, score),
+      },
+      timeSpent: {
+        ...prev.timeSpent,
+        [lessonId]: (prev.timeSpent[lessonId] ?? 0) + (timeSeconds || 0),
       },
     }));
   }, [userId]);
