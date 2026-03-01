@@ -8,7 +8,7 @@ interface ProgressState {
   timeSpent: Record<string, number>;
 }
 
-export function useProgress(userId: string | undefined) {
+export function useProgress(userId: string | undefined, childId?: string | null) {
   const [progress, setProgress] = useState<ProgressState>({
     completedLessons: [],
     earnedBadges: [],
@@ -24,10 +24,15 @@ export function useProgress(userId: string | undefined) {
     }
 
     const fetchProgress = async () => {
-      const [progressRes, badgesRes] = await Promise.all([
-        supabase.from("progress").select("*").eq("user_id", userId),
-        supabase.from("badges").select("*").eq("user_id", userId),
-      ]);
+      let progressQuery = supabase.from("progress").select("*").eq("user_id", userId);
+      let badgesQuery = supabase.from("badges").select("*").eq("user_id", userId);
+
+      if (childId) {
+        progressQuery = progressQuery.eq("child_id", childId);
+        badgesQuery = badgesQuery.eq("child_id", childId);
+      }
+
+      const [progressRes, badgesRes] = await Promise.all([progressQuery, badgesQuery]);
 
       const completedLessons: string[] = [];
       const quizScores: Record<string, number> = {};
@@ -48,15 +53,20 @@ export function useProgress(userId: string | undefined) {
     };
 
     fetchProgress();
-  }, [userId]);
+  }, [userId, childId]);
 
   const completeLesson = useCallback(async (lessonId: string, score: number, timeSeconds?: number) => {
     if (!userId) return;
 
-    await supabase.from("progress").upsert(
-      { user_id: userId, lesson_id: lessonId, score, time_spent_seconds: timeSeconds || 0 } as any,
-      { onConflict: "user_id,lesson_id" }
-    );
+    const record: any = {
+      user_id: userId,
+      lesson_id: lessonId,
+      score,
+      time_spent_seconds: timeSeconds || 0,
+    };
+    if (childId) record.child_id = childId;
+
+    await supabase.from("progress").upsert(record, { onConflict: "user_id,lesson_id" });
 
     setProgress((prev) => ({
       ...prev,
@@ -72,15 +82,15 @@ export function useProgress(userId: string | undefined) {
         [lessonId]: (prev.timeSpent[lessonId] ?? 0) + (timeSeconds || 0),
       },
     }));
-  }, [userId]);
+  }, [userId, childId]);
 
   const earnBadge = useCallback(async (badgeId: string) => {
     if (!userId) return;
 
-    await supabase.from("badges").upsert(
-      { user_id: userId, badge_id: badgeId } as any,
-      { onConflict: "user_id,badge_id" }
-    );
+    const record: any = { user_id: userId, badge_id: badgeId };
+    if (childId) record.child_id = childId;
+
+    await supabase.from("badges").upsert(record, { onConflict: "user_id,badge_id" });
 
     setProgress((prev) => ({
       ...prev,
@@ -88,7 +98,7 @@ export function useProgress(userId: string | undefined) {
         ? prev.earnedBadges
         : [...prev.earnedBadges, badgeId],
     }));
-  }, [userId]);
+  }, [userId, childId]);
 
   const isLessonComplete = useCallback(
     (lessonId: string) => progress.completedLessons.includes(lessonId),

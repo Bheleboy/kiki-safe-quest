@@ -51,7 +51,7 @@ export default function ParentDashboard() {
       <header className="sticky top-0 z-50 glass-overlay border-b border-border/60 px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <button
-            onClick={() => navigate("/course")}
+            onClick={() => navigate("/family")}
             className="touch-target p-2 rounded-lg hover:bg-muted transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />

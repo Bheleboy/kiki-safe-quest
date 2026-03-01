@@ -17,21 +17,59 @@ export type Database = {
       badges: {
         Row: {
           badge_id: string
+          child_id: string | null
           earned_at: string
           id: string
           user_id: string
         }
         Insert: {
           badge_id: string
+          child_id?: string | null
           earned_at?: string
           id?: string
           user_id: string
         }
         Update: {
           badge_id?: string
+          child_id?: string | null
           earned_at?: string
           id?: string
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "badges_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      children: {
+        Row: {
+          age_band: string
+          avatar_color: string
+          created_at: string
+          first_name: string
+          id: string
+          parent_id: string
+        }
+        Insert: {
+          age_band?: string
+          avatar_color?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          parent_id: string
+        }
+        Update: {
+          age_band?: string
+          avatar_color?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          parent_id?: string
         }
         Relationships: []
       }
@@ -58,6 +96,7 @@ export type Database = {
       }
       progress: {
         Row: {
+          child_id: string | null
           completed_at: string
           id: string
           lesson_id: string
@@ -66,6 +105,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          child_id?: string | null
           completed_at?: string
           id?: string
           lesson_id: string
@@ -74,6 +114,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          child_id?: string | null
           completed_at?: string
           id?: string
           lesson_id?: string
@@ -81,7 +122,15 @@ export type Database = {
           time_spent_seconds?: number
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "progress_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

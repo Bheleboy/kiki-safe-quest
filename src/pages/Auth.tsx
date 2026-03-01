@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { z } from "zod";
 
 type Mode = "login" | "signup" | "forgot";
@@ -11,7 +11,6 @@ const signupSchema = z.object({
   firstName: z.string().trim().min(1, "Name is required").max(50),
   email: z.string().trim().email("Invalid email").max(255),
   password: z.string().min(6, "Password must be at least 6 characters").max(128),
-  ageBand: z.enum(["6-9", "10-13"]),
 });
 
 const loginSchema = z.object({
@@ -20,16 +19,22 @@ const loginSchema = z.object({
 });
 
 export default function AuthPage() {
-  const [mode, setMode] = useState<Mode>("login");
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [ageBand, setAgeBand] = useState<"6-9" | "10-13">("6-9");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const { signUp, signIn, resetPassword } = useAuth();
+  const { signUp, signIn, resetPassword, user } = useAuth();
   const navigate = useNavigate();
+
+  // If already logged in, redirect to family dashboard
+  useEffect(() => {
+    if (user) navigate("/family", { replace: true });
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,15 +44,15 @@ export default function AuthPage() {
 
     try {
       if (mode === "signup") {
-        const parsed = signupSchema.parse({ firstName, email, password, ageBand });
-        const { error: err } = await signUp(parsed.email, parsed.password, parsed.firstName, parsed.ageBand);
+        const parsed = signupSchema.parse({ firstName, email, password });
+        const { error: err } = await signUp(parsed.email, parsed.password, parsed.firstName, "parent");
         if (err) { setError(err.message); }
         else { setMessage("Check your email for a verification link!"); }
       } else if (mode === "login") {
         loginSchema.parse({ email, password });
         const { error: err } = await signIn(email.trim(), password);
         if (err) { setError(err.message); }
-        else { navigate("/course"); }
+        else { navigate("/family"); }
       } else {
         z.string().email().parse(email.trim());
         const { error: err } = await resetPassword(email.trim());
@@ -74,60 +79,39 @@ export default function AuthPage() {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-copper mb-4">
-            <ShieldIcon size={32} className="stroke-primary-foreground" />
-          </div>
+          <Link to="/" className="inline-block">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-copper mb-4">
+              <ShieldIcon size={32} className="stroke-primary-foreground" />
+            </div>
+          </Link>
           <h1 className="font-display text-3xl font-bold tracking-wide text-foreground uppercase">
             Kiki Warrior
           </h1>
           <p className="font-body text-muted-foreground text-sm mt-1">
-            Internet Safety Course
+            {mode === "signup" ? "Create your parent account" : "Internet Safety for Families"}
           </p>
         </div>
 
         {/* Card */}
         <div className="card-kiki">
           <h2 className="font-display text-xl font-semibold text-foreground uppercase tracking-wider mb-6 text-center">
-            {mode === "login" ? "Welcome Back" : mode === "signup" ? "Create Account" : "Reset Password"}
+            {mode === "login" ? "Welcome Back" : mode === "signup" ? "Parent Account" : "Reset Password"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
-              <>
-                <div>
-                  <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Your first name"
-                    className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
-                    Age Band
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(["6-9", "10-13"] as const).map((band) => (
-                      <button
-                        key={band}
-                        type="button"
-                        onClick={() => setAgeBand(band)}
-                        className={`rounded-lg border-2 px-4 py-3 font-display font-semibold text-sm tracking-wide transition-all ${
-                          ageBand === band
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-muted text-muted-foreground hover:border-primary/50"
-                        }`}
-                      >
-                        AGES {band}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
+              <div>
+                <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Your first name"
+                  className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors"
+                />
+              </div>
             )}
 
             <div>

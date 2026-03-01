@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, LogOut, Users } from "lucide-react";
+import { ArrowLeft, LogOut, Users, Home } from "lucide-react";
 import { courseData, type AgeStream } from "@/data/courseData";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
@@ -10,7 +10,8 @@ import { LessonView } from "@/components/course/LessonView";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { Certificate } from "@/components/course/Certificate";
 import { ShieldIcon, CourseIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 type View =
   | { type: "home" }
@@ -18,9 +19,34 @@ type View =
   | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number }
   | { type: "certificate"; streamId: string };
 
+interface ChildInfo {
+  id: string;
+  first_name: string;
+  age_band: string;
+}
+
 export default function CoursePage() {
   const [view, setView] = useState<View>({ type: "home" });
   const { user, profile, signOut } = useAuth();
+  const [searchParams] = useSearchParams();
+  const childId = searchParams.get("child");
+  const [child, setChild] = useState<ChildInfo | null>(null);
+  const navigate = useNavigate();
+
+  // Fetch child info
+  useEffect(() => {
+    if (!childId || !user) return;
+    supabase
+      .from("children")
+      .select("id, first_name, age_band")
+      .eq("id", childId)
+      .eq("parent_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) setChild(data as unknown as ChildInfo);
+      });
+  }, [childId, user]);
+
   const {
     progress,
     completeLesson,
@@ -28,8 +54,7 @@ export default function CoursePage() {
     isLessonComplete,
     getModuleProgress,
     isStreamComplete,
-  } = useProgress(user?.id);
-  const navigate = useNavigate();
+  } = useProgress(user?.id, childId);
 
   const getStream = (id: string) => courseData.find((s) => s.id === id)!;
 
@@ -50,7 +75,6 @@ export default function CoursePage() {
 
   const handleLessonComplete = useCallback(
     (lessonId: string, score: number, timeSeconds: number, moduleId: string) => {
-      // Only persist if score >= 70%
       if (score < 70) return;
       completeLesson(lessonId, score, timeSeconds);
       if (score === 100) earnBadge(`star-${lessonId}`);
@@ -70,10 +94,17 @@ export default function CoursePage() {
 
   const handleLogout = async () => {
     await signOut();
-    navigate("/auth");
+    navigate("/");
   };
 
-  const learnerName = profile?.first_name || "Warrior";
+  const learnerName = child?.first_name || profile?.first_name || "Warrior";
+  // Use child's age band if available, otherwise fallback
+  const ageBand = child?.age_band || profile?.age_band;
+
+  // If child has specific age band, filter to that stream
+  const filteredStreams = ageBand
+    ? courseData.filter((s) => s.id === ageBand)
+    : courseData;
 
   return (
     <div className="min-h-screen gradient-dark">
@@ -89,6 +120,13 @@ export default function CoursePage() {
           <div className="flex-1">
             <SearchBar onNavigate={handleSearchNavigate} />
           </div>
+          <button
+            onClick={() => navigate("/family")}
+            className="text-muted-foreground hover:text-foreground transition-colors p-2"
+            title="Family Hub"
+          >
+            <Home className="w-5 h-5" />
+          </button>
           <button
             onClick={() => navigate("/parent")}
             className="text-muted-foreground hover:text-foreground transition-colors p-2"
@@ -122,13 +160,15 @@ export default function CoursePage() {
                   Internet Safety
                 </h1>
                 <p className="font-body text-muted-foreground max-w-sm mx-auto">
-                  Choose your learning path to begin your journey, {learnerName}.
+                  {child
+                    ? `${learnerName}'s learning journey`
+                    : `Choose your learning path, ${learnerName}.`}
                 </p>
               </div>
 
               {/* Age Selection */}
               <div className="grid gap-4">
-                {courseData.map((stream) => {
+                {filteredStreams.map((stream) => {
                   const allIds = getAllLessonIds(stream);
                   const prog = getModuleProgress(allIds);
                   const complete = isStreamComplete(allIds);
