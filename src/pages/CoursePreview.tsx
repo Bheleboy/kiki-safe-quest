@@ -1,6 +1,6 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Award, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Award, CheckCircle, PlayCircle, ShieldCheck } from "lucide-react";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { courseData } from "@/data/courseData";
 
@@ -8,7 +8,6 @@ export default function CoursePreview() {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
-  // Only the internet-safety course is available
   if (courseId !== "internet-safety") {
     return (
       <div className="min-h-screen gradient-dark flex items-center justify-center px-4">
@@ -22,10 +21,8 @@ export default function CoursePreview() {
     );
   }
 
-  // Combine both age streams for a preview
   const youngStream = courseData.find((s) => s.id === "6-9");
   const teenStream = courseData.find((s) => s.id === "10-13");
-  const totalModules = (youngStream?.modules.length || 0) + (teenStream?.modules.length || 0);
   const totalLessons = courseData.reduce(
     (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.length, 0),
     0
@@ -50,35 +47,27 @@ export default function CoursePreview() {
             <span className="font-body text-sm">Back</span>
           </button>
           <Link to="/auth?mode=signup" className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display">
-            Sign Up Free
+            Start Free Course
           </Link>
         </div>
       </nav>
 
       <main className="max-w-4xl mx-auto px-4 py-10 space-y-12">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row gap-8 items-start"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row gap-8 items-start">
           <div className="w-20 h-20 rounded-2xl gradient-copper flex items-center justify-center shrink-0">
             <ShieldIcon size={40} className="stroke-primary-foreground" />
           </div>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <span className="bg-primary/10 text-primary font-display text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                Featured Course
-              </span>
-              <span className="bg-success/10 text-success font-display text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                Free
-              </span>
+              <span className="bg-primary/10 text-primary font-display text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">Featured Course</span>
+              <span className="bg-success/10 text-success font-display text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">Free</span>
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider">
               Internet Safety for Kids
             </h1>
             <p className="font-body text-lg text-muted-foreground leading-relaxed max-w-2xl">
-              A comprehensive, fun-filled course teaching children aged 6–13 how to stay safe, smart, and strong online. 
+              A comprehensive, fun-filled course teaching children aged 6–13 how to stay safe, smart, and strong online.
               Through animated lessons, interactive quizzes, and rewarding badges, young warriors learn essential digital safety skills.
             </p>
             <div className="flex flex-wrap gap-6 text-sm font-body text-muted-foreground">
@@ -89,16 +78,20 @@ export default function CoursePreview() {
           </div>
         </motion.div>
 
-        {/* What You'll Learn */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="card-kiki space-y-4"
-        >
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
-            What's Included
-          </h2>
+        {/* Video Placeholder */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki">
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-4">Sample Lesson Preview</h2>
+          <div className="relative w-full aspect-video bg-muted/30 rounded-lg flex items-center justify-center border border-border/40">
+            <div className="text-center space-y-3">
+              <PlayCircle className="w-16 h-16 text-primary mx-auto opacity-60" />
+              <p className="font-body text-sm text-muted-foreground">Video preview coming soon</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* What's Included */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-4">
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">What's Included</h2>
           <div className="grid md:grid-cols-2 gap-3">
             {highlights.map((h) => (
               <div key={h} className="flex items-start gap-3">
@@ -109,31 +102,30 @@ export default function CoursePreview() {
           </div>
         </motion.div>
 
+        {/* Pass Requirement */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki flex items-start gap-4">
+          <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
+          <div>
+            <h3 className="font-display text-base font-bold text-foreground uppercase tracking-wide mb-1">70% Pass Requirement</h3>
+            <p className="font-body text-sm text-muted-foreground">Children must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress through the course.</p>
+          </div>
+        </motion.div>
+
         {/* Module Preview */}
         {[youngStream, teenStream].filter(Boolean).map((stream) => (
-          <motion.div
-            key={stream!.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-4"
-          >
+          <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
             <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
               {stream!.label} — {stream!.description}
             </h2>
             <div className="grid gap-3">
-              {stream!.modules.map((mod, i) => (
+              {stream!.modules.map((mod) => (
                 <div key={mod.id} className="card-kiki flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg gradient-earth flex items-center justify-center shrink-0">
                     <span className="text-lg">{mod.emoji}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">
-                      {mod.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground font-body">
-                      {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
-                    </p>
+                    <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
+                    <p className="text-xs text-muted-foreground font-body">{mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}</p>
                   </div>
                 </div>
               ))}
@@ -141,24 +133,21 @@ export default function CoursePreview() {
           </motion.div>
         ))}
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center space-y-4 py-8"
-        >
-          <h2 className="font-display text-2xl font-bold text-foreground uppercase tracking-wider">
-            Ready to Start?
-          </h2>
-          <p className="font-body text-muted-foreground">
-            Create a free parent account and enrol your children today.
+        {/* Certificate Preview */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki text-center space-y-4">
+          <Award className="w-12 h-12 text-primary mx-auto" />
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">Completion Certificate</h2>
+          <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
+            When your child completes all modules and passes the quizzes, they receive a downloadable certificate of completion they can be proud of.
           </p>
-          <Link
-            to="/auth?mode=signup"
-            className="touch-target inline-flex items-center gap-2 btn-copper px-10 py-4 text-sm uppercase tracking-widest"
-          >
-            Create Free Account <ArrowRight className="w-4 h-4" />
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center space-y-4 py-8">
+          <h2 className="font-display text-2xl font-bold text-foreground uppercase tracking-wider">Ready to Start?</h2>
+          <p className="font-body text-muted-foreground">Create a free parent account and enrol your children today.</p>
+          <Link to="/auth?mode=signup" className="touch-target inline-flex items-center gap-2 btn-copper px-10 py-4 text-sm uppercase tracking-widest">
+            Start Free Course <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
       </main>
