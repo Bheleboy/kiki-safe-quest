@@ -27,6 +27,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { signUp, signIn, resetPassword, user } = useAuth();
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ export default function AuthPage() {
 
     try {
       if (mode === "signup") {
+        if (!consent) { setError("You must agree to the privacy policy to create an account."); setSubmitting(false); return; }
         const parsed = signupSchema.parse({ firstName, email, password });
         const { error: err } = await signUp(parsed.email, parsed.password, parsed.firstName, "parent");
         if (err) { setError(err.message); }
@@ -140,6 +142,20 @@ export default function AuthPage() {
                   className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors"
                 />
               </div>
+            )}
+
+            {mode === "signup" && (
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded border-border accent-primary"
+                />
+                <span className="font-body text-xs text-muted-foreground leading-relaxed">
+                  I agree to the collection and processing of my personal data in accordance with POPIA and GDPR. I consent to receive course-related communications.
+                </span>
+              </label>
             )}
 
             {error && (
