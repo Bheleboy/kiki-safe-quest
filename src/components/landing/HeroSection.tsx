@@ -6,16 +6,44 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background image with overlay */}
-      <div className="absolute inset-0">
+      <motion.div
+        className="absolute inset-0"
+        animate={{ scale: [1.1, 1.14, 1.1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      >
         <img
           src="/images/kiki-warrior-3d.png"
           alt=""
-          className="w-full h-full object-cover object-top scale-110"
+          className="w-full h-full object-cover object-top"
           loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
-      </div>
+      </motion.div>
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
+
+      {/* Glowing shield orb */}
+      <motion.div
+        className="absolute top-1/3 right-[20%] w-40 h-40 md:w-64 md:h-64 rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, hsl(25 70% 50% / 0.15) 0%, transparent 70%)",
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.4, 0.7, 0.4],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute top-[28%] right-[22%] w-20 h-20 md:w-32 md:h-32 rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, hsl(40 55% 42% / 0.2) 0%, transparent 70%)",
+        }}
+        animate={{
+          scale: [1.1, 0.9, 1.1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
         <div className="max-w-xl space-y-6">
