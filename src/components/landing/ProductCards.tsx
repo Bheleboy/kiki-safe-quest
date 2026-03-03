@@ -34,17 +34,17 @@ const products = [
   },
   {
     number: 3,
-    title: "Kiki Warrior Book",
-    subtitle: "Read Kiki's Armour of God",
+    title: "Kiki's Armour of God",
+    subtitle: "Available on Amazon, Kobo & Barnes & Noble",
     description:
       "A Christian themed workbook for children that teaches about the armour of God through activities, Bible verses, and prayers.",
     whatItIs: "An illustrated children's workbook available on Amazon, Kobo, and Barnes & Noble.",
     whoItsFor: "Children and parents looking for ways to understand spiritual concepts.",
-    cta: "Coming Soon",
+    cta: "Buy Now",
     link: "#",
-    active: false,
+    active: true,
     icon: <BookOpen className="w-8 h-8 text-accent" />,
-    image: null,
+    image: "/images/kiki-armour-of-god.png",
   },
 ];
 
