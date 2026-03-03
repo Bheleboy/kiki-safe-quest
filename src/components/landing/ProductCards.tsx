@@ -16,7 +16,7 @@ const products = [
     link: "/courses/internet-safety",
     active: true,
     icon: <ShieldIcon size={32} className="stroke-primary" />,
-    image: "/images/kiki-safety-warrior.png",
+    image: "/images/kiki-safety-course.png",
   },
   {
     number: 2,
@@ -86,11 +86,11 @@ export default function ProductCards() {
 
                 {/* Image area */}
                 {p.image && (
-                  <div className="relative w-full h-56 mb-6 rounded-2xl overflow-hidden bg-muted/30">
+                  <div className="relative w-full h-64 mb-6 rounded-2xl overflow-hidden bg-muted/30">
                     <img
                       src={p.image}
                       alt={p.title}
-                      className="w-full h-full object-cover object-top rounded-2xl"
+                      className="w-full h-full object-cover object-center rounded-2xl"
                       loading="lazy"
                     />
                     {!p.active && (
