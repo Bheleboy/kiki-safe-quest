@@ -18,14 +18,14 @@ export default function HeroSection() {
           loading="eager"
         />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
 
       {/* Glowing shield orb */}
       <motion.div
         className="absolute top-1/3 right-[20%] w-40 h-40 md:w-64 md:h-64 rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, hsl(25 70% 50% / 0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, hsl(25 85% 55% / 0.12) 0%, transparent 70%)",
         }}
         animate={{
           scale: [1, 1.2, 1],
@@ -36,7 +36,7 @@ export default function HeroSection() {
       <motion.div
         className="absolute top-[28%] right-[22%] w-20 h-20 md:w-32 md:h-32 rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, hsl(40 55% 42% / 0.2) 0%, transparent 70%)",
+          background: "radial-gradient(circle, hsl(40 70% 52% / 0.15) 0%, transparent 70%)",
         }}
         animate={{
           scale: [1.1, 0.9, 1.1],
