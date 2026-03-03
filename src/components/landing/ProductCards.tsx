@@ -86,11 +86,11 @@ export default function ProductCards() {
 
                 {/* Image area */}
                 {p.image && (
-                  <div className="relative w-full h-48 mb-6 rounded-lg overflow-hidden bg-muted/30">
+                  <div className="relative w-full h-56 mb-6 rounded-2xl overflow-hidden bg-muted/30">
                     <img
                       src={p.image}
                       alt={p.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top rounded-2xl"
                       loading="lazy"
                     />
                     {!p.active && (
