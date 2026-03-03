@@ -16,7 +16,7 @@ const products = [
     link: "/courses/internet-safety",
     active: true,
     icon: <ShieldIcon size={32} className="stroke-primary" />,
-    image: "/images/hero-warrior.png",
+    image: "/images/kiki-safety-warrior.png",
   },
   {
     number: 2,
