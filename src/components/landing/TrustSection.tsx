@@ -28,8 +28,8 @@ export default function TrustSection() {
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {items.map((item) => (
-              <div key={item.text} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                <div className="text-success">{item.icon}</div>
+              <div key={item.text} className="flex items-center gap-3 p-3 rounded-lg bg-trust/5 border border-trust/10">
+                <div className="text-trust">{item.icon}</div>
                 <span className="font-body text-sm text-foreground">{item.text}</span>
               </div>
             ))}

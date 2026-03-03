@@ -71,6 +71,10 @@ export default {
           DEFAULT: "hsl(var(--clay))",
           foreground: "hsl(var(--clay-foreground))",
         },
+        trust: {
+          DEFAULT: "hsl(var(--trust))",
+          foreground: "hsl(var(--trust-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
