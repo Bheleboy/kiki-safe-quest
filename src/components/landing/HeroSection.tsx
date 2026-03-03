@@ -87,7 +87,7 @@ export default function HeroSection() {
             </Link>
             <Link
               to="/auth?mode=signup"
-              className="touch-target inline-flex items-center gap-2 border border-border rounded-xl px-8 py-4 text-sm font-display uppercase tracking-widest text-foreground hover:bg-muted transition-colors"
+              className="touch-target inline-flex items-center gap-2 bg-foreground text-primary-foreground rounded-xl px-8 py-4 text-sm font-display uppercase tracking-widest hover:bg-foreground/90 transition-colors"
             >
               Create Parent Account
             </Link>
