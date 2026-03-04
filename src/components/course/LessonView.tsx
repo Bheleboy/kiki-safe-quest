@@ -49,7 +49,7 @@ export function LessonView({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-5 pb-24"
+      className="space-y-5"
     >
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -106,8 +106,8 @@ export function LessonView({
         />
       </div>
 
-      {/* Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 glass-overlay border-t border-border/60 p-4 flex items-center justify-between z-40">
+      {/* Navigation - inline instead of fixed */}
+      <div className="border-t border-border/40 pt-4 mt-6 flex items-center justify-between">
         <button
           onClick={onPrev}
           disabled={lessonIndex === 0}
