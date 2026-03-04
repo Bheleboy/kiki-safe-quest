@@ -35,8 +35,8 @@ export function LessonSidebar({
             <div key={mod.id} className="space-y-1.5">
               {/* Module header */}
               <div className="flex items-center gap-2 px-2 py-1">
-                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center shrink-0">
-                  <CourseIcon name={mod.icon || "shield"} size={14} className="stroke-primary" />
+                <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
+                  <CourseIcon name={mod.icon || "shield"} size={14} className="stroke-primary-foreground" />
                 </div>
                 <span className="font-display text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">
                   {mod.title}
