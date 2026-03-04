@@ -7,22 +7,21 @@ export default function HeroSection() {
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background image with overlay */}
       <motion.div
-        className="absolute inset-0"
+        className="absolute inset-0 scale-125 md:scale-110 origin-center"
         animate={{ 
-          scale: [1.05, 1.12, 1.05],
-          rotate: [0, 1.5, 0],
+          scale: [1.25, 1.35, 1.25],
         }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
         <img
           src="/images/kiki-warrior-3d.png"
           alt=""
-          className="w-full h-full object-contain object-center"
+          className="w-full h-full object-cover object-[center_20%]"
           loading="eager"
         />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/30 to-background" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/50 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-background/20" />
 
       {/* Glowing shield orb */}
       <motion.div
