@@ -81,7 +81,7 @@ export default function CoursePreview() {
 
         {/* Video Placeholder */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-1">Sample Lesson Preview</h2>
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-1">Why We Use the Internet</h2>
           <VideoPlayer
             videoUrl="https://www.youtube.com/embed/xCEpBjb7_bE"
             fallbackUrl="https://www.youtube.com/watch?v=xCEpBjb7_bE"
