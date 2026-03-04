@@ -120,8 +120,8 @@ export default function CoursePreview() {
             <div className="grid gap-3">
               {stream!.modules.map((mod) => (
                 <div key={mod.id} className="card-kiki flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg gradient-earth flex items-center justify-center shrink-0">
-                    <span className="text-lg">{mod.emoji}</span>
+                  <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                    <span className="text-lg text-primary-foreground">{mod.emoji}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
