@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, BookOpen, Clock, Award, CheckCircle, PlayCircle, ShieldCheck } from "lucide-react";
-import { ShieldIcon } from "@/components/course/CourseIcons";
+import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import { courseData } from "@/data/courseData";
 
 export default function CoursePreview() {
@@ -121,7 +121,7 @@ export default function CoursePreview() {
               {stream!.modules.map((mod) => (
                 <div key={mod.id} className="card-kiki flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                    <span className="text-lg text-primary-foreground">{mod.emoji}</span>
+                    <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
