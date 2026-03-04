@@ -31,7 +31,7 @@ export default function Navbar() {
                 Sign In
               </Link>
               <Link
-                to="/auth?mode=signup"
+                to="/courses/internet-safety"
                 className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display"
               >
                 Try Free
