@@ -7,6 +7,7 @@ import { useProgress } from "@/hooks/useProgress";
 import { SearchBar } from "@/components/course/SearchBar";
 import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
+import { LessonSidebar } from "@/components/course/LessonSidebar";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { Certificate } from "@/components/course/Certificate";
 import { ShieldIcon, CourseIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
@@ -110,7 +111,7 @@ export default function CoursePage() {
     <div className="min-h-screen gradient-dark">
       {/* Top Bar */}
       <header className="sticky top-0 z-50 glass-overlay border-b border-border/60 px-4 py-3">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
+        <div className={`mx-auto flex items-center gap-3 ${view.type === "lesson" ? "max-w-7xl" : "max-w-2xl"}`}>
           <div className="flex items-center gap-2 shrink-0">
             <ShieldIcon size={24} className="stroke-primary" />
             <span className="font-display font-bold text-sm text-foreground uppercase tracking-wider hidden sm:inline">
@@ -140,7 +141,7 @@ export default function CoursePage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
+      <main className={`mx-auto px-4 py-6 ${view.type === "lesson" ? "max-w-7xl" : "max-w-2xl"}`}>
         <AnimatePresence mode="wait">
           {/* HOME */}
           {view.type === "home" && (
@@ -288,7 +289,7 @@ export default function CoursePage() {
             );
           })()}
 
-          {/* LESSON VIEW */}
+          {/* LESSON VIEW — 3-column layout */}
           {view.type === "lesson" && (() => {
             const stream = getStream(view.streamId);
             const mod = stream.modules.find((m) => m.id === view.moduleId)!;
@@ -302,49 +303,85 @@ export default function CoursePage() {
 
             if (!current) return null;
 
+            const handleSelectLesson = (moduleId: string, lessonIndex: number) => {
+              setView({
+                type: "lesson",
+                streamId: view.streamId,
+                moduleId,
+                lessonIndex,
+              });
+            };
+
             return (
               <motion.div
                 key={`lesson-${current.lesson.id}`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex gap-6"
               >
-                <LessonView
-                  lesson={current.lesson}
-                  module={current.module}
-                  lessonIndex={flatIndex}
-                  totalLessons={allStreamLessons.length}
-                  isComplete={isLessonComplete(current.lesson.id)}
-                  canAdvance={isLessonComplete(current.lesson.id)}
-                  onComplete={(score, timeSeconds) =>
-                    handleLessonComplete(current.lesson.id, score, timeSeconds, current.module.id)
-                  }
-                  onNext={() => {
-                    if (flatIndex < allStreamLessons.length - 1) {
-                      const next = allStreamLessons[flatIndex + 1];
-                      setView({
-                        type: "lesson",
-                        streamId: view.streamId,
-                        moduleId: next.module.id,
-                        lessonIndex: next.module.lessons.indexOf(next.lesson),
-                      });
-                    } else {
-                      setView({ type: "stream", streamId: view.streamId });
+                {/* Left column — back to modules */}
+                <div className="hidden lg:block w-48 shrink-0 pt-2">
+                  <button
+                    onClick={() => setView({ type: "stream", streamId: view.streamId })}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-display uppercase tracking-wide"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to modules
+                  </button>
+                </div>
+
+                {/* Center — lesson content */}
+                <div className="flex-1 min-w-0">
+                  <LessonView
+                    lesson={current.lesson}
+                    module={current.module}
+                    lessonIndex={flatIndex}
+                    totalLessons={allStreamLessons.length}
+                    isComplete={isLessonComplete(current.lesson.id)}
+                    canAdvance={isLessonComplete(current.lesson.id)}
+                    onComplete={(score, timeSeconds) =>
+                      handleLessonComplete(current.lesson.id, score, timeSeconds, current.module.id)
                     }
-                  }}
-                  onPrev={() => {
-                    if (flatIndex > 0) {
-                      const prev = allStreamLessons[flatIndex - 1];
-                      setView({
-                        type: "lesson",
-                        streamId: view.streamId,
-                        moduleId: prev.module.id,
-                        lessonIndex: prev.module.lessons.indexOf(prev.lesson),
-                      });
-                    }
-                  }}
-                  onBack={() => setView({ type: "stream", streamId: view.streamId })}
-                />
+                    onNext={() => {
+                      if (flatIndex < allStreamLessons.length - 1) {
+                        const next = allStreamLessons[flatIndex + 1];
+                        setView({
+                          type: "lesson",
+                          streamId: view.streamId,
+                          moduleId: next.module.id,
+                          lessonIndex: next.module.lessons.indexOf(next.lesson),
+                        });
+                      } else {
+                        setView({ type: "stream", streamId: view.streamId });
+                      }
+                    }}
+                    onPrev={() => {
+                      if (flatIndex > 0) {
+                        const prev = allStreamLessons[flatIndex - 1];
+                        setView({
+                          type: "lesson",
+                          streamId: view.streamId,
+                          moduleId: prev.module.id,
+                          lessonIndex: prev.module.lessons.indexOf(prev.lesson),
+                        });
+                      }
+                    }}
+                    onBack={() => setView({ type: "stream", streamId: view.streamId })}
+                  />
+                </div>
+
+                {/* Right column — lesson sidebar */}
+                <div className="hidden lg:block w-80 shrink-0">
+                  <div className="sticky top-20 card-kiki p-0 overflow-hidden max-h-[calc(100vh-6rem)]">
+                    <LessonSidebar
+                      stream={stream}
+                      currentLessonId={current.lesson.id}
+                      isLessonComplete={isLessonComplete}
+                      onSelectLesson={handleSelectLesson}
+                    />
+                  </div>
+                </div>
               </motion.div>
             );
           })()}
