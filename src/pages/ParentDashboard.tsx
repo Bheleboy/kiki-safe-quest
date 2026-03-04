@@ -3,6 +3,7 @@ import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2 } fro
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { courseData } from "@/data/courseData";
+import { CourseIcon } from "@/components/course/CourseIcons";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { useNavigate } from "react-router-dom";
 
@@ -136,8 +137,8 @@ export default function ParentDashboard() {
                 <div key={mod.id} className="card-kiki space-y-4">
                   {/* Module Header */}
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg gradient-copper flex items-center justify-center shrink-0">
-                      <span className="text-lg">{mod.emoji}</span>
+                    <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                      <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display text-base font-bold text-foreground uppercase tracking-wide truncate">
