@@ -1,7 +1,8 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Award, CheckCircle, PlayCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Award, CheckCircle, ShieldCheck } from "lucide-react";
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
+import { VideoPlayer } from "@/components/course/VideoPlayer";
 import { courseData } from "@/data/courseData";
 
 export default function CoursePreview() {
@@ -79,14 +80,14 @@ export default function CoursePreview() {
         </motion.div>
 
         {/* Video Placeholder */}
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki">
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-4">Sample Lesson Preview</h2>
-          <div className="relative w-full aspect-video bg-muted/30 rounded-lg flex items-center justify-center border border-border/40">
-            <div className="text-center space-y-3">
-              <PlayCircle className="w-16 h-16 text-primary mx-auto opacity-60" />
-              <p className="font-body text-sm text-muted-foreground">Video preview coming soon</p>
-            </div>
-          </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-1">Sample Lesson Preview</h2>
+          <VideoPlayer
+            videoUrl="https://www.youtube.com/embed/xCEpBjb7_bE"
+            fallbackUrl="https://www.youtube.com/watch?v=xCEpBjb7_bE"
+            title="Making the Internet Safe for Children – UNICEF"
+            videoCredit="UNICEF · Making the Internet Safe for Children"
+          />
         </motion.div>
 
         {/* What's Included */}
