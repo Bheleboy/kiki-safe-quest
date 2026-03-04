@@ -23,8 +23,8 @@ export function ModuleCard({ module, index, progress, onClick }: ModuleCardProps
       className="w-full card-kiki text-left hover:border-primary/40 active:scale-[0.99] transition-all group"
     >
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
-          <CourseIcon name={module.icon || "shield"} size={24} />
+        <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center shrink-0">
+          <CourseIcon name={module.icon || "shield"} size={24} className="stroke-primary-foreground" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">

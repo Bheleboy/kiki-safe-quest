@@ -132,7 +132,7 @@
   }
 
   .icon-stroke {
-    stroke: hsl(25 60% 55%);
+    stroke: currentColor;
     stroke-width: 1.5;
     fill: none;
   }
