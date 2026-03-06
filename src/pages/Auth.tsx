@@ -28,6 +28,7 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [consent, setConsent] = useState(false);
+  const [guardianConsent, setGuardianConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { signUp, signIn, resetPassword, user } = useAuth();
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ export default function AuthPage() {
 
     try {
       if (mode === "signup") {
-        if (!consent) { setError("You must agree to the privacy policy to create an account."); setSubmitting(false); return; }
+        if (!consent || !guardianConsent) { setError("You must confirm both checkboxes to create an account."); setSubmitting(false); return; }
         const parsed = signupSchema.parse({ firstName, email, password });
         const { error: err } = await signUp(parsed.email, parsed.password, parsed.firstName, "parent");
         if (err) { setError(err.message); }
@@ -147,17 +148,38 @@ export default function AuthPage() {
             )}
 
             {mode === "signup" && (
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-1 w-4 h-4 rounded border-border accent-primary"
-                />
-                <span className="font-body text-xs text-muted-foreground leading-relaxed">
-                  I agree to the collection and processing of my personal data in accordance with POPIA and GDPR. I consent to receive course-related communications.
-                </span>
-              </label>
+              <div className="space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={guardianConsent}
+                    onChange={(e) => setGuardianConsent(e.target.checked)}
+                    className="mt-1 w-4 h-4 shrink-0 rounded border-border accent-primary"
+                  />
+                  <span className="font-body text-xs text-muted-foreground leading-relaxed">
+                    I confirm that I am the parent or legal guardian of the minor(s) for whom I am creating sub-accounts. I understand that I am solely responsible for overseeing their use of this platform, including all content accessed and data shared. I accept full responsibility for the safety and conduct of the minors under my care while using this service.
+                  </span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                    className="mt-1 w-4 h-4 shrink-0 rounded border-border accent-primary"
+                  />
+                  <span className="font-body text-xs text-muted-foreground leading-relaxed">
+                    I agree to the collection and processing of personal data (including that of the minors in my care) in accordance with the{" "}
+                    <a href="https://popia.co.za" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                      Protection of Personal Information Act (POPIA)
+                    </a>{" "}
+                    and the{" "}
+                    <a href="https://gdpr.eu" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                      General Data Protection Regulation (GDPR)
+                    </a>
+                    . I consent to receive course-related communications.
+                  </span>
+                </label>
+              </div>
             )}
 
             {error && (
