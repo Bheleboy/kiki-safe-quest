@@ -34,6 +34,12 @@ export default function FooterSection() {
               <Link to="/auth" className="block font-body text-xs text-muted-foreground hover:text-foreground transition-colors">
                 Sign In
               </Link>
+              <Link to="/privacy" className="block font-body text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="block font-body text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Terms of Service
+              </Link>
             </div>
           </div>
 
