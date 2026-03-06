@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import BookArmourOfGod from "./pages/BookArmourOfGod";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
 
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CookieConsent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
