@@ -1,16 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
-import { Plus, Trash2, ArrowRight, LogOut, Users } from "lucide-react";
+import { Plus, Trash2, ArrowRight, LogOut, Users, BookOpen, ExternalLink } from "lucide-react";
 
 interface Child {
   id: string;
   first_name: string;
   age_band: string;
   avatar_color: string;
+}
+
+interface BookPurchase {
+  id: string;
+  book_id: string;
+  book_title: string;
+  store_name: string;
+  store_url: string;
+  purchased_at: string;
 }
 
 const AVATAR_COLORS = [
@@ -26,6 +35,7 @@ export default function ManageChildren() {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [children, setChildren] = useState<Child[]>([]);
+  const [bookPurchases, setBookPurchases] = useState<BookPurchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState("");
@@ -43,9 +53,20 @@ export default function ManageChildren() {
     setLoading(false);
   }, [user]);
 
+  const fetchBookPurchases = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("book_purchases")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("purchased_at", { ascending: false });
+    if (data) setBookPurchases(data as unknown as BookPurchase[]);
+  }, [user]);
+
   useEffect(() => {
     fetchChildren();
-  }, [fetchChildren]);
+    fetchBookPurchases();
+  }, [fetchChildren, fetchBookPurchases]);
 
   const addChild = async () => {
     if (!user || !newName.trim()) return;
@@ -242,6 +263,58 @@ export default function ManageChildren() {
             <Plus className="w-5 h-5" />
             <span className="font-display text-sm uppercase tracking-widest">Add Child</span>
           </motion.button>
+        )}
+
+        {/* My Books */}
+        {bookPurchases.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mt-8">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-primary" />
+              <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">My Books</h2>
+            </div>
+            <div className="grid gap-3">
+              {/* Group by book */}
+              {Array.from(new Set(bookPurchases.map((p) => p.book_id))).map((bookId) => {
+                const purchases = bookPurchases.filter((p) => p.book_id === bookId);
+                const title = purchases[0].book_title;
+                return (
+                  <div key={bookId} className="card-kiki space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <BookOpen className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display text-sm font-bold text-foreground uppercase tracking-wide truncate">{title}</h3>
+                        <p className="text-xs text-muted-foreground font-body">
+                          Purchased from {purchases.length} store{purchases.length > 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <Link
+                        to={`/books/${bookId}`}
+                        className="text-xs text-primary hover:underline font-display uppercase tracking-wide"
+                      >
+                        View
+                      </Link>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {purchases.map((p) => (
+                        <a
+                          key={p.id}
+                          href={p.store_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted border border-border text-xs font-display uppercase tracking-wide text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                        >
+                          {p.store_name}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
         )}
       </main>
     </div>

@@ -1,6 +1,13 @@
-import { Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, ExternalLink, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+
+const BOOK_ID = "armour-of-god";
+const BOOK_TITLE = "Kiki's Armour of God";
 
 const bookLinks = [
   {
@@ -51,15 +58,68 @@ const armourComponents = [
 ];
 
 export default function BookArmourOfGod() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [purchasedStores, setPurchasedStores] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("book_purchases")
+        .select("store_name")
+        .eq("user_id", user.id)
+        .eq("book_id", BOOK_ID)
+        .then(({ data }) => {
+          if (data) setPurchasedStores(data.map((d) => d.store_name));
+        });
+    }
+  }, [user]);
+
+  const handleBuyClick = async (storeName: string, storeUrl: string) => {
+    if (!user) {
+      toast({
+        title: "Account required",
+        description: "Please sign in or create an account to purchase this book.",
+      });
+      navigate("/auth", { state: { returnTo: "/books/armour-of-god" } });
+      return;
+    }
+
+    // Save bookmark if not already saved for this store
+    if (!purchasedStores.includes(storeName)) {
+      await supabase.from("book_purchases").insert({
+        user_id: user.id,
+        book_id: BOOK_ID,
+        book_title: BOOK_TITLE,
+        store_name: storeName,
+        store_url: storeUrl,
+      });
+      setPurchasedStores((prev) => [...prev, storeName]);
+    }
+
+    // Open external store
+    window.open(storeUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
       <nav className="border-b border-border/60 bg-card/80 backdrop-blur-sm sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="font-display uppercase tracking-wide">Back to Home</span>
           </Link>
+          {user && purchasedStores.length > 0 && (
+            <Link
+              to="/family"
+              className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="font-display uppercase tracking-wide text-xs">My Books</span>
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -126,25 +186,30 @@ export default function BookArmourOfGod() {
             <div className="space-y-3">
               <h2 className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Get Your Copy</h2>
               <div className="grid grid-cols-2 gap-3">
-                {bookLinks.map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="card-kiki flex items-center gap-3 p-4 hover:border-primary/60 hover:shadow-md transition-all group"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
-                      {link.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="font-display text-xs font-bold text-foreground uppercase tracking-wide block truncate">{link.name}</span>
-                      <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                        Buy Now <ExternalLink className="w-2.5 h-2.5" />
-                      </span>
-                    </div>
-                  </a>
-                ))}
+                {bookLinks.map((link) => {
+                  const alreadyPurchased = purchasedStores.includes(link.name);
+                  return (
+                    <button
+                      key={link.name}
+                      onClick={() => handleBuyClick(link.name, link.url)}
+                      className="card-kiki flex items-center gap-3 p-4 hover:border-primary/60 hover:shadow-md transition-all group text-left"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
+                        {link.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="font-display text-xs font-bold text-foreground uppercase tracking-wide block truncate">{link.name}</span>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          {alreadyPurchased ? (
+                            <>Saved <BookOpen className="w-2.5 h-2.5" /></>
+                          ) : (
+                            <>Buy Now <ExternalLink className="w-2.5 h-2.5" /></>
+                          )}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
