@@ -169,12 +169,19 @@ export default function AuthPage() {
                   />
                   <span className="font-body text-xs text-muted-foreground leading-relaxed">
                     I agree to the collection and processing of personal data (including that of the minors in my care) in accordance with the{" "}
-                    <a href="https://popia.co.za" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
-                      Protection of Personal Information Act (POPIA)
-                    </a>{" "}
+                    <Link to="/privacy" target="_blank" className="text-primary hover:underline font-semibold">
+                      Privacy Policy
+                    </Link>{" "}
                     and the{" "}
-                    <a href="https://gdpr.eu" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
-                      General Data Protection Regulation (GDPR)
+                    <Link to="/terms" target="_blank" className="text-primary hover:underline font-semibold">
+                      Terms of Service
+                    </Link>
+                    , which incorporate our obligations under{" "}
+                    <a href="https://popia.co.za" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      POPIA
+                    </a>{" "}and{" "}
+                    <a href="https://gdpr.eu" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      GDPR
                     </a>
                     . I consent to receive course-related communications.
                   </span>
