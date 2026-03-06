@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { ShieldIcon } from "@/components/course/CourseIcons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -10,16 +10,38 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const { updatePassword } = useAuth();
+  const [isRecovery, setIsRecovery] = useState(false);
+  const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for recovery token in URL hash
+    // Listen for PASSWORD_RECOVERY event from Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setIsRecovery(true);
+          setChecking(false);
+        }
+      }
+    );
+
+    // Also check hash for type=recovery (fallback)
     const hash = window.location.hash;
-    if (!hash.includes("type=recovery")) {
-      navigate("/auth");
+    if (hash.includes("type=recovery")) {
+      setIsRecovery(true);
+      setChecking(false);
     }
-  }, [navigate]);
+
+    // Give it a moment to process the token, then stop checking
+    const timeout = setTimeout(() => {
+      setChecking(false);
+    }, 3000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,11 +50,34 @@ export default function ResetPasswordPage() {
     if (password !== confirm) { setError("Passwords do not match"); return; }
 
     setSubmitting(true);
-    const { error: err } = await updatePassword(password);
+    const { error: err } = await supabase.auth.updateUser({ password });
     if (err) { setError(err.message); }
-    else { setSuccess(true); setTimeout(() => navigate("/course"), 2000); }
+    else { setSuccess(true); setTimeout(() => navigate("/family"), 2000); }
     setSubmitting(false);
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isRecovery) {
+    return (
+      <div className="min-h-screen gradient-dark flex items-center justify-center px-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md text-center">
+          <div className="card-kiki py-8 space-y-4">
+            <p className="font-body text-foreground">This password reset link is invalid or has expired.</p>
+            <Link to="/auth" className="btn-copper inline-block px-6 py-3 text-sm uppercase tracking-widest">
+              Back to Sign In
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-dark flex items-center justify-center px-4">
