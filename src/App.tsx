@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import ManageChildren from "./pages/ManageChildren";
 import NotFound from "./pages/NotFound";
+import BookArmourOfGod from "./pages/BookArmourOfGod";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/courses/:courseId" element={<CoursePreview />} />
+          <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
 
           {/* Protected */}
           <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />

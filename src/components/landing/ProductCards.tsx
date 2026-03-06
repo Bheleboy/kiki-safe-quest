@@ -41,7 +41,7 @@ const products = [
     whatItIs: "An illustrated children's workbook available on Amazon, Kobo, and Barnes & Noble.",
     whoItsFor: "Children and parents looking for ways to understand spiritual concepts.",
     cta: "Buy Now",
-    link: "#",
+    link: "/books/armour-of-god",
     active: true,
     icon: <BookOpen className="w-8 h-8 text-accent" />,
     image: "/images/kiki-armour-of-god.png",
