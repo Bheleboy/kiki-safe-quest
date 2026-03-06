@@ -14,6 +14,8 @@ import ParentDashboard from "./pages/ParentDashboard";
 import ManageChildren from "./pages/ManageChildren";
 import NotFound from "./pages/NotFound";
 import BookArmourOfGod from "./pages/BookArmourOfGod";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,8 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/courses/:courseId" element={<CoursePreview />} />
           <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
 
           {/* Protected */}
           <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
