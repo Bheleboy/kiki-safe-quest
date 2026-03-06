@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
 import { z } from "zod";
 
 type Mode = "login" | "signup" | "forgot";
@@ -31,11 +31,13 @@ export default function AuthPage() {
   const [submitting, setSubmitting] = useState(false);
   const { signUp, signIn, resetPassword, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as any)?.returnTo || "/family";
 
-  // If already logged in, redirect to family dashboard
+  // If already logged in, redirect
   useEffect(() => {
-    if (user) navigate("/family", { replace: true });
-  }, [user, navigate]);
+    if (user) navigate(returnTo, { replace: true });
+  }, [user, navigate, returnTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +56,7 @@ export default function AuthPage() {
         loginSchema.parse({ email, password });
         const { error: err } = await signIn(email.trim(), password);
         if (err) { setError(err.message); }
-        else { navigate("/family"); }
+        else { navigate(returnTo); }
       } else {
         z.string().email().parse(email.trim());
         const { error: err } = await resetPassword(email.trim());

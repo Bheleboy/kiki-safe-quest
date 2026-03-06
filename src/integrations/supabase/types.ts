@@ -46,6 +46,36 @@ export type Database = {
           },
         ]
       }
+      book_purchases: {
+        Row: {
+          book_id: string
+          book_title: string
+          id: string
+          purchased_at: string
+          store_name: string
+          store_url: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          book_title: string
+          id?: string
+          purchased_at?: string
+          store_name: string
+          store_url: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          book_title?: string
+          id?: string
+          purchased_at?: string
+          store_name?: string
+          store_url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       children: {
         Row: {
           age_band: string
