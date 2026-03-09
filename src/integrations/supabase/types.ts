@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      armour_pieces: {
+        Row: {
+          child_id: string | null
+          course_id: string
+          earned_at: string
+          id: string
+          piece_id: string
+          user_id: string
+        }
+        Insert: {
+          child_id?: string | null
+          course_id?: string
+          earned_at?: string
+          id?: string
+          piece_id: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string | null
+          course_id?: string
+          earned_at?: string
+          id?: string
+          piece_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "armour_pieces_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           badge_id: string

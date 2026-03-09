@@ -1,17 +1,21 @@
 import { motion } from "framer-motion";
 import { ProgressBar } from "./ProgressBar";
 import { CourseIcon } from "./CourseIcons";
+import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import type { Module } from "@/data/courseData";
+import type { ArmourPiece } from "@/data/armourData";
 import { CheckCircle } from "lucide-react";
 
 interface ModuleCardProps {
   module: Module;
   index: number;
   progress: number;
+  armourPiece?: ArmourPiece;
+  armourEarned?: boolean;
   onClick: () => void;
 }
 
-export function ModuleCard({ module, index, progress, onClick }: ModuleCardProps) {
+export function ModuleCard({ module, index, progress, armourPiece, armourEarned, onClick }: ModuleCardProps) {
   const isComplete = progress === 1;
 
   return (
@@ -36,6 +40,19 @@ export function ModuleCard({ module, index, progress, onClick }: ModuleCardProps
           <p className="text-xs text-muted-foreground font-body mt-1">
             {module.lessons.length} lesson{module.lessons.length !== 1 ? "s" : ""}
           </p>
+
+          {/* Armour piece indicator */}
+          {armourPiece && (
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <ArmourPieceIcon pieceId={armourPiece.id} earned={armourEarned} size={16} />
+              <span className={`font-display text-[10px] uppercase tracking-wide font-medium ${
+                armourEarned ? "text-primary" : "text-muted-foreground/60"
+              }`}>
+                {armourEarned ? `${armourPiece.name} ✓` : `Unlocks ${armourPiece.name}`}
+              </span>
+            </div>
+          )}
+
           <div className="mt-2">
             <ProgressBar progress={progress} />
           </div>
