@@ -20,14 +20,19 @@ export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConv
       animate={{ opacity: 1, y: 0 }}
       className="card-kiki space-y-6 border-primary/30 bg-gradient-to-b from-primary/5 to-card"
     >
-      {/* Earned pieces */}
-      <div className="text-center space-y-3">
+      {/* Kiki Warrior with earned armour */}
+      <div className="flex flex-col items-center space-y-3">
+        <KikiWarriorAvatar earnedPieces={earnedPieces} size="md" showLabel={false} />
         <p className="font-display text-sm text-primary uppercase tracking-widest font-medium">
           Congratulations, {learnerName}!
         </p>
         <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
           3 Armour Pieces Earned!
         </h3>
+      </div>
+
+      {/* Earned pieces */}
+      <div className="text-center space-y-3">
         <div className="flex justify-center gap-4">
           {ONLINE_SAFETY_PIECES.map((piece) => (
             <div key={piece.id} className="text-center space-y-1">
