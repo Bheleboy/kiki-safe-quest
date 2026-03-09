@@ -8,7 +8,6 @@ import { ProgressBar } from "@/components/course/ProgressBar";
 import { ShieldIcon, StarIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
-import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { LogOut } from "lucide-react";
 
 export default function DashboardPage() {
