@@ -2,17 +2,20 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
+import { useArmour } from "@/hooks/useArmour";
 import { courseData } from "@/data/courseData";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { ShieldIcon, StarIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
+import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { LogOut } from "lucide-react";
 
 export default function DashboardPage() {
   const { user, profile, signOut } = useAuth();
   const { progress, loading } = useProgress(user?.id);
+  const { earnedPieces, loading: armourLoading, getPieceProgress } = useArmour(user?.id);
   const navigate = useNavigate();
 
-  if (loading) {
+  if (loading || armourLoading) {
     return (
       <div className="min-h-screen gradient-dark flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -28,6 +31,13 @@ export default function DashboardPage() {
   const overallProgress = totalLessons > 0 ? completedCount / totalLessons : 0;
   const totalStars = progress.earnedBadges.filter((b) => b.startsWith("star-")).length;
 
+  const pieceProgress = Object.fromEntries(
+    ["belt-of-truth", "shield-of-faith", "helmet-of-salvation"].map((id) => [
+      id,
+      getPieceProgress(id, ageBand, progress.completedLessons),
+    ])
+  );
+
   const handleLogout = async () => {
     await signOut();
     navigate("/auth");
@@ -35,7 +45,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen gradient-dark">
-      {/* Header */}
       <header className="border-b border-border/60 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -51,7 +60,6 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-        {/* Welcome */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display text-3xl font-bold text-foreground uppercase tracking-wide">
             Welcome, {profile?.first_name || "Warrior"}
@@ -77,6 +85,11 @@ export default function DashboardPage() {
             <p className="font-display text-2xl font-bold text-foreground">{completedCount}</p>
             <p className="font-body text-xs text-muted-foreground">Lessons</p>
           </div>
+        </div>
+
+        {/* Armour Collection */}
+        <div className="card-kiki">
+          <ArmourCollection earnedPieces={earnedPieces} pieceProgress={pieceProgress} />
         </div>
 
         {/* Resume */}

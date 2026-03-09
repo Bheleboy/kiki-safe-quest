@@ -4,6 +4,8 @@ import { ArrowLeft, LogOut, Users, Home } from "lucide-react";
 import { courseData, type AgeStream } from "@/data/courseData";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
+import { useArmour } from "@/hooks/useArmour";
+import { getArmourPieceForModule } from "@/data/armourData";
 import { SearchBar } from "@/components/course/SearchBar";
 import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
@@ -11,6 +13,10 @@ import { LessonSidebar } from "@/components/course/LessonSidebar";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { Certificate } from "@/components/course/Certificate";
 import { ShieldIcon, CourseIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
+import { ArmourCollection } from "@/components/armour/ArmourCollection";
+import { ArmourUnlockModal } from "@/components/armour/ArmourUnlockModal";
+import { ArmourConversionScreen } from "@/components/armour/ArmourConversionScreen";
+import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,6 +39,7 @@ export default function CoursePage() {
   const childId = searchParams.get("child");
   const [child, setChild] = useState<ChildInfo | null>(null);
   const navigate = useNavigate();
+  const [unlockingPiece, setUnlockingPiece] = useState<string | null>(null);
 
   // Fetch child info
   useEffect(() => {
@@ -57,6 +64,14 @@ export default function CoursePage() {
     isStreamComplete,
   } = useProgress(user?.id, childId);
 
+  const {
+    earnedPieces,
+    earnPiece,
+    checkUnlocks,
+    getPieceProgress,
+    isPieceEarned,
+  } = useArmour(user?.id, childId);
+
   const getStream = (id: string) => courseData.find((s) => s.id === id)!;
 
   const getAllLessonIds = (stream: AgeStream) =>
@@ -75,10 +90,11 @@ export default function CoursePage() {
   }, []);
 
   const handleLessonComplete = useCallback(
-    (lessonId: string, score: number, timeSeconds: number, moduleId: string) => {
+    async (lessonId: string, score: number, timeSeconds: number, moduleId: string) => {
       if (score < 70) return;
-      completeLesson(lessonId, score, timeSeconds);
+      await completeLesson(lessonId, score, timeSeconds);
       if (score === 100) earnBadge(`star-${lessonId}`);
+
       if (view.type === "lesson") {
         const stream = getStream(view.streamId);
         const mod = stream.modules.find((m) => m.id === moduleId);
@@ -88,9 +104,20 @@ export default function CoursePage() {
           );
           if (allDone) earnBadge(`module-${moduleId}`);
         }
+
+        // Check armour unlocks — include the just-completed lesson
+        const updatedCompleted = [...progress.completedLessons, lessonId];
+        const newPieces = checkUnlocks(updatedCompleted, view.streamId);
+        if (newPieces.length > 0) {
+          // Award the pieces and show unlock animation for the first one
+          for (const piece of newPieces) {
+            await earnPiece(piece.id, piece.course);
+          }
+          setUnlockingPiece(newPieces[0].id);
+        }
       }
     },
-    [completeLesson, earnBadge, isLessonComplete, view]
+    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece]
   );
 
   const handleLogout = async () => {
@@ -99,10 +126,7 @@ export default function CoursePage() {
   };
 
   const learnerName = child?.first_name || profile?.first_name || "Warrior";
-  // Use child's age band if available, otherwise fallback
   const ageBand = child?.age_band || profile?.age_band;
-
-  // If child has specific age band, filter to that stream
   const filteredStreams = ageBand
     ? courseData.filter((s) => s.id === ageBand)
     : courseData;
@@ -152,7 +176,6 @@ export default function CoursePage() {
               exit={{ opacity: 0 }}
               className="space-y-6"
             >
-              {/* Hero */}
               <div className="text-center space-y-3 py-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-copper float">
                   <ShieldIcon size={32} className="stroke-primary-foreground" />
@@ -167,7 +190,13 @@ export default function CoursePage() {
                 </p>
               </div>
 
-              {/* Age Selection */}
+              {/* Armour Collection mini */}
+              {earnedPieces.length > 0 && (
+                <div className="card-kiki">
+                  <ArmourCollection earnedPieces={earnedPieces} compact />
+                </div>
+              )}
+
               <div className="grid gap-4">
                 {filteredStreams.map((stream) => {
                   const allIds = getAllLessonIds(stream);
@@ -243,23 +272,42 @@ export default function CoursePage() {
 
                 <ProgressBar progress={getModuleProgress(allIds)} label="Overall Progress" />
 
+                {/* Armour progress for this stream */}
+                <div className="card-kiki">
+                  <ArmourCollection
+                    earnedPieces={earnedPieces}
+                    pieceProgress={Object.fromEntries(
+                      ["belt-of-truth", "shield-of-faith", "helmet-of-salvation"].map((id) => [
+                        id,
+                        getPieceProgress(id, view.streamId, progress.completedLessons),
+                      ])
+                    )}
+                  />
+                </div>
+
                 <div className="grid gap-4">
-                  {stream.modules.map((mod, i) => (
-                    <ModuleCard
-                      key={mod.id}
-                      module={mod}
-                      index={i}
-                      progress={getModuleProgress(mod.lessons.map((l) => l.id))}
-                      onClick={() =>
-                        setView({
-                          type: "lesson",
-                          streamId: stream.id,
-                          moduleId: mod.id,
-                          lessonIndex: 0,
-                        })
-                      }
-                    />
-                  ))}
+                  {stream.modules.map((mod, i) => {
+                    const armourPiece = getArmourPieceForModule(view.streamId, mod.id);
+                    return (
+                      <div key={mod.id}>
+                        <ModuleCard
+                          module={mod}
+                          index={i}
+                          progress={getModuleProgress(mod.lessons.map((l) => l.id))}
+                          armourPiece={armourPiece}
+                          armourEarned={armourPiece ? isPieceEarned(armourPiece.id) : false}
+                          onClick={() =>
+                            setView({
+                              type: "lesson",
+                              streamId: stream.id,
+                              moduleId: mod.id,
+                              lessonIndex: 0,
+                            })
+                          }
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {complete && (
@@ -283,13 +331,19 @@ export default function CoursePage() {
                       learnerName={learnerName}
                       ageGroup={stream.id as "6-9" | "10-13"}
                     />
+
+                    {/* Lead magnet conversion */}
+                    <ArmourConversionScreen
+                      earnedPieces={earnedPieces}
+                      learnerName={learnerName}
+                    />
                   </motion.div>
                 )}
               </motion.div>
             );
           })()}
 
-          {/* LESSON VIEW — 3-column layout */}
+          {/* LESSON VIEW */}
           {view.type === "lesson" && (() => {
             const stream = getStream(view.streamId);
             const mod = stream.modules.find((m) => m.id === view.moduleId)!;
@@ -302,6 +356,8 @@ export default function CoursePage() {
             const current = allStreamLessons[flatIndex];
 
             if (!current) return null;
+
+            const armourPiece = getArmourPieceForModule(view.streamId, current.module.id);
 
             const handleSelectLesson = (moduleId: string, lessonIndex: number) => {
               setView({
@@ -320,7 +376,6 @@ export default function CoursePage() {
                 exit={{ opacity: 0 }}
                 className="flex gap-6"
               >
-                {/* Left column — back to modules */}
                 <div className="hidden lg:block w-48 shrink-0 pt-2">
                   <button
                     onClick={() => setView({ type: "stream", streamId: view.streamId })}
@@ -329,9 +384,30 @@ export default function CoursePage() {
                     <ArrowLeft className="w-4 h-4" />
                     Back to modules
                   </button>
+
+                  {/* Armour piece indicator */}
+                  {armourPiece && (
+                    <div className="mt-4 card-kiki p-3 text-center space-y-2">
+                      <ArmourPieceIcon
+                        pieceId={armourPiece.id}
+                        earned={isPieceEarned(armourPiece.id)}
+                        size={32}
+                      />
+                      <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+                        {armourPiece.name}
+                      </p>
+                      <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full gradient-copper rounded-full transition-all"
+                          style={{
+                            width: `${getPieceProgress(armourPiece.id, view.streamId, progress.completedLessons) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Center — lesson content */}
                 <div className="flex-1 min-w-0">
                   <LessonView
                     lesson={current.lesson}
@@ -371,7 +447,6 @@ export default function CoursePage() {
                   />
                 </div>
 
-                {/* Right column — lesson sidebar */}
                 <div className="hidden lg:block w-80 shrink-0">
                   <div className="sticky top-20 card-kiki p-0 overflow-hidden max-h-[calc(100vh-6rem)]">
                     <LessonSidebar
@@ -387,6 +462,13 @@ export default function CoursePage() {
           })()}
         </AnimatePresence>
       </main>
+
+      {/* Armour Unlock Modal */}
+      <ArmourUnlockModal
+        pieceId={unlockingPiece}
+        totalEarned={earnedPieces.length + (unlockingPiece ? 1 : 0)}
+        onClose={() => setUnlockingPiece(null)}
+      />
     </div>
   );
 }

@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
+import { useArmour } from "@/hooks/useArmour";
 import { courseData } from "@/data/courseData";
+import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
 import { CourseIcon } from "@/components/course/CourseIcons";
 import { ProgressBar } from "@/components/course/ProgressBar";
+import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { useNavigate } from "react-router-dom";
 
 function formatTime(seconds: number): string {
@@ -19,16 +22,15 @@ function formatTime(seconds: number): string {
 export default function ParentDashboard() {
   const { user, profile } = useAuth();
   const { progress, loading } = useProgress(user?.id);
+  const { earnedPieces, loading: armourLoading, getPieceProgress } = useArmour(user?.id);
   const navigate = useNavigate();
 
   const learnerName = profile?.first_name || "Learner";
   const ageBand = profile?.age_band || "6-9";
 
-  // Find the matching stream
   const stream = courseData.find((s) => s.id === ageBand);
   const allStreams = stream ? [stream] : courseData;
 
-  // Calculate aggregate stats
   const totalLessonsCompleted = progress.completedLessons.length;
   const totalBadges = progress.earnedBadges.length;
   const totalTimeSeconds = Object.values(progress.timeSpent).reduce((sum, t) => sum + t, 0);
@@ -38,7 +40,17 @@ export default function ParentDashboard() {
     ? Math.round(allScores.reduce((sum, s) => sum + s, 0) / allScores.length)
     : 0;
 
-  if (loading) {
+  const safetyPiecesEarned = ONLINE_SAFETY_PIECES.filter((p) => earnedPieces.includes(p.id)).length;
+  const allSafetyComplete = safetyPiecesEarned === 3;
+
+  const pieceProgress = Object.fromEntries(
+    ["belt-of-truth", "shield-of-faith", "helmet-of-salvation"].map((id) => [
+      id,
+      getPieceProgress(id, ageBand, progress.completedLessons),
+    ])
+  );
+
+  if (loading || armourLoading) {
     return (
       <div className="min-h-screen gradient-dark flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -48,7 +60,6 @@ export default function ParentDashboard() {
 
   return (
     <div className="min-h-screen gradient-dark">
-      {/* Header */}
       <header className="sticky top-0 z-50 glass-overlay border-b border-border/60 px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <button
@@ -75,31 +86,37 @@ export default function ParentDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
-          <SummaryCard
-            icon={<BookOpen className="w-5 h-5" />}
-            label="Lessons Done"
-            value={String(totalLessonsCompleted)}
-            color="text-primary"
-          />
-          <SummaryCard
-            icon={<BarChart3 className="w-5 h-5" />}
-            label="Avg. Score"
-            value={`${averageScore}%`}
-            color="text-success"
-          />
-          <SummaryCard
-            icon={<Clock className="w-5 h-5" />}
-            label="Time Spent"
-            value={formatTime(totalTimeSeconds)}
-            color="text-secondary"
-          />
-          <SummaryCard
-            icon={<Trophy className="w-5 h-5" />}
-            label="Badges"
-            value={String(totalBadges)}
-            color="text-accent"
-          />
+          <SummaryCard icon={<BookOpen className="w-5 h-5" />} label="Lessons Done" value={String(totalLessonsCompleted)} color="text-primary" />
+          <SummaryCard icon={<BarChart3 className="w-5 h-5" />} label="Avg. Score" value={`${averageScore}%`} color="text-success" />
+          <SummaryCard icon={<Clock className="w-5 h-5" />} label="Time Spent" value={formatTime(totalTimeSeconds)} color="text-secondary" />
+          <SummaryCard icon={<Trophy className="w-5 h-5" />} label="Armour Pieces" value={`${safetyPiecesEarned}/3`} color="text-accent" />
         </motion.div>
+
+        {/* Armour Progress */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <div className="card-kiki">
+            <ArmourCollection earnedPieces={earnedPieces} pieceProgress={pieceProgress} />
+          </div>
+        </motion.div>
+
+        {/* Christian Academy CTA */}
+        {allSafetyComplete && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="card-kiki border-primary/30 bg-gradient-to-b from-primary/5 to-card space-y-3"
+          >
+            <p className="font-display text-base font-bold text-foreground uppercase tracking-wide">
+              {learnerName} has earned 3 pieces of the Armour of God!
+            </p>
+            <p className="font-body text-sm text-muted-foreground">
+              Continue the journey in Kiki Christian Academy to unlock the remaining pieces.
+            </p>
+            <button className="btn-copper px-6 py-3 text-sm uppercase tracking-widest flex items-center gap-2">
+              Continue the Journey <ArrowRight className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
 
         {/* Per-Module Breakdown */}
         {allStreams.map((stream) => (
@@ -135,7 +152,6 @@ export default function ParentDashboard() {
 
               return (
                 <div key={mod.id} className="card-kiki space-y-4">
-                  {/* Module Header */}
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
                       <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
@@ -161,7 +177,6 @@ export default function ParentDashboard() {
 
                   <ProgressBar progress={moduleProgress} label="Module Progress" />
 
-                  {/* Per-Lesson Scores */}
                   <div className="space-y-2">
                     {mod.lessons.map((lesson) => {
                       const isComplete = progress.completedLessons.includes(lesson.id);
@@ -180,18 +195,13 @@ export default function ParentDashboard() {
                           ) : (
                             <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/30 shrink-0" />
                           )}
-
-                          <span className="flex-1 text-foreground truncate">
-                            {lesson.title}
-                          </span>
-
+                          <span className="flex-1 text-foreground truncate">{lesson.title}</span>
                           {time > 0 && (
                             <span className="text-xs text-muted-foreground flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               {formatTime(time)}
                             </span>
                           )}
-
                           {score !== undefined && (
                             <span className={`text-xs font-display font-bold px-2 py-0.5 rounded-full ${
                               score >= 70
@@ -201,7 +211,6 @@ export default function ParentDashboard() {
                               {score}%
                             </span>
                           )}
-
                           {score === 100 && (
                             <Star className="w-4 h-4 text-primary fill-primary shrink-0" />
                           )}
