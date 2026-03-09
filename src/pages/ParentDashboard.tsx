@@ -8,6 +8,7 @@ import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
 import { CourseIcon } from "@/components/course/CourseIcons";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
+import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useNavigate } from "react-router-dom";
 
 function formatTime(seconds: number): string {
@@ -95,6 +96,9 @@ export default function ParentDashboard() {
         {/* Armour Progress */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
           <div className="card-kiki">
+            <div className="flex flex-col items-center mb-4">
+              <KikiWarriorAvatar earnedPieces={earnedPieces} size="md" />
+            </div>
             <ArmourCollection earnedPieces={earnedPieces} pieceProgress={pieceProgress} />
           </div>
         </motion.div>

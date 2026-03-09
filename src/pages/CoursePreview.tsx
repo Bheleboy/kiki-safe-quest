@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldChec
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import { VideoPlayer } from "@/components/course/VideoPlayer";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
+import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
 import { courseData } from "@/data/courseData";
 
@@ -91,6 +92,12 @@ export default function CoursePreview() {
             <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
               As your child passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
             </p>
+          </div>
+
+          {/* Kiki Warrior preview */}
+          <div className="flex flex-col items-center">
+            <KikiWarriorAvatar earnedPieces={[]} size="lg" showLabel={false} />
+            <p className="font-body text-xs text-muted-foreground mt-2 italic">Your warrior starts here — earn armour as you learn!</p>
           </div>
 
           {/* Free course pieces */}
