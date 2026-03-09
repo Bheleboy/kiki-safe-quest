@@ -24,7 +24,7 @@ type View =
   | { type: "home" }
   | { type: "stream"; streamId: string }
   | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number }
-  | { type: "certificate"; streamId: string };
+  | { type: "stream"; streamId: string; };
 
 interface ChildInfo {
   id: string;
