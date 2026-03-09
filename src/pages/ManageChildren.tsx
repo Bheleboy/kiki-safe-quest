@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { Plus, Trash2, ArrowRight, LogOut, Users, BookOpen, ExternalLink } from "lucide-react";
+import { ChildArmourAvatar } from "@/components/armour/ChildArmourAvatar";
 
 interface Child {
   id: string;
