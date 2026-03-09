@@ -20,8 +20,8 @@ const features = [
   },
   {
     icon: <Award className="w-6 h-6" />,
-    title: "Certificates & Badges",
-    desc: "Downloadable certificates and collectible badges when children complete courses.",
+    title: "Armour of God Rewards",
+    desc: "Children earn pieces of the Armour of God as they pass quizzes — collect all 6 across both courses.",
   },
 ];
 

@@ -17,7 +17,7 @@ const testimonials = [
   {
     name: "Sarah N.",
     role: "Parent",
-    text: "The certificate feature motivated my kids to complete every lesson. They're so proud of their achievements!",
+    text: "The Armour of God rewards motivated my kids to complete every lesson. They're so proud of the pieces they've collected!",
     stars: 5,
   },
 ];

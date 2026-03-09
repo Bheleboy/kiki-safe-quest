@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { UserPlus, Users, PlayCircle, Award } from "lucide-react";
+import { UserPlus, Users, PlayCircle, Shield } from "lucide-react";
 
 const steps = [
   { icon: <UserPlus className="w-7 h-7" />, title: "Create Parent Account", desc: "Sign up free with email verification." },
   { icon: <Users className="w-7 h-7" />, title: "Add Your Child", desc: "Create child profiles with name and age band." },
   { icon: <PlayCircle className="w-7 h-7" />, title: "Start Lessons", desc: "Interactive video lessons with quizzes and badges." },
-  { icon: <Award className="w-7 h-7" />, title: "Earn Certificate", desc: "Complete the course and download your certificate." },
+  { icon: <Shield className="w-7 h-7" />, title: "Earn Armour", desc: "Pass quizzes to collect pieces of the Armour of God." },
 ];
 
 export default function HowItWorks() {

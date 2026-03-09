@@ -324,13 +324,9 @@ export default function CoursePage() {
                         Congratulations!
                       </h3>
                       <p className="text-sm text-muted-foreground font-body">
-                        You completed all modules. Download your certificate below.
+                        You completed all modules and earned your armour pieces!
                       </p>
                     </div>
-                    <Certificate
-                      learnerName={learnerName}
-                      ageGroup={stream.id as "6-9" | "10-13"}
-                    />
 
                     {/* Lead magnet conversion */}
                     <ArmourConversionScreen
