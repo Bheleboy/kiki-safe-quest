@@ -11,7 +11,7 @@ import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
 import { LessonSidebar } from "@/components/course/LessonSidebar";
 import { ProgressBar } from "@/components/course/ProgressBar";
-import { Certificate } from "@/components/course/Certificate";
+
 import { ShieldIcon, CourseIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { ArmourUnlockModal } from "@/components/armour/ArmourUnlockModal";
