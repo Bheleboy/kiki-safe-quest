@@ -17,6 +17,7 @@ import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { ArmourUnlockModal } from "@/components/armour/ArmourUnlockModal";
 import { ArmourConversionScreen } from "@/components/armour/ArmourConversionScreen";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
+import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
