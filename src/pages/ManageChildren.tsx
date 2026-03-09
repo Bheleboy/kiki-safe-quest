@@ -155,15 +155,17 @@ export default function ManageChildren() {
                 transition={{ delay: i * 0.05 }}
                 className="card-kiki flex items-center gap-4"
               >
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 font-display font-bold text-lg"
-                  style={{
-                    backgroundColor: child.avatar_color,
-                    color: "hsl(0 0% 100%)",
-                  }}
-                >
-                  {child.first_name.charAt(0).toUpperCase()}
-                </div>
+                {/* Kiki Warrior Avatar with armour progress */}
+                {user && (
+                  <div className="shrink-0">
+                    <ChildArmourAvatar
+                      userId={user.id}
+                      childId={child.id}
+                      size="sm"
+                      showLabel={false}
+                    />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide truncate">
                     {child.first_name}
