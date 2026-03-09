@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArmourPieceIcon } from "./ArmourPieceIcon";
+import { KikiWarriorAvatar } from "./KikiWarriorAvatar";
 import { ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
 import { ArrowRight } from "lucide-react";
 
