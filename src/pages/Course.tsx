@@ -272,8 +272,11 @@ export default function CoursePage() {
 
                 <ProgressBar progress={getModuleProgress(allIds)} label="Overall Progress" />
 
-                {/* Armour progress for this stream */}
+                {/* Kiki Warrior + Armour progress */}
                 <div className="card-kiki">
+                  <div className="flex flex-col items-center mb-4">
+                    <KikiWarriorAvatar earnedPieces={earnedPieces} size="md" />
+                  </div>
                   <ArmourCollection
                     earnedPieces={earnedPieces}
                     pieceProgress={Object.fromEntries(
