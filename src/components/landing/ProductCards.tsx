@@ -10,7 +10,7 @@ const products = [
     subtitle: "Keep your Kids Safe Online",
     description:
       "A comprehensive internet safety course teaching children aged 6–13 how to stay safe, smart, and strong online through animated lessons and interactive quizzes.",
-    whatItIs: "An interactive online safety course with video lessons, quizzes, badges, and certificates.",
+    whatItIs: "An interactive online safety course with video lessons, quizzes, and Armour of God rewards.",
     whoItsFor: "Children ages 6–13 and parents who want to protect their children online.",
     cta: "Start Free Course",
     link: "/courses/internet-safety",

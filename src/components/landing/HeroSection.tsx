@@ -71,8 +71,8 @@ export default function HeroSection() {
             transition={{ duration: 0.5, delay: 0.15 }}
             className="font-body text-lg text-muted-foreground max-w-md leading-relaxed"
           >
-            Learn to be safe, smart and strong online. Fun, interactive courses
-            designed for children ages 6–13.
+            Learn to be safe, smart and strong online. Earn pieces of the Armour of God
+            through fun, interactive courses designed for children ages 6–13.
           </motion.p>
 
           <motion.div

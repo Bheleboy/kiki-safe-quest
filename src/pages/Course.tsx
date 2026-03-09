@@ -11,7 +11,7 @@ import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
 import { LessonSidebar } from "@/components/course/LessonSidebar";
 import { ProgressBar } from "@/components/course/ProgressBar";
-import { Certificate } from "@/components/course/Certificate";
+
 import { ShieldIcon, CourseIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { ArmourUnlockModal } from "@/components/armour/ArmourUnlockModal";
@@ -24,7 +24,7 @@ type View =
   | { type: "home" }
   | { type: "stream"; streamId: string }
   | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number }
-  | { type: "certificate"; streamId: string };
+  | { type: "stream"; streamId: string; };
 
 interface ChildInfo {
   id: string;
@@ -324,13 +324,9 @@ export default function CoursePage() {
                         Congratulations!
                       </h3>
                       <p className="text-sm text-muted-foreground font-body">
-                        You completed all modules. Download your certificate below.
+                        You completed all modules and earned your armour pieces!
                       </p>
                     </div>
-                    <Certificate
-                      learnerName={learnerName}
-                      ageGroup={stream.id as "6-9" | "10-13"}
-                    />
 
                     {/* Lead magnet conversion */}
                     <ArmourConversionScreen

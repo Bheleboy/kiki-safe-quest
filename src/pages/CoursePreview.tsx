@@ -1,8 +1,10 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Award, CheckCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck } from "lucide-react";
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import { VideoPlayer } from "@/components/course/VideoPlayer";
+import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
+import { ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
 import { courseData } from "@/data/courseData";
 
 export default function CoursePreview() {
@@ -32,9 +34,9 @@ export default function CoursePreview() {
   const highlights = [
     "Age-appropriate content for 6–9 and 10–13 year olds",
     "Interactive quizzes with 70% pass requirement",
-    "Earn stars and badges for achievements",
+    "Earn 3 pieces of the Armour of God as rewards",
     "Parent dashboard to track progress",
-    "Downloadable completion certificates",
+    "Collect all 6 pieces across both courses",
     "Video lessons with narration support",
   ];
 
@@ -69,12 +71,56 @@ export default function CoursePreview() {
             </h1>
             <p className="font-body text-lg text-muted-foreground leading-relaxed max-w-2xl">
               A comprehensive, fun-filled course teaching children aged 6–13 how to stay safe, smart, and strong online.
-              Through animated lessons, interactive quizzes, and rewarding badges, young warriors learn essential digital safety skills.
+              Through animated lessons, interactive quizzes, and the Armour of God reward system, young warriors earn heroic armour pieces as they learn essential digital safety skills.
             </p>
             <div className="flex flex-wrap gap-6 text-sm font-body text-muted-foreground">
               <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary" /> {totalLessons} lessons</span>
               <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-secondary" /> ~2 hours</span>
-              <span className="flex items-center gap-1.5"><Award className="w-4 h-4 text-accent" /> Certificate</span>
+              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-accent" /> 3 Armour Pieces</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Armour Reward Highlight */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki border-primary/30 bg-gradient-to-b from-primary/5 to-card space-y-5">
+          <div className="text-center space-y-2">
+            <span className="font-display text-xs uppercase tracking-[0.3em] text-primary">Reward System</span>
+            <h2 className="font-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-wide">
+              Earn the Armour of God
+            </h2>
+            <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
+              As your child passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
+            </p>
+          </div>
+
+          {/* Free course pieces */}
+          <div>
+            <p className="font-display text-[10px] uppercase tracking-widest text-muted-foreground text-center mb-3">This Course Awards</p>
+            <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto">
+              {ONLINE_SAFETY_PIECES.map((piece) => (
+                <div key={piece.id} className="text-center space-y-2">
+                  <div className="mx-auto">
+                    <ArmourPieceIcon pieceId={piece.id} earned size={44} />
+                  </div>
+                  <p className="font-display text-[10px] uppercase tracking-wide text-foreground font-semibold">{piece.name}</p>
+                  <p className="font-body text-[9px] text-muted-foreground italic">{piece.verse}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Remaining pieces teaser */}
+          <div className="border-t border-border/40 pt-4">
+            <p className="font-display text-[10px] uppercase tracking-widest text-muted-foreground text-center mb-3">Complete the Set in Kiki Christian Academy</p>
+            <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto opacity-50">
+              {CHRISTIAN_ACADEMY_PIECES.map((piece) => (
+                <div key={piece.id} className="text-center space-y-2">
+                  <div className="mx-auto">
+                    <ArmourPieceIcon pieceId={piece.id} earned={false} size={36} />
+                  </div>
+                  <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground/60 font-semibold">{piece.name}</p>
+                </div>
+              ))}
             </div>
           </div>
         </motion.div>
@@ -108,7 +154,7 @@ export default function CoursePreview() {
           <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
           <div>
             <h3 className="font-display text-base font-bold text-foreground uppercase tracking-wide mb-1">70% Pass Requirement</h3>
-            <p className="font-body text-sm text-muted-foreground">Children must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress through the course.</p>
+            <p className="font-body text-sm text-muted-foreground">Children must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
           </div>
         </motion.div>
 
@@ -134,19 +180,23 @@ export default function CoursePreview() {
           </motion.div>
         ))}
 
-        {/* Certificate Preview */}
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki text-center space-y-4">
-          <Award className="w-12 h-12 text-primary mx-auto" />
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">Completion Certificate</h2>
+        {/* Armour Reward CTA (replaces certificate preview) */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki text-center space-y-4 border-primary/20">
+          <div className="flex justify-center gap-3">
+            {ONLINE_SAFETY_PIECES.map((piece) => (
+              <ArmourPieceIcon key={piece.id} pieceId={piece.id} earned size={36} />
+            ))}
+          </div>
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">Earn Your Armour</h2>
           <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
-            When your child completes all modules and passes the quizzes, they receive a downloadable certificate of completion they can be proud of.
+            Complete each module and pass the quizzes to earn the Belt of Truth, Shield of Faith, and Helmet of Salvation. Then continue to Kiki Christian Academy to collect the full Armour of God!
           </p>
         </motion.div>
 
         {/* CTA */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center space-y-4 py-8">
           <h2 className="font-display text-2xl font-bold text-foreground uppercase tracking-wider">Ready to Start?</h2>
-          <p className="font-body text-muted-foreground">Create a free parent account and enrol your children today.</p>
+          <p className="font-body text-muted-foreground">Create a free parent account and begin your child's Armour of God journey today.</p>
           <Link to="/auth?mode=signup" className="touch-target inline-flex items-center gap-2 btn-copper px-10 py-4 text-sm uppercase tracking-widest">
             Start Free Course <ArrowRight className="w-4 h-4" />
           </Link>
