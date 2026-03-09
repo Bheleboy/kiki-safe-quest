@@ -7,6 +7,7 @@ import { courseData } from "@/data/courseData";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { ShieldIcon, StarIcon, CertBadgeIcon } from "@/components/course/CourseIcons";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
+import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { LogOut } from "lucide-react";
 
 export default function DashboardPage() {
@@ -87,8 +88,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Armour Collection */}
+        {/* Kiki Warrior Avatar + Armour Collection */}
         <div className="card-kiki">
+          <div className="flex flex-col items-center mb-6">
+            <KikiWarriorAvatar earnedPieces={earnedPieces} size="lg" />
+          </div>
           <ArmourCollection earnedPieces={earnedPieces} pieceProgress={pieceProgress} />
         </div>
 

@@ -17,6 +17,7 @@ import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { ArmourUnlockModal } from "@/components/armour/ArmourUnlockModal";
 import { ArmourConversionScreen } from "@/components/armour/ArmourConversionScreen";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
+import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -272,8 +273,11 @@ export default function CoursePage() {
 
                 <ProgressBar progress={getModuleProgress(allIds)} label="Overall Progress" />
 
-                {/* Armour progress for this stream */}
+                {/* Kiki Warrior + Armour progress */}
                 <div className="card-kiki">
+                  <div className="flex flex-col items-center mb-4">
+                    <KikiWarriorAvatar earnedPieces={earnedPieces} size="md" />
+                  </div>
                   <ArmourCollection
                     earnedPieces={earnedPieces}
                     pieceProgress={Object.fromEntries(
