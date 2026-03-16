@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { ChildSurvey } from "@/components/survey/ChildSurvey";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, LogOut, Users, Home } from "lucide-react";
 import { courseData, type AgeStream } from "@/data/courseData";
