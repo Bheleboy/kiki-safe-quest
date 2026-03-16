@@ -91,8 +91,9 @@ export default function CoursePreview() {
             </p>
             <div className="flex flex-wrap gap-6 text-sm font-body text-muted-foreground">
               <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary" /> {totalLessons} lessons</span>
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-secondary" /> ~2 hours</span>
-              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-accent" /> 3 Armour Pieces</span>
+              <span className="flex items-center gap-1.5"><PlayCircle className="w-4 h-4 text-secondary" /> {formatTime(totalVideoMinutes)} video</span>
+              <span className="flex items-center gap-1.5"><Hourglass className="w-4 h-4 text-accent" /> {formatTime(totalEstimatedMinutes)} total</span>
+              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-coral" /> 3 Armour Pieces</span>
             </div>
           </div>
         </motion.div>
