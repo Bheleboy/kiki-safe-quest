@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2, ArrowRight } from "lucide-react";
+import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2, ArrowRight, ClipboardList } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { useArmour } from "@/hooks/useArmour";
@@ -9,6 +10,8 @@ import { CourseIcon } from "@/components/course/CourseIcons";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
+import { ChildSurveyReview } from "@/components/survey/ChildSurveyReview";
+import { ParentSurvey } from "@/components/survey/ParentSurvey";
 import { useNavigate } from "react-router-dom";
 
 function formatTime(seconds: number): string {
