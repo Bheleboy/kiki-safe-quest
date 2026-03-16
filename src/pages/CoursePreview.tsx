@@ -1,6 +1,6 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck, PlayCircle, Hourglass } from "lucide-react";
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import { VideoPlayer } from "@/components/course/VideoPlayer";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
@@ -27,10 +27,25 @@ export default function CoursePreview() {
 
   const youngStream = courseData.find((s) => s.id === "6-9");
   const teenStream = courseData.find((s) => s.id === "10-13");
+  
+  // Calculate time totals
   const totalLessons = courseData.reduce(
     (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.length, 0),
     0
   );
+  const totalVideoMinutes = courseData.reduce(
+    (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.videoDurationMinutes, 0), 0),
+    0
+  );
+  const totalEstimatedMinutes = courseData.reduce(
+    (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.estimatedMinutes, 0), 0),
+    0
+  );
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+  };
 
   const highlights = [
     "Age-appropriate content for 6–9 and 10–13 year olds",
@@ -76,10 +91,47 @@ export default function CoursePreview() {
             </p>
             <div className="flex flex-wrap gap-6 text-sm font-body text-muted-foreground">
               <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary" /> {totalLessons} lessons</span>
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-secondary" /> ~2 hours</span>
-              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-accent" /> 3 Armour Pieces</span>
+              <span className="flex items-center gap-1.5"><PlayCircle className="w-4 h-4 text-secondary" /> {formatTime(totalVideoMinutes)} video</span>
+              <span className="flex items-center gap-1.5"><Hourglass className="w-4 h-4 text-accent" /> {formatTime(totalEstimatedMinutes)} total</span>
+              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-coral" /> 3 Armour Pieces</span>
             </div>
           </div>
+        </motion.div>
+
+        {/* Course Time Summary */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-kiki border-secondary/30 bg-gradient-to-b from-secondary/5 to-card">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5 text-secondary-foreground" />
+            </div>
+            <div>
+              <h2 className="font-display text-base font-bold text-foreground uppercase tracking-wide">Course Time Breakdown</h2>
+              <p className="font-body text-xs text-muted-foreground">Plan your child's learning journey</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-primary">{totalLessons}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Lessons</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-secondary">{formatTime(totalVideoMinutes)}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Video Watch Time</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-accent">{formatTime(totalEstimatedMinutes)}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Total Completion Time</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-coral">~{Math.ceil(totalEstimatedMinutes / 10)}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Sessions (10 min each)</p>
+            </div>
+          </div>
+          
+          <p className="font-body text-xs text-muted-foreground mt-4 text-center">
+            Total completion time includes video watching, quizzes, and activities. Your child can complete this in short daily sessions or all at once!
+          </p>
         </motion.div>
 
         {/* Armour Reward Highlight */}
@@ -166,26 +218,48 @@ export default function CoursePreview() {
         </motion.div>
 
         {/* Module Preview */}
-        {[youngStream, teenStream].filter(Boolean).map((stream) => (
-          <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
-            <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
-              {stream!.label} — {stream!.description}
-            </h2>
-            <div className="grid gap-3">
-              {stream!.modules.map((mod) => (
-                <div key={mod.id} className="card-kiki flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                    <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
-                    <p className="text-xs text-muted-foreground font-body">{mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}</p>
-                  </div>
+        {[youngStream, teenStream].filter(Boolean).map((stream) => {
+          const streamVideoMinutes = stream!.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.videoDurationMinutes, 0), 0);
+          const streamEstimatedMinutes = stream!.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.estimatedMinutes, 0), 0);
+          
+          return (
+            <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+                  {stream!.label} — {stream!.description}
+                </h2>
+                <div className="flex items-center gap-3 text-xs font-body text-muted-foreground">
+                  <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> {formatTime(streamVideoMinutes)} video</span>
+                  <span className="flex items-center gap-1"><Hourglass className="w-3.5 h-3.5" /> {formatTime(streamEstimatedMinutes)} total</span>
                 </div>
-              ))}
-            </div>
-          </motion.div>
-        ))}
+              </div>
+              <div className="grid gap-3">
+                {stream!.modules.map((mod) => {
+                  const modVideoMinutes = mod.lessons.reduce((sum, l) => sum + l.videoDurationMinutes, 0);
+                  const modEstimatedMinutes = mod.lessons.reduce((sum, l) => sum + l.estimatedMinutes, 0);
+                  
+                  return (
+                    <div key={mod.id} className="card-kiki flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                        <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
+                        <p className="text-xs text-muted-foreground font-body">
+                          {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
+                          <span className="mx-1">·</span>
+                          <span className="flex items-center gap-1 inline-flex"><PlayCircle className="w-3 h-3" /> {formatTime(modVideoMinutes)}</span>
+                          <span className="mx-1">·</span>
+                          <span className="text-primary/70 flex items-center gap-1 inline-flex"><Hourglass className="w-3 h-3" /> {formatTime(modEstimatedMinutes)}</span>
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          );
+        })}
 
         {/* Armour Reward CTA (replaces certificate preview) */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki text-center space-y-4 border-primary/20">
