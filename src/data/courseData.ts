@@ -57,6 +57,8 @@ export const courseData: AgeStream[] = [
             title: "The Internet – A Big Playground!",
             videoUrl: "https://www.youtube.com/embed/gVoHRKIIFGg",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "The internet is like a big library and playground. You can learn, play, and talk to friends. But just like in a real playground, there are rules to stay safe!",
             explanationText: "The internet connects computers all around the world. You can use it to watch videos, play games, learn new things, and talk to people. It's amazing, but we need to be careful too!",
             quiz: [
@@ -87,6 +89,8 @@ export const courseData: AgeStream[] = [
             title: "How Does the Internet Work?",
             videoUrl: "https://www.youtube.com/embed/Sfzo4xm5eX8",
             videoCredit: "SciShow Kids",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Have you ever wondered how the internet sends pictures and messages? It uses special cables and invisible waves to connect computers all over the world!",
             explanationText: "When you send a message online, it travels through wires and wireless signals to reach the other person's device. It's like sending a letter, but super fast! The message gets broken into tiny pieces called 'packets' that zoom around the world.",
             quiz: [
@@ -117,6 +121,8 @@ export const courseData: AgeStream[] = [
             title: "Websites and Apps – What's the Difference?",
             videoUrl: "https://www.youtube.com/embed/FCBMt55CNOE",
             videoCredit: "National Cyber Security Centre",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Websites are pages you visit in a browser, and apps are programs you download to your tablet or phone. Both can be fun, but always ask a grown-up before downloading anything!",
             explanationText: "A website is like a book you read in a library – you go there to look at it. An app is like a toy you take home – you download it to your device. Some apps and websites are safe, but some aren't, so always check with a grown-up!",
             quiz: [
@@ -146,6 +152,8 @@ export const courseData: AgeStream[] = [
             title: "Good vs Bad Content Online",
             videoUrl: "https://www.youtube.com/embed/MQlJ3vOp6nI",
             videoCredit: "Common Sense Education",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "The internet has amazing stuff like fun videos and learning games! But it also has some content that isn't made for kids. If you ever see something that makes you feel yucky, close it and tell a grown-up!",
             explanationText: "There's lots of wonderful content on the internet – educational videos, fun games, and creative tools! But sometimes you might accidentally find something that's mean, scary, or not for children. The best thing to do is close it straight away and tell a parent or teacher.",
             quiz: [
@@ -176,6 +184,8 @@ export const courseData: AgeStream[] = [
             title: "Screen Time – Balance is Key!",
             videoUrl: "https://www.youtube.com/embed/hFnYhTn6gHQ",
             videoCredit: "GoNoodle",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Being online is lots of fun, but it's important to take breaks! Play outside, read a book, draw a picture – your body and brain need different activities to stay healthy!",
             explanationText: "Too much screen time can make your eyes tired and your body stiff. It's important to balance your time online with other activities. Try the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds!",
             quiz: [
@@ -216,6 +226,8 @@ export const courseData: AgeStream[] = [
             title: "S – Stay Safe Online",
             videoUrl: "https://www.youtube.com/embed/TqPCnOsq_Mo",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Stay safe! Never share your name, address, phone number, or school with strangers online. Keep your personal information private!",
             explanationText: "The S in SMART stands for SAFE. Keep your personal information safe. Don't tell strangers your real name, where you live, or where you go to school.",
             quiz: [
@@ -256,6 +268,8 @@ export const courseData: AgeStream[] = [
             title: "M – Meeting People Online",
             videoUrl: "https://www.youtube.com/embed/UMjCc4pJfPg",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Meeting people! People online might not be who they say they are. Never meet someone from the internet without telling a grown-up first!",
             explanationText: "The M in SMART stands for MEETING. People online might pretend to be someone they're not. Never agree to meet someone you only know from the internet. Always tell a parent or guardian.",
             quiz: [
@@ -286,6 +300,8 @@ export const courseData: AgeStream[] = [
             title: "A – Accepting Content",
             videoUrl: "https://www.youtube.com/embed/QKe-aO44R7k",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Accepting things! Be careful about clicking links or downloading things. Some files can have viruses that hurt your computer!",
             explanationText: "The A in SMART stands for ACCEPTING. Don't click on links or download files from people you don't know. They might contain viruses or bad content.",
             quiz: [
@@ -315,6 +331,8 @@ export const courseData: AgeStream[] = [
             title: "R – Reliable Information",
             videoUrl: "https://www.youtube.com/embed/MHvY1RfRJSY",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Reliable info! Not everything you read online is true. Some websites have wrong information. Always check with a grown-up!",
             explanationText: "The R in SMART stands for RELIABLE. Not everything on the internet is true! Some people put wrong information online. Always check facts with a trusted adult or website.",
             quiz: [
@@ -344,6 +362,8 @@ export const courseData: AgeStream[] = [
             title: "T – Tell an Adult",
             videoUrl: "https://www.youtube.com/embed/6RRyVPmtL9I",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Tell an adult! If something online makes you feel scared, sad, or confused, always tell a grown-up you trust. They can help!",
             explanationText: "The T in SMART stands for TELL. If anything online makes you worried or uncomfortable, tell a parent, teacher, or trusted adult right away. You won't get in trouble!",
             quiz: [
@@ -382,6 +402,8 @@ export const courseData: AgeStream[] = [
             title: "Kindness on the Internet",
             videoUrl: "https://www.youtube.com/embed/PGSCnMx0gLo",
             videoCredit: "BrainPOP",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Being kind online is just as important as being kind in person! Use nice words, be helpful, and think before you type!",
             explanationText: "The internet is a better place when everyone is kind! Think about how your words might make others feel. If you wouldn't say it to someone's face, don't type it online.",
             quiz: [
@@ -412,6 +434,8 @@ export const courseData: AgeStream[] = [
             title: "What is Cyberbullying?",
             videoUrl: "https://www.youtube.com/embed/vtfMzmkYp9E",
             videoCredit: "Smile and Learn",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Cyberbullying is when someone uses the internet to be mean, call names, or make fun of others. It hurts just as much as bullying in person, and it's never okay!",
             explanationText: "Cyberbullying can be sending mean messages, posting embarrassing photos, or leaving someone out of a group on purpose. If someone is being mean to you online, it's NOT your fault. Tell a grown-up right away!",
             quiz: [
@@ -442,6 +466,8 @@ export const courseData: AgeStream[] = [
             title: "Being a Good Digital Friend",
             videoUrl: "https://www.youtube.com/embed/BZhpJBsoL3I",
             videoCredit: "Google for Education",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Just like in real life, being a good friend online means being kind, including everyone, and standing up for others when you see someone being mean!",
             explanationText: "A good digital friend shares kind messages, includes others in games and chats, and speaks up if they see someone being bullied. You have the power to make the internet a nicer place!",
             quiz: [
@@ -472,6 +498,8 @@ export const courseData: AgeStream[] = [
             title: "Think Before You Post!",
             videoUrl: "https://www.youtube.com/embed/NI5bMnecv0M",
             videoCredit: "Common Sense Education",
+            videoDurationMinutes: 3,
+            estimatedMinutes: 8,
             narrationText: "Once you put something online, it can stay there forever! Before you post a message, photo, or comment, stop and think – is it true? Is it helpful? Is it kind?",
             explanationText: "The internet has a long memory! Photos, messages, and comments can be saved, shared, and seen by lots of people. Before posting anything, use the THINK test: Is it True? Is it Helpful? Is it Inspiring? Is it Necessary? Is it Kind?",
             quiz: [
@@ -501,6 +529,8 @@ export const courseData: AgeStream[] = [
             title: "Dealing with Mean Messages",
             videoUrl: "https://www.youtube.com/embed/mgMkPIRGLcI",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Sometimes people send mean messages online. It can make you feel sad or angry. But remember – don't reply to mean messages! Save them, block the person, and tell a grown-up.",
             explanationText: "If someone sends you a mean message: 1) Don't reply – that's what they want! 2) Take a screenshot to save it. 3) Block the person so they can't message you again. 4) Tell a parent or teacher. You are NOT alone!",
             quiz: [
@@ -549,6 +579,8 @@ export const courseData: AgeStream[] = [
             title: "What is the Internet?",
             videoUrl: "https://www.youtube.com/embed/gVoHRKIIFGg",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "The internet is a global network connecting billions of devices. It's an incredible tool for learning, communication, and entertainment — but it comes with responsibilities.",
             explanationText: "The internet connects computers worldwide through a network of servers. Understanding how it works helps you make smarter choices about what you share, click, and trust online.",
             quiz: [
@@ -580,6 +612,8 @@ export const courseData: AgeStream[] = [
             title: "Your Digital Footprint",
             videoUrl: "https://www.youtube.com/embed/4P_gvJ1jXMc",
             videoCredit: "Common Sense Education",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Every time you go online, you leave a trail called a digital footprint. Posts, comments, photos, likes – they all build up a picture of who you are. Future schools and employers might see it!",
             explanationText: "Your digital footprint is the record of everything you do online. It includes posts, comments, searches, and even things others share about you. It can be hard to erase, so think carefully about what you put out there.",
             quiz: [
@@ -610,6 +644,8 @@ export const courseData: AgeStream[] = [
             title: "Online vs Offline – Knowing the Difference",
             videoUrl: "https://www.youtube.com/embed/fBJsMRSrml4",
             videoCredit: "BBC Own It",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "The online world can feel very different from real life. People might act differently behind a screen. Remember that real people with real feelings are behind every profile!",
             explanationText: "Online communication removes body language and tone of voice, making it easy to misunderstand each other. People sometimes say things online they'd never say in person. Always remember there's a real person reading your messages.",
             quiz: [
@@ -640,6 +676,8 @@ export const courseData: AgeStream[] = [
             title: "Screen Time and Wellbeing",
             videoUrl: "https://www.youtube.com/embed/jo_B4LTHi3I",
             videoCredit: "BBC Own It",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Too much screen time can affect your sleep, mood, and even your friendships. Learning to balance your online and offline life is a superpower!",
             explanationText: "Research shows that excessive screen time can lead to poor sleep, anxiety, and reduced physical activity. Set boundaries: no devices at bedtime, take regular breaks, and make time for offline hobbies and face-to-face friendships.",
             quiz: [
@@ -670,6 +708,8 @@ export const courseData: AgeStream[] = [
             title: "Your Rights Online",
             videoUrl: "https://www.youtube.com/embed/V9_PjdU3Mpo",
             videoCredit: "UNICEF",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "You have rights online, just like offline! You have the right to be safe, to privacy, and to access information. You also have the right to say no and to get help if something goes wrong.",
             explanationText: "The UN Convention on the Rights of the Child applies online too! You have the right to: be safe from harm, keep your information private, access age-appropriate content, express your opinions, and get help when you need it. Knowing your rights empowers you!",
             quiz: [
@@ -709,6 +749,8 @@ export const courseData: AgeStream[] = [
             title: "Creating Strong Passwords",
             videoUrl: "https://www.youtube.com/embed/aEmF3Iylvr4",
             videoCredit: "Google for Education",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Your password is like a key to your digital life. A strong password uses a mix of letters, numbers, and symbols. Never share your passwords with friends!",
             explanationText: "Strong passwords are at least 12 characters long and include uppercase letters, lowercase letters, numbers, and symbols. Never use your name, birthday, or common words. Use different passwords for different accounts.",
             quiz: [
@@ -749,6 +791,8 @@ export const courseData: AgeStream[] = [
             title: "What is Personal Information?",
             videoUrl: "https://www.youtube.com/embed/yiKeLOKc1tw",
             videoCredit: "Common Sense Education",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Personal information is any data that can identify you – your full name, address, phone number, school, birthday, and even photos. Protecting it keeps you safe online!",
             explanationText: "Personal information includes: your full name, home address, phone number, email, school name, birthday, photos, and location data. Sharing too much can put you at risk. Only share personal info with people and websites you trust.",
             quiz: [
@@ -779,6 +823,8 @@ export const courseData: AgeStream[] = [
             title: "Two-Factor Authentication",
             videoUrl: "https://www.youtube.com/embed/hGRii5f_uSc",
             videoCredit: "Google",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Two-factor authentication adds an extra lock to your accounts. Even if someone guesses your password, they still can't get in without the second step!",
             explanationText: "Two-factor authentication (2FA) requires two things to log in: something you know (password) and something you have (like a code sent to your phone). It's like having two locks on your door instead of one!",
             quiz: [
@@ -809,6 +855,8 @@ export const courseData: AgeStream[] = [
             title: "Privacy Settings on Apps",
             videoUrl: "https://www.youtube.com/embed/dbqBqzCYxnY",
             videoCredit: "Internet Matters",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Every app and social media platform has privacy settings. Taking a few minutes to adjust them can make a huge difference in who sees your information!",
             explanationText: "Most apps collect data about you by default. Check your privacy settings to control: who can see your posts, who can message you, whether your location is shared, and what data apps can access. Review these settings regularly!",
             quiz: [
@@ -839,6 +887,8 @@ export const courseData: AgeStream[] = [
             title: "Cookies and Tracking",
             videoUrl: "https://www.youtube.com/embed/GURxbEhMZBw",
             videoCredit: "TED-Ed",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Have you noticed websites asking about cookies? Not the chocolate kind! Digital cookies track what you do online. Understanding them helps you protect your privacy.",
             explanationText: "Website cookies are small files that remember your preferences and track your browsing. Some are useful (keeping you logged in), but others track you across the internet to show targeted ads. You can manage cookies in your browser settings.",
             quiz: [
@@ -878,6 +928,8 @@ export const courseData: AgeStream[] = [
             title: "5 Ways to Stay Private Online",
             videoUrl: "https://www.youtube.com/embed/HxySrSbSY7o",
             videoCredit: "National Crime Agency (CEOP)",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Your online profile tells the world about you. Make sure you're only sharing what you want everyone to see. Check your privacy settings on every app and social media!",
             explanationText: "1. Set profiles to private. 2. Think before you post — would you show it to a teacher? 3. Don't share your location. 4. Be careful with photos. 5. Review your friends/followers list regularly.",
             quiz: [
@@ -917,6 +969,8 @@ export const courseData: AgeStream[] = [
             title: "Sharing Photos Safely",
             videoUrl: "https://www.youtube.com/embed/4Gxhjdlkadg",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Photos can reveal more than you think! Location data, school uniforms, street signs – all these details in the background can give away where you are.",
             explanationText: "Before sharing a photo: 1) Check the background for identifying details. 2) Make sure everyone in the photo is happy for it to be shared. 3) Turn off location tags on your camera. 4) Never share photos you might regret later.",
             quiz: [
@@ -947,6 +1001,8 @@ export const courseData: AgeStream[] = [
             title: "Managing Your Online Reputation",
             videoUrl: "https://www.youtube.com/embed/wWClBERMN14",
             videoCredit: "Common Sense Education",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Your online reputation is what people think of you based on what they see online. It's like a first impression that lasts forever! Keep it positive by being thoughtful about what you share.",
             explanationText: "Everything you post contributes to your online reputation. Universities and future employers often check social media. Keep your accounts positive and professional. Remember: it's easier to maintain a good reputation than to fix a bad one!",
             quiz: [
@@ -977,6 +1033,8 @@ export const courseData: AgeStream[] = [
             title: "Catfishing and Fake Profiles",
             videoUrl: "https://www.youtube.com/embed/qDjQ2PZRxRo",
             videoCredit: "CEOP Education",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Not everyone online is who they claim to be. Catfishing is when someone creates a fake profile to trick others. Learn to spot the warning signs!",
             explanationText: "Catfishing is when someone uses fake photos and information to pretend to be someone else online. Warning signs include: refusing to video call, having very few posts or friends, having only perfect-looking photos, and asking too many personal questions.",
             quiz: [
@@ -1007,6 +1065,8 @@ export const courseData: AgeStream[] = [
             title: "Location Sharing – Hidden Dangers",
             videoUrl: "https://www.youtube.com/embed/0j21nNNpXJU",
             videoCredit: "Internet Matters",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Many apps track and share your location without you realising. This can tell strangers exactly where you are – at school, at home, or hanging out with friends!",
             explanationText: "Location sharing can happen through: geotagged photos, social media check-ins, app permissions, and even Wi-Fi connections. Turn off location services for apps that don't need it. Never post in real-time where you are – wait until you've left!",
             quiz: [
@@ -1046,6 +1106,8 @@ export const courseData: AgeStream[] = [
             title: "Standing Up to Cyberbullying",
             videoUrl: "https://www.youtube.com/embed/Jwu_7IqWh8Y",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Cyberbullying is when someone uses technology to hurt, embarrass, or threaten others. If it happens to you, don't respond — save the evidence and tell a trusted adult.",
             explanationText: "Cyberbullying includes mean messages, sharing embarrassing photos, excluding someone on purpose, or spreading rumours online. It's never okay, and it's not your fault. Always report it!",
             quiz: [
@@ -1076,6 +1138,8 @@ export const courseData: AgeStream[] = [
             title: "Being an Upstander, Not a Bystander",
             videoUrl: "https://www.youtube.com/embed/lPBfsWv_9xc",
             videoCredit: "Common Sense Education",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "When you see someone being bullied online, you have a choice: be a bystander and watch, or be an upstander and help. Standing up for others takes courage, but it makes a real difference!",
             explanationText: "An upstander is someone who supports a person being bullied. You can: send a kind message to the victim, report the bully, don't share or like mean content, and tell a trusted adult. Even small actions can have a big impact!",
             quiz: [
@@ -1106,6 +1170,8 @@ export const courseData: AgeStream[] = [
             title: "The Impact of Words Online",
             videoUrl: "https://www.youtube.com/embed/niRT0rlFOeE",
             videoCredit: "Childnet International",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Words online can hurt just as much as words in person – sometimes even more, because they stay there forever. Think before you type, and always choose kindness!",
             explanationText: "Online messages lack tone of voice and facial expressions, so they can be easily misunderstood. What you think is a joke might really hurt someone. Remember: once it's posted, you can't take it back. Use emojis to show tone, and when in doubt, be kind!",
             quiz: [
@@ -1135,6 +1201,8 @@ export const courseData: AgeStream[] = [
             title: "How to Block and Report",
             videoUrl: "https://www.youtube.com/embed/K6CrfMOP0ds",
             videoCredit: "Internet Matters",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Every social media app and game has tools to block and report people who are being harmful. Learning how to use these tools is an important skill for staying safe!",
             explanationText: "Blocking someone stops them from seeing your profile and contacting you. Reporting tells the platform that someone is breaking the rules. You should block AND report: don't just block, as reporting helps protect others too!",
             quiz: [
@@ -1165,6 +1233,8 @@ export const courseData: AgeStream[] = [
             title: "Building a Positive Online Community",
             videoUrl: "https://www.youtube.com/embed/PUl7m0cHBpg",
             videoCredit: "Google for Education",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "The internet can be an amazing, positive place when we all do our part! By being kind, respectful, and inclusive, you help build a community where everyone feels welcome.",
             explanationText: "You have the power to shape your online community! Share positive content, celebrate others' achievements, include everyone, and stand up against negativity. Remember: every kind comment, supportive message, and positive post makes the internet better for everyone!",
             quiz: [
@@ -1204,6 +1274,8 @@ export const courseData: AgeStream[] = [
             title: "Spotting Scams Online",
             videoUrl: "https://www.youtube.com/embed/XCF_wMBqXuY",
             videoCredit: "Google for Education",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Scammers try to trick you into giving away your information or money. They might pretend to be a company you trust. Learn to spot the signs!",
             explanationText: "Phishing is when scammers send fake emails or messages pretending to be real companies. Look for: spelling mistakes, urgent language, requests for personal info, and suspicious links. When in doubt, don't click!",
             quiz: [
@@ -1234,6 +1306,8 @@ export const courseData: AgeStream[] = [
             title: "Fake Websites – How to Tell",
             videoUrl: "https://www.youtube.com/embed/KjnPprhyRjU",
             videoCredit: "National Cyber Security Centre",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Scammers create fake websites that look almost identical to real ones. They want you to enter your login details or payment information. Learning to spot fakes protects you!",
             explanationText: "Check for: 1) The padlock icon in the address bar. 2) The correct URL spelling (g00gle vs google). 3) Poor design or spelling errors. 4) Unrealistic offers. When in doubt, type the website address directly instead of clicking links.",
             quiz: [
@@ -1264,6 +1338,8 @@ export const courseData: AgeStream[] = [
             title: "Social Media Scams",
             videoUrl: "https://www.youtube.com/embed/KDojDx9oky0",
             videoCredit: "Internet Matters",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "Scammers love social media! They create fake competitions, impersonate celebrities, and send messages with dodgy links. Knowing the tricks helps you avoid getting caught!",
             explanationText: "Common social media scams include: fake giveaways asking you to share personal info, fake celebrity accounts, 'click to see who viewed your profile' links, and messages from hacked friend accounts. If something seems off, trust your instinct!",
             quiz: [
@@ -1293,6 +1369,8 @@ export const courseData: AgeStream[] = [
             title: "In-Game Scams",
             videoUrl: "https://www.youtube.com/embed/nPrkqbhZxkc",
             videoCredit: "Internet Matters",
+            videoDurationMinutes: 4,
+            estimatedMinutes: 10,
             narrationText: "Online games are full of scams too! People might offer free skins, coins, or upgrades in exchange for your login details. Don't fall for it – they just want to steal your account!",
             explanationText: "Common gaming scams include: fake 'free V-Bucks' generators, people offering to 'boost' your account (but stealing it), phishing links in game chats, and fake trading offers. Only use official stores for purchases and never share your login details!",
             quiz: [
@@ -1322,6 +1400,8 @@ export const courseData: AgeStream[] = [
             title: "What To Do If You Get Scammed",
             videoUrl: "https://www.youtube.com/embed/s7wmiS2mSXY",
             videoCredit: "BBC Bitesize",
+            videoDurationMinutes: 5,
+            estimatedMinutes: 12,
             narrationText: "If you think you've been scammed, don't panic! There are steps you can take right away to protect yourself and prevent more damage.",
             explanationText: "If you've been scammed: 1) Tell a trusted adult immediately. 2) Change your passwords right away. 3) Don't reply to the scammer. 4) Report it to the platform. 5) If money was involved, contact the bank. Remember: it's not your fault, and getting help quickly is the best thing you can do!",
             quiz: [
