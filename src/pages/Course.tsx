@@ -335,6 +335,19 @@ export default function CoursePage() {
                       </p>
                     </div>
 
+                    {/* Child Survey - shows after course completion */}
+                    {!surveyDismissed && user && childId && (
+                      <ChildSurvey
+                        userId={user.id}
+                        childId={childId}
+                        childName={learnerName}
+                        streamId={view.streamId}
+                        ageBand={child?.age_band || "6-9"}
+                        onComplete={() => setSurveyDismissed(true)}
+                        onSkip={() => setSurveyDismissed(true)}
+                      />
+                    )}
+
                     {/* Lead magnet conversion */}
                     <ArmourConversionScreen
                       earnedPieces={earnedPieces}
