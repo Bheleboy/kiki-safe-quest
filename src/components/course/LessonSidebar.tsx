@@ -79,8 +79,11 @@ export function LessonSidebar({
                         >
                           {lesson.title}
                         </p>
+                        <span className="text-[10px] text-muted-foreground/60 font-body">
+                          🎬 {lesson.videoDurationMinutes} min · ⏱ ~{lesson.estimatedMinutes} min
+                        </span>
                         {isCurrent && (
-                          <span className="text-[10px] text-primary font-display font-medium uppercase tracking-wider">
+                          <span className="block text-[10px] text-primary font-display font-medium uppercase tracking-wider">
                             Now playing
                           </span>
                         )}
