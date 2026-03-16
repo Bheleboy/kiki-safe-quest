@@ -28,6 +28,8 @@ export default function ParentDashboard() {
   const { progress, loading } = useProgress(user?.id);
   const { earnedPieces, loading: armourLoading, getPieceProgress } = useArmour(user?.id);
   const navigate = useNavigate();
+  const [showSurveyReview, setShowSurveyReview] = useState(false);
+  const [showParentSurvey, setShowParentSurvey] = useState(false);
 
   const learnerName = profile?.first_name || "Learner";
   const ageBand = profile?.age_band || "6-9";
