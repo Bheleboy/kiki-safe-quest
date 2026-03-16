@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { ChildSurvey } from "@/components/survey/ChildSurvey";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, LogOut, Users, Home } from "lucide-react";
 import { courseData, type AgeStream } from "@/data/courseData";
@@ -41,6 +42,8 @@ export default function CoursePage() {
   const [child, setChild] = useState<ChildInfo | null>(null);
   const navigate = useNavigate();
   const [unlockingPiece, setUnlockingPiece] = useState<string | null>(null);
+  const [showSurvey, setShowSurvey] = useState(false);
+  const [surveyDismissed, setSurveyDismissed] = useState(false);
 
   // Fetch child info
   useEffect(() => {
@@ -331,6 +334,19 @@ export default function CoursePage() {
                         You completed all modules and earned your armour pieces!
                       </p>
                     </div>
+
+                    {/* Child Survey - shows after course completion */}
+                    {!surveyDismissed && user && childId && (
+                      <ChildSurvey
+                        userId={user.id}
+                        childId={childId}
+                        childName={learnerName}
+                        streamId={view.streamId}
+                        ageBand={child?.age_band || "6-9"}
+                        onComplete={() => setSurveyDismissed(true)}
+                        onSkip={() => setSurveyDismissed(true)}
+                      />
+                    )}
 
                     {/* Lead magnet conversion */}
                     <ArmourConversionScreen

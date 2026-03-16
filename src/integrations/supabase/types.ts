@@ -111,6 +111,62 @@ export type Database = {
         }
         Relationships: []
       }
+      child_surveys: {
+        Row: {
+          age_band: string
+          child_id: string
+          created_at: string
+          favorite_part: string | null
+          id: string
+          learned_something: boolean | null
+          stream_id: string
+          user_id: string
+          videos_helpful: boolean | null
+          was_easy: boolean | null
+          was_fun: boolean | null
+          what_to_improve: string | null
+          would_recommend: boolean | null
+        }
+        Insert: {
+          age_band: string
+          child_id: string
+          created_at?: string
+          favorite_part?: string | null
+          id?: string
+          learned_something?: boolean | null
+          stream_id: string
+          user_id: string
+          videos_helpful?: boolean | null
+          was_easy?: boolean | null
+          was_fun?: boolean | null
+          what_to_improve?: string | null
+          would_recommend?: boolean | null
+        }
+        Update: {
+          age_band?: string
+          child_id?: string
+          created_at?: string
+          favorite_part?: string | null
+          id?: string
+          learned_something?: boolean | null
+          stream_id?: string
+          user_id?: string
+          videos_helpful?: boolean | null
+          was_easy?: boolean | null
+          was_fun?: boolean | null
+          what_to_improve?: string | null
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_surveys_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       children: {
         Row: {
           age_band: string
@@ -137,6 +193,69 @@ export type Database = {
           parent_id?: string
         }
         Relationships: []
+      }
+      parent_surveys: {
+        Row: {
+          child_id: string | null
+          child_more_aware: boolean | null
+          created_at: string
+          easy_to_use: boolean | null
+          feedback: string | null
+          google_review_clicked: boolean | null
+          helped_child: boolean | null
+          id: string
+          overall_rating: number | null
+          reviewed_child_survey_id: string | null
+          stream_id: string | null
+          user_id: string
+          would_recommend: boolean | null
+        }
+        Insert: {
+          child_id?: string | null
+          child_more_aware?: boolean | null
+          created_at?: string
+          easy_to_use?: boolean | null
+          feedback?: string | null
+          google_review_clicked?: boolean | null
+          helped_child?: boolean | null
+          id?: string
+          overall_rating?: number | null
+          reviewed_child_survey_id?: string | null
+          stream_id?: string | null
+          user_id: string
+          would_recommend?: boolean | null
+        }
+        Update: {
+          child_id?: string | null
+          child_more_aware?: boolean | null
+          created_at?: string
+          easy_to_use?: boolean | null
+          feedback?: string | null
+          google_review_clicked?: boolean | null
+          helped_child?: boolean | null
+          id?: string
+          overall_rating?: number | null
+          reviewed_child_survey_id?: string | null
+          stream_id?: string | null
+          user_id?: string
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_surveys_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_surveys_reviewed_child_survey_id_fkey"
+            columns: ["reviewed_child_survey_id"]
+            isOneToOne: false
+            referencedRelation: "child_surveys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
