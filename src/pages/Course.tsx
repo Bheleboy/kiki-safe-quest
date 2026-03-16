@@ -42,6 +42,8 @@ export default function CoursePage() {
   const [child, setChild] = useState<ChildInfo | null>(null);
   const navigate = useNavigate();
   const [unlockingPiece, setUnlockingPiece] = useState<string | null>(null);
+  const [showSurvey, setShowSurvey] = useState(false);
+  const [surveyDismissed, setSurveyDismissed] = useState(false);
 
   // Fetch child info
   useEffect(() => {
