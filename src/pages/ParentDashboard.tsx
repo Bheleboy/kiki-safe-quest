@@ -232,6 +232,62 @@ export default function ParentDashboard() {
             })}
           </motion.div>
         ))}
+
+        {/* Survey Section */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-4">
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+            Surveys & Feedback
+          </h2>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              onClick={() => { setShowSurveyReview(true); setShowParentSurvey(false); }}
+              className="card-kiki text-left hover:border-primary/30 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <ClipboardList className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Review Child Surveys</p>
+                  <p className="text-xs text-muted-foreground font-body">See what your children shared</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setShowParentSurvey(true); setShowSurveyReview(false); }}
+              className="card-kiki text-left hover:border-primary/30 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                  <Star className="w-5 h-5 text-secondary" />
+                </div>
+                <div>
+                  <p className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Share Your Feedback</p>
+                  <p className="text-xs text-muted-foreground font-body">Help us improve Kiki Warrior</p>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {showSurveyReview && user && (
+            <ChildSurveyReview
+              userId={user.id}
+              childName={learnerName}
+              onDone={() => setShowSurveyReview(false)}
+            />
+          )}
+
+          {showParentSurvey && user && (
+            <ParentSurvey
+              userId={user.id}
+              childName={learnerName}
+              onComplete={() => setShowParentSurvey(false)}
+              onSkip={() => setShowParentSurvey(false)}
+            />
+          )}
+        </motion.div>
       </main>
     </div>
   );
