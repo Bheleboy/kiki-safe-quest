@@ -39,6 +39,10 @@ export function ModuleCard({ module, index, progress, armourPiece, armourEarned,
           </div>
           <p className="text-xs text-muted-foreground font-body mt-1">
             {module.lessons.length} lesson{module.lessons.length !== 1 ? "s" : ""}
+            <span className="mx-1">·</span>
+            <span className="text-primary/70">
+              ⏱ {module.lessons.reduce((sum, l) => sum + l.estimatedMinutes, 0)} min
+            </span>
           </p>
 
           {/* Armour piece indicator */}

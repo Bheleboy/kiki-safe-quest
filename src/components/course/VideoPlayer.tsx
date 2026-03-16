@@ -5,6 +5,7 @@ interface VideoPlayerProps {
   fallbackUrl?: string;
   title: string;
   videoCredit?: string;
+  durationMinutes?: number;
 }
 
 export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit }: VideoPlayerProps) {
