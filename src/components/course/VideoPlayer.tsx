@@ -8,7 +8,7 @@ interface VideoPlayerProps {
   durationMinutes?: number;
 }
 
-export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit }: VideoPlayerProps) {
+export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, durationMinutes }: VideoPlayerProps) {
   const [error, setError] = useState(false);
 
   return (
