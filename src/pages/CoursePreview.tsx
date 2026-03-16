@@ -1,6 +1,6 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck, PlayCircle, Hourglass } from "lucide-react";
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import { VideoPlayer } from "@/components/course/VideoPlayer";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
