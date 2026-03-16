@@ -218,26 +218,48 @@ export default function CoursePreview() {
         </motion.div>
 
         {/* Module Preview */}
-        {[youngStream, teenStream].filter(Boolean).map((stream) => (
-          <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
-            <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
-              {stream!.label} — {stream!.description}
-            </h2>
-            <div className="grid gap-3">
-              {stream!.modules.map((mod) => (
-                <div key={mod.id} className="card-kiki flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                    <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
-                    <p className="text-xs text-muted-foreground font-body">{mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}</p>
-                  </div>
+        {[youngStream, teenStream].filter(Boolean).map((stream) => {
+          const streamVideoMinutes = stream!.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.videoDurationMinutes, 0), 0);
+          const streamEstimatedMinutes = stream!.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.estimatedMinutes, 0), 0);
+          
+          return (
+            <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+                  {stream!.label} — {stream!.description}
+                </h2>
+                <div className="flex items-center gap-3 text-xs font-body text-muted-foreground">
+                  <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> {formatTime(streamVideoMinutes)} video</span>
+                  <span className="flex items-center gap-1"><Hourglass className="w-3.5 h-3.5" /> {formatTime(streamEstimatedMinutes)} total</span>
                 </div>
-              ))}
-            </div>
-          </motion.div>
-        ))}
+              </div>
+              <div className="grid gap-3">
+                {stream!.modules.map((mod) => {
+                  const modVideoMinutes = mod.lessons.reduce((sum, l) => sum + l.videoDurationMinutes, 0);
+                  const modEstimatedMinutes = mod.lessons.reduce((sum, l) => sum + l.estimatedMinutes, 0);
+                  
+                  return (
+                    <div key={mod.id} className="card-kiki flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                        <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
+                        <p className="text-xs text-muted-foreground font-body">
+                          {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
+                          <span className="mx-1">·</span>
+                          <span className="flex items-center gap-1 inline-flex"><PlayCircle className="w-3 h-3" /> {formatTime(modVideoMinutes)}</span>
+                          <span className="mx-1">·</span>
+                          <span className="text-primary/70 flex items-center gap-1 inline-flex"><Hourglass className="w-3 h-3" /> {formatTime(modEstimatedMinutes)}</span>
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          );
+        })}
 
         {/* Armour Reward CTA (replaces certificate preview) */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki text-center space-y-4 border-primary/20">
