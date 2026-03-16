@@ -98,6 +98,42 @@ export default function CoursePreview() {
           </div>
         </motion.div>
 
+        {/* Course Time Summary */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-kiki border-secondary/30 bg-gradient-to-b from-secondary/5 to-card">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5 text-secondary-foreground" />
+            </div>
+            <div>
+              <h2 className="font-display text-base font-bold text-foreground uppercase tracking-wide">Course Time Breakdown</h2>
+              <p className="font-body text-xs text-muted-foreground">Plan your child's learning journey</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-primary">{totalLessons}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Lessons</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-secondary">{formatTime(totalVideoMinutes)}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Video Watch Time</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-accent">{formatTime(totalEstimatedMinutes)}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Total Completion Time</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
+              <p className="font-display text-2xl font-bold text-coral">~{Math.ceil(totalEstimatedMinutes / 10)}</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Sessions (10 min each)</p>
+            </div>
+          </div>
+          
+          <p className="font-body text-xs text-muted-foreground mt-4 text-center">
+            Total completion time includes video watching, quizzes, and activities. Your child can complete this in short daily sessions or all at once!
+          </p>
+        </motion.div>
+
         {/* Armour Reward Highlight */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki border-primary/30 bg-gradient-to-b from-primary/5 to-card space-y-5">
           <div className="text-center space-y-2">
