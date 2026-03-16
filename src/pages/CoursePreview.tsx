@@ -161,7 +161,7 @@ export default function CoursePreview() {
           <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
           <div>
             <h3 className="font-display text-base font-bold text-foreground uppercase tracking-wide mb-1">70% Pass Requirement</h3>
-            <p className="font-body text-sm text-muted-foreground">Children must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
+            <p className="font-body text-sm text-muted-foreground">Your child must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
           </div>
         </motion.div>
 
