@@ -90,7 +90,7 @@ export default function CoursePreview() {
               Earn the Armour of God
             </h2>
             <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
-              As your child passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
+              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
             </p>
           </div>
 
