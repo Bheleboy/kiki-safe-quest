@@ -71,7 +71,7 @@ export function LessonView({
       </div>
 
       {/* Video */}
-      <VideoPlayer videoUrl={lesson.videoUrl} fallbackUrl={lesson.videoFallbackUrl} title={lesson.title} videoCredit={lesson.videoCredit} />
+      <VideoPlayer videoUrl={lesson.videoUrl} fallbackUrl={lesson.videoFallbackUrl} title={lesson.title} videoCredit={lesson.videoCredit} durationMinutes={lesson.videoDurationMinutes} />
 
       {/* Narration + Explanation */}
       <div className="space-y-3">
