@@ -11,6 +11,8 @@ export interface Lesson {
   videoUrl: string;
   videoFallbackUrl?: string;
   videoCredit?: string;
+  videoDurationMinutes: number;
+  estimatedMinutes: number;
   narrationText: string;
   explanationText: string;
   quiz: QuizQuestion[];
