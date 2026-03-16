@@ -35,7 +35,7 @@ export default function CoursePreview() {
   const highlights = [
     "Age-appropriate content for 6–9 and 10–13 year olds",
     "Interactive quizzes with 70% pass requirement",
-    "Earn 3 pieces of the Armour of God as rewards",
+    "Your child earns 3 pieces of the Armour of God as rewards",
     "Parent dashboard to track progress",
     "Collect all 6 pieces across both courses",
     "Video lessons with narration support",
