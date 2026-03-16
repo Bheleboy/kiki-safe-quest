@@ -61,6 +61,9 @@ export function LessonView({
             {module.title}
           </p>
           <h2 className="font-display text-lg font-bold text-foreground truncate">{lesson.title}</h2>
+          <p className="text-xs text-muted-foreground/80 font-body mt-0.5">
+            🎬 {lesson.videoDurationMinutes} min video · ⏱ ~{lesson.estimatedMinutes} min total
+          </p>
         </div>
         <span className="text-xs font-display font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
           {lessonIndex + 1}/{totalLessons}
@@ -68,7 +71,7 @@ export function LessonView({
       </div>
 
       {/* Video */}
-      <VideoPlayer videoUrl={lesson.videoUrl} fallbackUrl={lesson.videoFallbackUrl} title={lesson.title} videoCredit={lesson.videoCredit} />
+      <VideoPlayer videoUrl={lesson.videoUrl} fallbackUrl={lesson.videoFallbackUrl} title={lesson.title} videoCredit={lesson.videoCredit} durationMinutes={lesson.videoDurationMinutes} />
 
       {/* Narration + Explanation */}
       <div className="space-y-3">

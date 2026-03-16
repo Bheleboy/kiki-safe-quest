@@ -5,9 +5,10 @@ interface VideoPlayerProps {
   fallbackUrl?: string;
   title: string;
   videoCredit?: string;
+  durationMinutes?: number;
 }
 
-export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit }: VideoPlayerProps) {
+export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, durationMinutes }: VideoPlayerProps) {
   const [error, setError] = useState(false);
 
   return (
@@ -38,9 +39,11 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit }: Video
           </div>
         )}
       </div>
-      {videoCredit && (
+      {(videoCredit || durationMinutes) && (
         <p className="text-[11px] font-body text-muted-foreground/70 px-1">
-          📹 {videoCredit} · Used under Creative Commons licence
+          {durationMinutes && <span>🎬 {durationMinutes} min</span>}
+          {durationMinutes && videoCredit && <span> · </span>}
+          {videoCredit && <span>📹 {videoCredit} · Used under Creative Commons licence</span>}
         </p>
       )}
     </div>
