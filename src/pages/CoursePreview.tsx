@@ -27,10 +27,25 @@ export default function CoursePreview() {
 
   const youngStream = courseData.find((s) => s.id === "6-9");
   const teenStream = courseData.find((s) => s.id === "10-13");
+  
+  // Calculate time totals
   const totalLessons = courseData.reduce(
     (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.length, 0),
     0
   );
+  const totalVideoMinutes = courseData.reduce(
+    (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.videoDurationMinutes, 0), 0),
+    0
+  );
+  const totalEstimatedMinutes = courseData.reduce(
+    (sum, s) => sum + s.modules.reduce((ms, m) => ms + m.lessons.reduce((ls, l) => ls + l.estimatedMinutes, 0), 0),
+    0
+  );
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+  };
 
   const highlights = [
     "Age-appropriate content for 6–9 and 10–13 year olds",
