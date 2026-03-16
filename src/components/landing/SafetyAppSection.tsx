@@ -21,7 +21,7 @@ const features = [
   {
     icon: <Award className="w-6 h-6" />,
     title: "Armour of God Rewards",
-    desc: "Children earn pieces of the Armour of God as they pass quizzes — collect all 6 across both courses.",
+    desc: "As your child completes lessons and passes quizzes, they earn pieces of the Armour of God — collect all 6 across both courses.",
   },
 ];
 

@@ -35,7 +35,7 @@ export default function CoursePreview() {
   const highlights = [
     "Age-appropriate content for 6–9 and 10–13 year olds",
     "Interactive quizzes with 70% pass requirement",
-    "Earn 3 pieces of the Armour of God as rewards",
+    "Your child earns 3 pieces of the Armour of God as rewards",
     "Parent dashboard to track progress",
     "Collect all 6 pieces across both courses",
     "Video lessons with narration support",
@@ -90,7 +90,7 @@ export default function CoursePreview() {
               Earn the Armour of God
             </h2>
             <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
-              As your child passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
+              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
             </p>
           </div>
 
@@ -161,7 +161,7 @@ export default function CoursePreview() {
           <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
           <div>
             <h3 className="font-display text-base font-bold text-foreground uppercase tracking-wide mb-1">70% Pass Requirement</h3>
-            <p className="font-body text-sm text-muted-foreground">Children must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
+            <p className="font-body text-sm text-muted-foreground">Your child must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
           </div>
         </motion.div>
 
