@@ -220,7 +220,7 @@ export default function CoursePage() {
                           <div className="w-12 h-12 rounded-lg gradient-copper flex items-center justify-center">
                             <CourseIcon name={stream.id === "6-9" ? "shield" : "eye"} size={24} className="stroke-primary-foreground" />
                           </div>
-                          <div>
+                          <div className="flex-1">
                             <h2 className="font-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-wide">
                               {stream.label}
                             </h2>
@@ -228,12 +228,13 @@ export default function CoursePage() {
                               {stream.description}
                             </p>
                           </div>
+                          <span className="font-display text-lg font-bold text-primary shrink-0">
+                            {Math.round(prog * 100)}%
+                          </span>
                         </div>
-                        {prog > 0 && (
-                          <div className="mt-3">
-                            <ProgressBar progress={prog} label={complete ? "Complete" : "Your progress"} />
-                          </div>
-                        )}
+                        <div className="mt-3">
+                          <ProgressBar progress={prog} label={complete ? "Complete" : "Your progress"} />
+                        </div>
                       </div>
                       <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
                         <CourseIcon name="shield" size={100} className="stroke-foreground" />
