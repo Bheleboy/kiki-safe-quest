@@ -193,12 +193,23 @@ export default function ManageChildren() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide truncate">
-                    {child.first_name}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide truncate">
+                      {child.first_name}
+                    </h3>
+                    <span className="font-display text-sm font-bold text-primary shrink-0">
+                      {childProgress[child.id] ?? 0}%
+                    </span>
+                  </div>
                   <p className="text-xs text-muted-foreground font-body">
                     Ages {child.age_band}
                   </p>
+                  <div className="mt-1.5 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full gradient-copper rounded-full transition-all duration-500"
+                      style={{ width: `${childProgress[child.id] ?? 0}%` }}
+                    />
+                  </div>
                 </div>
                 <button
                   onClick={() => removeChild(child.id)}
