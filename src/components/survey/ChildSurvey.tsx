@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Send, CheckCircle2 } from "lucide-react";
+import { Star, Send, CheckCircle2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ChildSurveyProps {
@@ -9,6 +9,7 @@ interface ChildSurveyProps {
   childName: string;
   streamId: string;
   ageBand: string;
+  isCourseComplete: boolean;
   onComplete: (surveyId: string) => void;
   onSkip: () => void;
 }
@@ -28,24 +29,42 @@ const questions: YesNoQuestion[] = [
   { key: "would_recommend", younger: "Would you tell a friend about it?", older: "Would you recommend this to a friend?", emoji: "🤝" },
 ];
 
-export function ChildSurvey({ userId, childId, childName, streamId, ageBand, onComplete, onSkip }: ChildSurveyProps) {
+export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isCourseComplete, onComplete, onSkip }: ChildSurveyProps) {
   const isYounger = ageBand === "6-9";
-  const [step, setStep] = useState(0); // 0-4 = yes/no questions, 5 = text, 6 = submitting
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean | null>>({});
   const [favoritePart, setFavoritePart] = useState("");
   const [improvement, setImprovement] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Gate: if course not complete, show prompt
+  if (!isCourseComplete) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card-kiki text-center space-y-4 py-6">
+        <AlertTriangle className="w-12 h-12 text-primary mx-auto" />
+        <h3 className="font-display text-lg font-bold text-foreground uppercase tracking-wide">
+          Complete the course first!
+        </h3>
+        <p className="font-body text-sm text-muted-foreground max-w-sm mx-auto">
+          {childName} needs to finish all lessons and quizzes before the survey becomes available. Keep going — you're doing great!
+        </p>
+        <button onClick={onSkip} className="text-xs font-body text-muted-foreground hover:text-foreground transition-colors">
+          Go back
+        </button>
+      </motion.div>
+    );
+  }
+
   const currentQ = questions[step];
-  const totalSteps = questions.length + 1; // +1 for text step
+  const totalSteps = questions.length + 1;
 
   const handleAnswer = (value: boolean) => {
     setAnswers((prev) => ({ ...prev, [currentQ.key]: value }));
     if (step < questions.length - 1) {
       setStep(step + 1);
     } else {
-      setStep(questions.length); // go to text step
+      setStep(questions.length);
     }
   };
 
@@ -69,6 +88,18 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, onC
       .select("id")
       .single();
 
+    // Create notification for the parent
+    if (!error && data) {
+      await supabase.from("notifications").insert({
+        user_id: userId,
+        type: "survey_review",
+        title: `${childName} completed a survey!`,
+        message: `${childName} has finished the course survey and is waiting for your review and approval.`,
+        child_id: childId,
+        related_id: (data as any).id,
+      } as any);
+    }
+
     setSubmitting(false);
     if (!error && data) {
       setSubmitted(true);
@@ -84,7 +115,9 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, onC
           {isYounger ? "Thank you, warrior! 🌟" : "Thanks for your feedback!"}
         </h3>
         <p className="font-body text-muted-foreground text-sm">
-          {isYounger ? "Your answers help us make things even better!" : "Your feedback helps us improve the platform."}
+          {isYounger
+            ? "Your answers help us make things even better! Your parent will review your responses."
+            : "Your feedback helps us improve the platform. Your parent will be notified to review."}
         </p>
       </motion.div>
     );
