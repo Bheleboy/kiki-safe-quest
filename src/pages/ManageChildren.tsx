@@ -72,9 +72,13 @@ export default function ManageChildren() {
       .select("*")
       .eq("parent_id", user.id)
       .order("created_at", { ascending: true });
-    if (data) setChildren(data as unknown as Child[]);
+    if (data) {
+      const childList = data as unknown as Child[];
+      setChildren(childList);
+      fetchChildProgress(childList);
+    }
     setLoading(false);
-  }, [user]);
+  }, [user, fetchChildProgress]);
 
   const fetchBookPurchases = useCallback(async () => {
     if (!user) return;
