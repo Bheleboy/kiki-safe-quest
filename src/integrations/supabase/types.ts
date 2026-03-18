@@ -119,6 +119,9 @@ export type Database = {
           favorite_part: string | null
           id: string
           learned_something: boolean | null
+          parent_approved: boolean | null
+          parent_approved_at: string | null
+          parent_notified: boolean | null
           stream_id: string
           user_id: string
           videos_helpful: boolean | null
@@ -134,6 +137,9 @@ export type Database = {
           favorite_part?: string | null
           id?: string
           learned_something?: boolean | null
+          parent_approved?: boolean | null
+          parent_approved_at?: string | null
+          parent_notified?: boolean | null
           stream_id: string
           user_id: string
           videos_helpful?: boolean | null
@@ -149,6 +155,9 @@ export type Database = {
           favorite_part?: string | null
           id?: string
           learned_something?: boolean | null
+          parent_approved?: boolean | null
+          parent_approved_at?: string | null
+          parent_notified?: boolean | null
           stream_id?: string
           user_id?: string
           videos_helpful?: boolean | null
@@ -193,6 +202,50 @@ export type Database = {
           parent_id?: string
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          child_id: string | null
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          related_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          child_id?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          related_id?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          related_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       parent_surveys: {
         Row: {
