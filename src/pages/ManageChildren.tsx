@@ -38,11 +38,32 @@ export default function ManageChildren() {
   const navigate = useNavigate();
   const [children, setChildren] = useState<Child[]>([]);
   const [bookPurchases, setBookPurchases] = useState<BookPurchase[]>([]);
+  const [childProgress, setChildProgress] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState("");
   const [newAge, setNewAge] = useState<"6-9" | "10-13">("6-9");
   const [submitting, setSubmitting] = useState(false);
+
+  // Fetch progress for all children
+  const fetchChildProgress = useCallback(async (childList: Child[]) => {
+    if (!user || childList.length === 0) return;
+    const { data } = await supabase
+      .from("progress")
+      .select("child_id, lesson_id")
+      .eq("user_id", user.id);
+    if (!data) return;
+
+    const progressMap: Record<string, number> = {};
+    for (const child of childList) {
+      const stream = courseData.find((s) => s.id === child.age_band);
+      if (!stream) { progressMap[child.id] = 0; continue; }
+      const totalLessons = stream.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+      const completedLessons = data.filter((p) => p.child_id === child.id).length;
+      progressMap[child.id] = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+    }
+    setChildProgress(progressMap);
+  }, [user]);
 
   const fetchChildren = useCallback(async () => {
     if (!user) return;
