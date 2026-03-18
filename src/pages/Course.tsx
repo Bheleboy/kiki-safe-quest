@@ -343,6 +343,7 @@ export default function CoursePage() {
                         childName={learnerName}
                         streamId={view.streamId}
                         ageBand={child?.age_band || "6-9"}
+                        isCourseComplete={complete}
                         onComplete={() => setSurveyDismissed(true)}
                         onSkip={() => setSurveyDismissed(true)}
                       />
