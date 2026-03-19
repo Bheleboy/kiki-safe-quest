@@ -184,15 +184,24 @@ export default function CoursePreview() {
           </div>
         </motion.div>
 
-        {/* Video Placeholder */}
+        {/* Intro Video */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-1">Why We Use the Internet</h2>
-          <VideoPlayer
-            videoUrl="https://www.youtube.com/embed/xCEpBjb7_bE"
-            fallbackUrl="https://www.youtube.com/watch?v=xCEpBjb7_bE"
-            title="Making the Internet Safe for Children – UNICEF"
-            videoCredit="UNICEF · Making the Internet Safe for Children"
-          />
+          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-1">Meet Kiki the Warrior</h2>
+          <div className="w-full rounded-xl overflow-hidden bg-muted aspect-video border border-border/40">
+            <video
+              className="w-full h-full object-cover"
+              controls
+              preload="metadata"
+              playsInline
+              poster=""
+            >
+              <source src="https://cadawrwcoqipuyzypgfx.supabase.co/storage/v1/object/public/videos/kiki-warrior-intro.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <p className="text-[11px] font-body text-muted-foreground/70 px-1">
+            🎬 Kiki Safe Quest · Introduction Video
+          </p>
         </motion.div>
 
         {/* What's Included */}
