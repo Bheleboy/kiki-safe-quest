@@ -41,6 +41,9 @@ export default function AuthPage() {
     if (user) navigate(returnTo, { replace: true });
   }, [user, navigate, returnTo]);
 
+  // Block auth on non-production domains
+  const domainBlocked = !isAllowedAuthDomain();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
