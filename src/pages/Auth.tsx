@@ -98,6 +98,8 @@ export default function AuthPage() {
       setGoogleLoading(false);
     }
   };
+
+  return (
     <div className="min-h-screen gradient-dark flex items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
