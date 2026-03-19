@@ -314,18 +314,21 @@ export type Database = {
         Row: {
           age_band: string
           created_at: string
+          email: string | null
           first_name: string
           id: string
         }
         Insert: {
           age_band?: string
           created_at?: string
+          email?: string | null
           first_name?: string
           id: string
         }
         Update: {
           age_band?: string
           created_at?: string
+          email?: string | null
           first_name?: string
           id?: string
         }
