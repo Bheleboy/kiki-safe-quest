@@ -54,7 +54,7 @@ export function useAuth() {
       password,
       options: {
         data: { first_name: firstName, age_band: ageBand },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: getProductionOrigin(),
       },
     });
     return { error };
