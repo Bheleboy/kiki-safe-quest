@@ -82,7 +82,22 @@ export default function AuthPage() {
     }
   };
 
-  return (
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setMessage("");
+    if (domainBlocked) { setError("Authentication is only available on the official website."); return; }
+    setGoogleLoading(true);
+    try {
+      const { error } = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (error) setError(error.message || "Google sign-in failed");
+    } catch (err: any) {
+      setError(err.message || "Google sign-in failed");
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
     <div className="min-h-screen gradient-dark flex items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
