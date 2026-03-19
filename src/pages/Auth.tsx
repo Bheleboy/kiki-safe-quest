@@ -32,6 +32,7 @@ export default function AuthPage() {
   const [consent, setConsent] = useState(false);
   const [guardianConsent, setGuardianConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { signUp, signIn, resetPassword, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
