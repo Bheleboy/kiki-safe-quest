@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
+import { isAllowedAuthDomain } from "@/lib/domain";
 import { z } from "zod";
 
 type Mode = "login" | "signup" | "forgot";
@@ -40,10 +41,14 @@ export default function AuthPage() {
     if (user) navigate(returnTo, { replace: true });
   }, [user, navigate, returnTo]);
 
+  // Block auth on non-production domains
+  const domainBlocked = !isAllowedAuthDomain();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
+    if (domainBlocked) { setError("Authentication is only available on the official website."); return; }
     setSubmitting(true);
 
     try {

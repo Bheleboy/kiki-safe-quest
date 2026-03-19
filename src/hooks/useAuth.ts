@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getProductionOrigin } from "@/lib/domain";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface Profile {
@@ -53,7 +54,7 @@ export function useAuth() {
       password,
       options: {
         data: { first_name: firstName, age_band: ageBand },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: getProductionOrigin(),
       },
     });
     return { error };
@@ -73,7 +74,7 @@ export function useAuth() {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${getProductionOrigin()}/reset-password`,
     });
     return { error };
   };
