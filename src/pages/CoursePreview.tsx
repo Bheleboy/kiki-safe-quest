@@ -193,7 +193,7 @@ export default function CoursePreview() {
               controls
               preload="metadata"
               playsInline
-              poster=""
+              poster={videoPoster}
             >
               <source src="https://cadawrwcoqipuyzypgfx.supabase.co/storage/v1/object/public/videos/kiki-warrior-intro.mp4" type="video/mp4" />
               Your browser does not support the video tag.
