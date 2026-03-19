@@ -2,7 +2,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck, PlayCircle, Hourglass } from "lucide-react";
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
-
+import videoPoster from "@/assets/video-poster-kiki-intro.jpg";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
@@ -193,7 +193,7 @@ export default function CoursePreview() {
               controls
               preload="metadata"
               playsInline
-              poster=""
+              poster={videoPoster}
             >
               <source src="https://cadawrwcoqipuyzypgfx.supabase.co/storage/v1/object/public/videos/kiki-warrior-intro.mp4" type="video/mp4" />
               Your browser does not support the video tag.
