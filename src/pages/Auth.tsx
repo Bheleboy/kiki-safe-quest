@@ -48,6 +48,7 @@ export default function AuthPage() {
     e.preventDefault();
     setError("");
     setMessage("");
+    if (domainBlocked) { setError("Authentication is only available on the official website."); return; }
     setSubmitting(true);
 
     try {
