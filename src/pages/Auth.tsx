@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
 import { isAllowedAuthDomain } from "@/lib/domain";
-import { lovable } from "@/integrations/lovable/index";
+
 import { z } from "zod";
 
 type Mode = "login" | "signup" | "forgot";
