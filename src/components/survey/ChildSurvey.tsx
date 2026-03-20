@@ -37,8 +37,8 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
   const [improvement, setImprovement] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-  // Gate: if course not complete, show prompt
   if (!isCourseComplete) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card-kiki text-center space-y-4 py-6">
@@ -70,6 +70,7 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setSubmitError("");
     const { data, error } = await supabase
       .from("child_surveys")
       .insert({
@@ -84,26 +85,36 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
         would_recommend: answers.would_recommend ?? null,
         favorite_part: favoritePart.trim() || null,
         what_to_improve: improvement.trim() || null,
-      } as any)
+      })
       .select("id")
       .single();
 
+    if (error) {
+      setSubmitting(false);
+      setSubmitError(
+        isYounger
+          ? "Oops! Something went wrong. Please try again!"
+          : "Submission failed. Please try again."
+      );
+      return;
+    }
+
     // Create notification for the parent
-    if (!error && data) {
+    if (data) {
       await supabase.from("notifications").insert({
         user_id: userId,
         type: "survey_review",
         title: `${childName} completed a survey!`,
         message: `${childName} has finished the course survey and is waiting for your review and approval.`,
         child_id: childId,
-        related_id: (data as any).id,
-      } as any);
+        related_id: data.id,
+      });
     }
 
     setSubmitting(false);
-    if (!error && data) {
+    if (data) {
       setSubmitted(true);
-      setTimeout(() => onComplete((data as any).id), 1500);
+      setTimeout(() => onComplete(data.id), 1500);
     }
   };
 
@@ -230,6 +241,11 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
               <Send className="w-4 h-4" />
               {submitting ? "Sending..." : isYounger ? "Send my answers!" : "Submit feedback"}
             </button>
+            {submitError && (
+              <p className="text-sm text-destructive text-center font-body mt-2">
+                {submitError}
+              </p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

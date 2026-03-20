@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Send, CheckCircle2, ExternalLink } from "lucide-react";
+import { Star, Send, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ParentSurveyProps {
@@ -52,7 +52,6 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
   const [feedback, setFeedback] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [showGoogleReview, setShowGoogleReview] = useState(false);
 
   const toggleAnswer = (key: string, val: boolean) => {
     setAnswers((prev) => ({ ...prev, [key]: val }));
@@ -73,23 +72,15 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
         overall_rating: rating || null,
         feedback: feedback.trim() || null,
         reviewed_child_survey_id: childSurveyId || null,
-      } as any);
+      });
 
     setSubmitting(false);
     if (!error) {
       setSubmitted(true);
-      setShowGoogleReview(true);
     }
   };
 
-  const handleGoogleReview = async () => {
-    // Track that they clicked
-    // Open Google review in new tab - replace with actual Google review link
-    window.open("https://g.page/r/kikiwarrior/review", "_blank");
-    onComplete();
-  };
-
-  if (showGoogleReview) {
+  if (submitted) {
     return (
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="card-kiki text-center space-y-5 py-6">
         <CheckCircle2 className="w-14 h-14 text-success mx-auto" />
@@ -99,28 +90,12 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
         <p className="font-body text-sm text-muted-foreground max-w-sm mx-auto">
           Your feedback helps us continuously improve and keep children safer online.
         </p>
-
-        <div className="border-t border-border pt-5 space-y-3">
-          <p className="font-body text-sm text-foreground font-medium">
-            Would you like to share your experience on Google?
-          </p>
-          <p className="font-body text-xs text-muted-foreground">
-            Your review helps other parents discover Kiki Warrior and helps us grow.
-          </p>
-          <button
-            onClick={handleGoogleReview}
-            className="btn-copper px-6 py-3 text-sm uppercase tracking-widest inline-flex items-center gap-2"
-          >
-            <Star className="w-4 h-4" />
-            Leave a Google Review
-            <ExternalLink className="w-3.5 h-3.5" />
-          </button>
-          <div>
-            <button onClick={onComplete} className="text-xs font-body text-muted-foreground hover:text-foreground transition-colors mt-2">
-              Maybe later
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={onComplete}
+          className="btn-copper px-6 py-3 text-sm uppercase tracking-widest"
+        >
+          Done
+        </button>
       </motion.div>
     );
   }
@@ -136,7 +111,7 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
         </p>
       </div>
 
-      {/* Yes/No questions - all at once for parents */}
+      {/* Yes/No questions */}
       <div className="space-y-3">
         {parentQuestions.map((q) => (
           <div key={q.key} className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">

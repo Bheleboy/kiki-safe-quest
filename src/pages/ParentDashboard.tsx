@@ -14,23 +14,10 @@ import { ChildSurveyReview } from "@/components/survey/ChildSurveyReview";
 import { ParentSurvey } from "@/components/survey/ParentSurvey";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
-interface ChildInfo {
-  id: string;
-  first_name: string;
-  age_band: string;
-}
-
-interface Notification {
-  id: string;
-  type: string;
-  title: string;
-  message: string;
-  child_id: string | null;
-  related_id: string | null;
-  read: boolean;
-  created_at: string;
-}
+type ChildInfo = Pick<Tables<"children">, "id" | "first_name" | "age_band">;
+type Notification = Tables<"notifications">;
 
 function formatTime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -78,7 +65,6 @@ function ChildProgressSection({ userId, child }: { userId: string; child: ChildI
 
   return (
     <div className="space-y-4">
-      {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <SummaryCard icon={<BookOpen className="w-4 h-4" />} label="Lessons" value={`${totalCompleted}/${allLessonIds.length}`} color="text-primary" />
         <SummaryCard icon={<BarChart3 className="w-4 h-4" />} label="Avg. Score" value={`${averageScore}%`} color="text-success" />
@@ -86,10 +72,8 @@ function ChildProgressSection({ userId, child }: { userId: string; child: ChildI
         <SummaryCard icon={<Trophy className="w-4 h-4" />} label="Armour" value={`${safetyPiecesEarned}/3`} color="text-accent" />
       </div>
 
-      {/* Overall Progress */}
       <ProgressBar progress={overallProgress} label={isFullyComplete ? "Course Complete ✓" : "Overall Progress"} />
 
-      {/* Armour */}
       <div className="card-kiki">
         <div className="flex flex-col items-center mb-4">
           <KikiWarriorAvatar earnedPieces={earnedPieces} size="sm" />
@@ -97,7 +81,6 @@ function ChildProgressSection({ userId, child }: { userId: string; child: ChildI
         <ArmourCollection earnedPieces={earnedPieces} pieceProgress={pieceProgress} compact />
       </div>
 
-      {/* Per-module breakdown */}
       {allStreams.map((s) => (
         <div key={s.id} className="space-y-3">
           {s.modules.map((mod) => {
@@ -160,15 +143,15 @@ export default function ParentDashboard() {
       supabase.from("children").select("id, first_name, age_band").eq("parent_id", user.id).order("created_at"),
       supabase.from("notifications").select("*").eq("user_id", user.id).eq("read", false).order("created_at", { ascending: false }),
     ]);
-    if (childrenRes.data) setChildren(childrenRes.data as unknown as ChildInfo[]);
-    if (notifRes.data) setNotifications(notifRes.data as unknown as Notification[]);
+    if (childrenRes.data) setChildren(childrenRes.data);
+    if (notifRes.data) setNotifications(notifRes.data);
     setLoading(false);
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const markNotificationRead = async (id: string) => {
-    await supabase.from("notifications").update({ read: true } as any).eq("id", id);
+    await supabase.from("notifications").update({ read: true }).eq("id", id);
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
@@ -215,7 +198,6 @@ export default function ParentDashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-        {/* Notifications */}
         {notifications.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
             <h2 className="font-display text-base font-bold text-foreground uppercase tracking-wide flex items-center gap-2">
@@ -241,7 +223,6 @@ export default function ParentDashboard() {
           </motion.div>
         )}
 
-        {/* Child selector tabs */}
         {children.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
             {children.map((child) => (
@@ -260,7 +241,6 @@ export default function ParentDashboard() {
           </div>
         )}
 
-        {/* Selected child progress */}
         {selectedChild && user && (
           <motion.div key={selectedChild.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
@@ -281,7 +261,6 @@ export default function ParentDashboard() {
           </div>
         )}
 
-        {/* Survey Section */}
         {selectedChild && user && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-4">
             <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">

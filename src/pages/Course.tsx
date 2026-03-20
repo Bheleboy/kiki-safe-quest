@@ -21,18 +21,14 @@ import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 type View =
   | { type: "home" }
   | { type: "stream"; streamId: string }
-  | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number }
-  | { type: "stream"; streamId: string; };
+  | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number };
 
-interface ChildInfo {
-  id: string;
-  first_name: string;
-  age_band: string;
-}
+type ChildInfo = Pick<Tables<"children">, "id" | "first_name" | "age_band">;
 
 export default function CoursePage() {
   const [view, setView] = useState<View>({ type: "home" });
@@ -55,7 +51,7 @@ export default function CoursePage() {
       .eq("parent_id", user.id)
       .single()
       .then(({ data }) => {
-        if (data) setChild(data as unknown as ChildInfo);
+        if (data) setChild(data);
       });
   }, [childId, user]);
 

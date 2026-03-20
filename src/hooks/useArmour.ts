@@ -4,7 +4,7 @@ import { ARMOUR_PIECES, getRequiredLessonIds, type ArmourPiece } from "@/data/ar
 import { courseData } from "@/data/courseData";
 
 interface ArmourState {
-  earnedPieces: string[]; // piece IDs
+  earnedPieces: string[];
   loading: boolean;
 }
 
@@ -17,9 +17,9 @@ export function useArmour(userId: string | undefined, childId?: string | null) {
       return;
     }
 
-    const fetch = async () => {
+    const fetchArmour = async () => {
       let query = supabase
-        .from("armour_pieces" as any)
+        .from("armour_pieces")
         .select("piece_id")
         .eq("user_id", userId);
 
@@ -28,25 +28,30 @@ export function useArmour(userId: string | undefined, childId?: string | null) {
       }
 
       const { data } = await query;
-      const earned = ((data as any[]) || []).map((r: any) => r.piece_id as string);
+      const earned = (data || []).map((r) => r.piece_id);
       setState({ earnedPieces: earned, loading: false });
     };
 
-    fetch();
+    fetchArmour();
   }, [userId, childId]);
 
   const earnPiece = useCallback(
     async (pieceId: string, courseId: string = "online-safety") => {
       if (!userId || state.earnedPieces.includes(pieceId)) return;
 
-      const record: any = {
+      const record: {
+        user_id: string;
+        piece_id: string;
+        course_id: string;
+        child_id?: string;
+      } = {
         user_id: userId,
         piece_id: pieceId,
         course_id: courseId,
       };
       if (childId) record.child_id = childId;
 
-      await supabase.from("armour_pieces" as any).upsert(record, {
+      await supabase.from("armour_pieces").upsert(record, {
         onConflict: "user_id,child_id,piece_id",
       });
 
@@ -58,10 +63,6 @@ export function useArmour(userId: string | undefined, childId?: string | null) {
     [userId, childId, state.earnedPieces]
   );
 
-  /**
-   * Check which pieces should be unlocked given the current completed lessons.
-   * Returns newly unlocked piece IDs (not previously earned).
-   */
   const checkUnlocks = useCallback(
     (completedLessons: string[], streamId: string): ArmourPiece[] => {
       const stream = courseData.find((s) => s.id === streamId);
@@ -84,7 +85,6 @@ export function useArmour(userId: string | undefined, childId?: string | null) {
     [state.earnedPieces]
   );
 
-  /** Get progress toward a specific piece (0–1) */
   const getPieceProgress = useCallback(
     (pieceId: string, streamId: string, completedLessons: string[]): number => {
       if (state.earnedPieces.includes(pieceId)) return 1;
