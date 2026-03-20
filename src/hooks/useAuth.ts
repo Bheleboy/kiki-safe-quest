@@ -6,7 +6,10 @@ import type { User, Session } from "@supabase/supabase-js";
 interface Profile {
   id: string;
   first_name: string;
-  age_band: "6-9" | "10-13";
+  age_band: "6-9" | "10-13" | "parent";
+  age_verified: boolean;
+  date_of_birth: string | null;
+  consent_accepted_at: string | null;
 }
 
 export function useAuth() {
