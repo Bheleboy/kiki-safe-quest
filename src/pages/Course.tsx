@@ -21,6 +21,7 @@ import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 type View =
   | { type: "home" }
