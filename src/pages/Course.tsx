@@ -51,7 +51,7 @@ export default function CoursePage() {
       .eq("parent_id", user.id)
       .single()
       .then(({ data }) => {
-        if (data) setChild(data as unknown as ChildInfo);
+        if (data) setChild(data);
       });
   }, [childId, user]);
 
