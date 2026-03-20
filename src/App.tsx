@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import CoursePreview from "./pages/CoursePreview";
@@ -31,8 +31,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!user) return <Navigate to="/auth" replace />;
-  // If user hasn't completed age verification, redirect there
   if (profile && !profile.age_verified) {
+    return <Navigate to="/verify-age" replace />;
+  }
+  return <>{children}</>;
+}
+
+/** Redirects authenticated-but-unverified users to /verify-age from any public page */
+function AgeGate({ children }: { children: React.ReactNode }) {
+  const { user, profile, loading } = useAuth();
+  const location = useLocation();
+  const exempt = ["/verify-age", "/privacy", "/terms", "/reset-password"];
+  if (!loading && user && profile && !profile.age_verified && !exempt.includes(location.pathname)) {
     return <Navigate to="/verify-age" replace />;
   }
   return <>{children}</>;
@@ -44,25 +54,27 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/courses/:courseId" element={<CoursePreview />} />
-          <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/verify-age" element={<AgeVerification />} />
+        <AgeGate>
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/courses/:courseId" element={<CoursePreview />} />
+            <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/verify-age" element={<AgeVerification />} />
 
-          {/* Protected */}
-          <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
-          <Route path="/parent" element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>} />
+            {/* Protected */}
+            <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
+            <Route path="/parent" element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AgeGate>
         <CookieConsent />
       </BrowserRouter>
     </TooltipProvider>
