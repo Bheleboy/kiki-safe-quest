@@ -1,22 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getProductionOrigin } from "@/lib/domain";
 import type { User, Session } from "@supabase/supabase-js";
+import type { Tables } from "@/integrations/supabase/types";
 
-interface Profile {
-  id: string;
-  first_name: string;
-  age_band: "6-9" | "10-13" | "parent";
-  age_verified: boolean;
-  date_of_birth: string | null;
-  consent_accepted_at: string | null;
-}
+type Profile = Tables<"profiles">;
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const lastAuthAttempt = useRef<number>(0);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
@@ -24,7 +19,7 @@ export function useAuth() {
       .select("*")
       .eq("id", userId)
       .single();
-    if (data) setProfile(data as unknown as Profile);
+    if (data) setProfile(data);
   }, []);
 
   useEffect(() => {
@@ -52,6 +47,12 @@ export function useAuth() {
   }, [fetchProfile]);
 
   const signUp = async (email: string, password: string, firstName: string, ageBand: string) => {
+    const now = Date.now();
+    if (now - lastAuthAttempt.current < 2000) {
+      return { error: { message: "Please wait before trying again." } };
+    }
+    lastAuthAttempt.current = now;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -64,6 +65,12 @@ export function useAuth() {
   };
 
   const signIn = async (email: string, password: string) => {
+    const now = Date.now();
+    if (now - lastAuthAttempt.current < 2000) {
+      return { error: { message: "Please wait before trying again." } };
+    }
+    lastAuthAttempt.current = now;
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
   };

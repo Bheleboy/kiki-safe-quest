@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface ProgressState {
   completedLessons: string[];
@@ -39,14 +40,14 @@ export function useProgress(userId: string | undefined, childId?: string | null)
       const timeSpent: Record<string, number> = {};
 
       if (progressRes.data) {
-        for (const row of progressRes.data as any[]) {
+        for (const row of progressRes.data) {
           completedLessons.push(row.lesson_id);
           quizScores[row.lesson_id] = row.score;
           timeSpent[row.lesson_id] = row.time_spent_seconds || 0;
         }
       }
 
-      const earnedBadges = (badgesRes.data as any[] || []).map((b: any) => b.badge_id);
+      const earnedBadges = (badgesRes.data || []).map((b) => b.badge_id);
 
       setProgress({ completedLessons, earnedBadges, quizScores, timeSpent });
       setLoading(false);
@@ -58,7 +59,13 @@ export function useProgress(userId: string | undefined, childId?: string | null)
   const completeLesson = useCallback(async (lessonId: string, score: number, timeSeconds?: number) => {
     if (!userId) return;
 
-    const record: any = {
+    const record: {
+      user_id: string;
+      lesson_id: string;
+      score: number;
+      time_spent_seconds: number;
+      child_id?: string;
+    } = {
       user_id: userId,
       lesson_id: lessonId,
       score,
@@ -66,7 +73,7 @@ export function useProgress(userId: string | undefined, childId?: string | null)
     };
     if (childId) record.child_id = childId;
 
-    await supabase.from("progress").upsert(record, { onConflict: "user_id,lesson_id" });
+    await supabase.from("progress").upsert(record, { onConflict: "user_id,lesson_id,child_id" });
 
     setProgress((prev) => ({
       ...prev,
@@ -87,10 +94,14 @@ export function useProgress(userId: string | undefined, childId?: string | null)
   const earnBadge = useCallback(async (badgeId: string) => {
     if (!userId) return;
 
-    const record: any = { user_id: userId, badge_id: badgeId };
+    const record: {
+      user_id: string;
+      badge_id: string;
+      child_id?: string;
+    } = { user_id: userId, badge_id: badgeId };
     if (childId) record.child_id = childId;
 
-    await supabase.from("badges").upsert(record, { onConflict: "user_id,badge_id" });
+    await supabase.from("badges").upsert(record, { onConflict: "user_id,badge_id,child_id" });
 
     setProgress((prev) => ({
       ...prev,

@@ -7,22 +7,10 @@ import { ShieldIcon } from "@/components/course/CourseIcons";
 import { Plus, Trash2, ArrowRight, LogOut, Users, BookOpen, ExternalLink } from "lucide-react";
 import { ChildArmourAvatar } from "@/components/armour/ChildArmourAvatar";
 import { courseData } from "@/data/courseData";
+import type { Tables } from "@/integrations/supabase/types";
 
-interface Child {
-  id: string;
-  first_name: string;
-  age_band: string;
-  avatar_color: string;
-}
-
-interface BookPurchase {
-  id: string;
-  book_id: string;
-  book_title: string;
-  store_name: string;
-  store_url: string;
-  purchased_at: string;
-}
+type Child = Pick<Tables<"children">, "id" | "first_name" | "age_band" | "avatar_color">;
+type BookPurchase = Tables<"book_purchases">;
 
 const AVATAR_COLORS = [
   "hsl(25 70% 50%)",
@@ -45,7 +33,6 @@ export default function ManageChildren() {
   const [newAge, setNewAge] = useState<"6-9" | "10-13">("6-9");
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch progress for all children
   const fetchChildProgress = useCallback(async (childList: Child[]) => {
     if (!user || childList.length === 0) return;
     const { data } = await supabase
@@ -73,9 +60,8 @@ export default function ManageChildren() {
       .eq("parent_id", user.id)
       .order("created_at", { ascending: true });
     if (data) {
-      const childList = data as unknown as Child[];
-      setChildren(childList);
-      fetchChildProgress(childList);
+      setChildren(data);
+      fetchChildProgress(data);
     }
     setLoading(false);
   }, [user, fetchChildProgress]);
@@ -87,7 +73,7 @@ export default function ManageChildren() {
       .select("*")
       .eq("user_id", user.id)
       .order("purchased_at", { ascending: false });
-    if (data) setBookPurchases(data as unknown as BookPurchase[]);
+    if (data) setBookPurchases(data);
   }, [user]);
 
   useEffect(() => {
@@ -137,7 +123,6 @@ export default function ManageChildren() {
 
   return (
     <div className="min-h-screen gradient-dark">
-      {/* Header */}
       <header className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -169,7 +154,6 @@ export default function ManageChildren() {
           </p>
         </motion.div>
 
-        {/* Children List */}
         <div className="grid gap-4">
           <AnimatePresence>
             {children.map((child, i) => (
@@ -181,7 +165,6 @@ export default function ManageChildren() {
                 transition={{ delay: i * 0.05 }}
                 className="card-kiki flex items-center gap-4"
               >
-                {/* Kiki Warrior Avatar with armour progress */}
                 {user && (
                   <div className="shrink-0">
                     <ChildArmourAvatar
@@ -229,7 +212,6 @@ export default function ManageChildren() {
           </AnimatePresence>
         </div>
 
-        {/* Add Child Form */}
         <AnimatePresence>
           {showAdd && (
             <motion.div
@@ -305,7 +287,6 @@ export default function ManageChildren() {
           </motion.button>
         )}
 
-        {/* My Books */}
         {bookPurchases.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mt-8">
             <div className="flex items-center gap-2">
@@ -313,7 +294,6 @@ export default function ManageChildren() {
               <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">My Books</h2>
             </div>
             <div className="grid gap-3">
-              {/* Group by book */}
               {Array.from(new Set(bookPurchases.map((p) => p.book_id))).map((bookId) => {
                 const purchases = bookPurchases.filter((p) => p.book_id === bookId);
                 const title = purchases[0].book_title;

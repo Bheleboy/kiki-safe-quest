@@ -3,23 +3,9 @@ import { motion } from "framer-motion";
 import { ClipboardList, CheckCircle2, XCircle, MessageSquare, ShieldCheck, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ParentSurvey } from "./ParentSurvey";
+import type { Tables } from "@/integrations/supabase/types";
 
-interface ChildSurveyData {
-  id: string;
-  child_id: string;
-  stream_id: string;
-  age_band: string;
-  was_fun: boolean | null;
-  was_easy: boolean | null;
-  videos_helpful: boolean | null;
-  learned_something: boolean | null;
-  would_recommend: boolean | null;
-  favorite_part: string | null;
-  what_to_improve: string | null;
-  parent_approved: boolean | null;
-  parent_approved_at: string | null;
-  created_at: string;
-}
+type ChildSurveyData = Tables<"child_surveys">;
 
 interface ChildSurveyReviewProps {
   userId: string;
@@ -49,7 +35,7 @@ export function ChildSurveyReview({ userId, childId, childName, onDone }: ChildS
       .eq("child_id", childId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
-        if (data) setSurveys(data as unknown as ChildSurveyData[]);
+        if (data) setSurveys(data);
         setLoading(false);
       });
   }, [userId, childId]);
@@ -61,7 +47,7 @@ export function ChildSurveyReview({ userId, childId, childName, onDone }: ChildS
       .update({
         parent_approved: approved,
         parent_approved_at: new Date().toISOString(),
-      } as any)
+      })
       .eq("id", survey.id);
 
     setSurveys((prev) =>
@@ -113,6 +99,8 @@ export function ChildSurveyReview({ userId, childId, childName, onDone }: ChildS
     would_recommend: "Would recommend",
   };
 
+  const boolKeys = ["was_fun", "was_easy", "videos_helpful", "learned_something", "would_recommend"] as const;
+
   return (
     <div className="space-y-4">
       <h3 className="font-display text-lg font-bold text-foreground uppercase tracking-wide">
@@ -148,10 +136,10 @@ export function ChildSurveyReview({ userId, childId, childName, onDone }: ChildS
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {Object.entries(labels).map(([key, label]) => (
+            {boolKeys.map((key) => (
               <div key={key} className="flex items-center gap-2 text-sm font-body">
-                <BoolIcon value={(survey as any)[key]} />
-                <span className="text-foreground">{label}</span>
+                <BoolIcon value={survey[key]} />
+                <span className="text-foreground">{labels[key]}</span>
               </div>
             ))}
           </div>
@@ -170,7 +158,6 @@ export function ChildSurveyReview({ userId, childId, childName, onDone }: ChildS
             </div>
           )}
 
-          {/* Approval buttons - show if not yet approved */}
           {survey.parent_approved === null && (
             <div className="flex gap-3 pt-1">
               <button

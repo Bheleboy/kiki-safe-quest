@@ -27,11 +27,7 @@ type View =
   | { type: "stream"; streamId: string }
   | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number };
 
-interface ChildInfo {
-  id: string;
-  first_name: string;
-  age_band: string;
-}
+type ChildInfo = Pick<Tables<"children">, "id" | "first_name" | "age_band">;
 
 export default function CoursePage() {
   const [view, setView] = useState<View>({ type: "home" });
