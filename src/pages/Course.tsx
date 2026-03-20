@@ -25,8 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 type View =
   | { type: "home" }
   | { type: "stream"; streamId: string }
-  | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number }
-  | { type: "stream"; streamId: string; };
+  | { type: "lesson"; streamId: string; moduleId: string; lessonIndex: number };
 
 interface ChildInfo {
   id: string;
