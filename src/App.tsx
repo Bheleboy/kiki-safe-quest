@@ -16,12 +16,13 @@ import NotFound from "./pages/NotFound";
 import BookArmourOfGod from "./pages/BookArmourOfGod";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import AgeVerification from "./pages/AgeVerification";
 import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -30,6 +31,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!user) return <Navigate to="/auth" replace />;
+  // If user hasn't completed age verification, redirect there
+  if (profile && !profile.age_verified) {
+    return <Navigate to="/verify-age" replace />;
+  }
   return <>{children}</>;
 }
 
@@ -48,6 +53,7 @@ const App = () => (
           <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/verify-age" element={<AgeVerification />} />
 
           {/* Protected */}
           <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
