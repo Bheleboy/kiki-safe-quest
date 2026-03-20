@@ -400,21 +400,30 @@ export type Database = {
       profiles: {
         Row: {
           age_band: string
+          age_verified: boolean
+          consent_accepted_at: string | null
           created_at: string
+          date_of_birth: string | null
           email: string | null
           first_name: string
           id: string
         }
         Insert: {
           age_band?: string
+          age_verified?: boolean
+          consent_accepted_at?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           first_name?: string
           id: string
         }
         Update: {
           age_band?: string
+          age_verified?: boolean
+          consent_accepted_at?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           first_name?: string
           id?: string
