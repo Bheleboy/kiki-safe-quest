@@ -54,28 +54,30 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AgeGate>
-          <Routes>
-            {/* Public */}
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/courses/:courseId" element={<CoursePreview />} />
-            <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/verify-age" element={<AgeVerification />} />
+        <AuthProvider>
+          <AgeGate>
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/courses/:courseId" element={<CoursePreview />} />
+              <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/verify-age" element={<AgeVerification />} />
 
-            {/* Protected */}
-            <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
-            <Route path="/parent" element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>} />
+              {/* Protected */}
+              <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
+              <Route path="/parent" element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AgeGate>
-        <CookieConsent />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AgeGate>
+          <CookieConsent />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
