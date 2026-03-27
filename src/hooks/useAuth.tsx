@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getProductionOrigin } from "@/lib/domain";
 import type { User, Session } from "@supabase/supabase-js";
@@ -6,7 +6,22 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
 
-export function useAuth() {
+interface AuthContextType {
+  user: User | null;
+  profile: Profile | null;
+  session: Session | null;
+  loading: boolean;
+  signUp: (email: string, password: string, firstName: string, ageBand: string) => Promise<{ error: { message: string } | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: { message: string } | null }>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: { message: string } | null }>;
+  updatePassword: (password: string) => Promise<{ error: { message: string } | null }>;
+  fetchProfile: (userId: string) => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -61,7 +76,7 @@ export function useAuth() {
         emailRedirectTo: getProductionOrigin(),
       },
     });
-    return { error };
+    return { error: error ? { message: error.message } : null };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -72,7 +87,7 @@ export function useAuth() {
     lastAuthAttempt.current = now;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error };
+    return { error: error ? { message: error.message } : null };
   };
 
   const signOut = async () => {
@@ -86,24 +101,26 @@ export function useAuth() {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${getProductionOrigin()}/reset-password`,
     });
-    return { error };
+    return { error: error ? { message: error.message } : null };
   };
 
   const updatePassword = async (password: string) => {
     const { error } = await supabase.auth.updateUser({ password });
-    return { error };
+    return { error: error ? { message: error.message } : null };
   };
 
-  return {
-    user,
-    profile,
-    session,
-    loading,
-    signUp,
-    signIn,
-    signOut,
-    resetPassword,
-    updatePassword,
-    fetchProfile,
-  };
+  return (
+    <AuthContext.Provider value={{
+      user, profile, session, loading,
+      signUp, signIn, signOut, resetPassword, updatePassword, fetchProfile,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 }
