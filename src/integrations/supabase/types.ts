@@ -401,6 +401,7 @@ export type Database = {
         Row: {
           age_band: string
           age_verified: boolean
+          age_verified_at: string | null
           consent_accepted_at: string | null
           created_at: string
           date_of_birth: string | null
@@ -411,6 +412,7 @@ export type Database = {
         Insert: {
           age_band?: string
           age_verified?: boolean
+          age_verified_at?: string | null
           consent_accepted_at?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -421,6 +423,7 @@ export type Database = {
         Update: {
           age_band?: string
           age_verified?: boolean
+          age_verified_at?: string | null
           consent_accepted_at?: string | null
           created_at?: string
           date_of_birth?: string | null
