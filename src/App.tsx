@@ -17,6 +17,7 @@ import BookArmourOfGod from "./pages/BookArmourOfGod";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AgeVerification from "./pages/AgeVerification";
+import AdminDashboard from "./pages/AdminDashboard";
 import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!user) return <Navigate to="/auth" replace />;
+  if (profile?.is_admin) return <>{children}</>;
   if (profile && !profile.age_verified) {
     return <Navigate to="/verify-age" replace />;
   }
@@ -42,7 +44,7 @@ function AgeGate({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
   const exempt = ["/verify-age", "/privacy", "/terms", "/reset-password"];
-  if (!loading && user && profile && !profile.age_verified && !exempt.includes(location.pathname)) {
+  if (!loading && user && profile && !profile.is_admin && !profile.age_verified && !exempt.includes(location.pathname)) {
     return <Navigate to="/verify-age" replace />;
   }
   return <>{children}</>;
@@ -72,6 +74,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
               <Route path="/parent" element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
