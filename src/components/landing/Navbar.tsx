@@ -3,7 +3,7 @@ import { ShieldIcon } from "@/components/course/CourseIcons";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
@@ -16,12 +16,22 @@ export default function Navbar() {
         </Link>
         <div className="flex items-center gap-3">
           {user ? (
-            <Link
-              to="/family"
-              className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display"
-            >
-              Dashboard
-            </Link>
+            <>
+              {profile?.is_admin && (
+                <Link
+                  to="/admin"
+                  className="font-body text-sm text-primary hover:text-primary/80 transition-colors hidden sm:block"
+                >
+                  Admin Dashboard
+                </Link>
+              )}
+              <Link
+                to="/family"
+                className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display"
+              >
+                Dashboard
+              </Link>
+            </>
           ) : (
             <>
               <Link
