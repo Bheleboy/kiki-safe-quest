@@ -39,6 +39,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AdminGuard() {
+  const { profile } = useAuth();
+  if (!profile?.is_admin) return <Navigate to="/" replace />;
+  return <AdminDashboard />;
+}
+
 /** Redirects authenticated-but-unverified users to /verify-age from any public page */
 function AgeGate({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
