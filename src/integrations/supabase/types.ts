@@ -408,6 +408,7 @@ export type Database = {
           email: string | null
           first_name: string
           id: string
+          is_admin: boolean
         }
         Insert: {
           age_band?: string
@@ -419,6 +420,7 @@ export type Database = {
           email?: string | null
           first_name?: string
           id: string
+          is_admin?: boolean
         }
         Update: {
           age_band?: string
@@ -430,6 +432,7 @@ export type Database = {
           email?: string | null
           first_name?: string
           id?: string
+          is_admin?: boolean
         }
         Relationships: []
       }
