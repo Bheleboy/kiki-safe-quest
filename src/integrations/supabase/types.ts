@@ -511,6 +511,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_parent_of_child: {
         Args: { _child_id: string; _user_id: string }
         Returns: boolean
