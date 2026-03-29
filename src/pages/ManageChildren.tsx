@@ -132,6 +132,11 @@ export default function ManageChildren() {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            {profile?.is_admin && (
+              <button onClick={() => navigate("/admin")} className="text-muted-foreground hover:text-foreground transition-colors p-2" title="Admin Dashboard">
+                <ShieldIcon size={20} className="stroke-primary" />
+              </button>
+            )}
             <button onClick={() => navigate("/parent")} className="text-muted-foreground hover:text-foreground transition-colors p-2" title="Parent Dashboard">
               <Users className="w-5 h-5" />
             </button>
