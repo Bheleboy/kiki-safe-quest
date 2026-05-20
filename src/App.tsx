@@ -24,6 +24,7 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
+  const location = useLocation();
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -31,7 +32,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    // Preserve the originally requested path so the user lands back here after auth.
+    const returnTo = `${location.pathname}${location.search}${location.hash}`;
+    return <Navigate to="/auth" replace state={{ returnTo }} />;
+  }
   if (profile?.is_admin) return <>{children}</>;
   if (profile && !profile.age_verified) {
     return <Navigate to="/verify-age" replace />;
