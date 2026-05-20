@@ -53,17 +53,20 @@ export default function ManageChildren() {
   }, [user]);
 
   const fetchChildren = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from("children")
-      .select("*")
-      .eq("parent_id", user.id)
-      .order("created_at", { ascending: true });
-    if (data) {
-      setChildren(data);
-      fetchChildProgress(data);
+    if (!user) { setLoading(false); return; }
+    try {
+      const { data } = await supabase
+        .from("children")
+        .select("*")
+        .eq("parent_id", user.id)
+        .order("created_at", { ascending: true });
+      if (data) {
+        setChildren(data);
+        fetchChildProgress(data);
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user, fetchChildProgress]);
 
   const fetchBookPurchases = useCallback(async () => {
