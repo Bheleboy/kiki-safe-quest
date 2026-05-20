@@ -29,35 +29,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const lastAuthAttempt = useRef<number>(0);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    if (data) setProfile(data);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+      if (error) {
+        console.warn("[useAuth] fetchProfile error:", error.message);
+        return;
+      }
+      setProfile(data ?? null);
+    } catch (e) {
+      console.warn("[useAuth] fetchProfile threw:", e);
+    }
   }, []);
 
   useEffect(() => {
     let mounted = true;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (!mounted) return;
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
-        if (mounted) setLoading(false);
+    // Belt-and-braces hard timeout: never leave the app stuck on a spinner.
+    // If anything below stalls (Safari/iOS storage throttling, network hiccup,
+    // Supabase listener deadlock), we still flip loading=false within 10s.
+    const safetyTimer = window.setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 10000);
+
+    const finish = (session: Session | null) => {
+      if (!mounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        // CRITICAL: never await Supabase calls inside the auth listener.
+        // Defer with setTimeout(0) to avoid the documented deadlock where the
+        // auth subsystem holds an internal lock while a query is in flight.
+        setTimeout(() => {
+          if (!mounted) return;
+          fetchProfile(session.user.id).finally(() => {
+            if (mounted) setLoading(false);
+          });
+        }, 0);
+      } else {
+        setProfile(null);
+        setLoading(false);
       }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => finish(session)
     );
+
+    // Fallback in case INITIAL_SESSION never fires (rare, but seen on iOS Safari).
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      // Only act if listener hasn't already populated state.
+      if (mounted && loading) finish(session);
+    }).catch(() => {
+      if (mounted) setLoading(false);
+    });
 
     return () => {
       mounted = false;
+      window.clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfile]);
 
   const signUp = async (email: string, password: string, firstName: string, ageBand: string) => {
