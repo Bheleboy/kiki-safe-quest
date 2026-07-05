@@ -18,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AgeVerification from "./pages/AgeVerification";
 import AdminDashboard from "./pages/AdminDashboard";
+import VideoDemo from "./pages/VideoDemo";
 import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/verify-age" element={<AgeVerification />} />
+              <Route path="/video-demo" element={<VideoDemo />} />
 
               {/* Protected */}
               <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
