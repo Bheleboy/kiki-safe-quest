@@ -14,37 +14,54 @@ export interface LessonVideoProps {
   durationSeconds: number;
 }
 
-// Split script into logical caption chunks
+// Caption chunks aligned to the recorded VO (per transcription of The_Internet.m4a).
 const scriptChunks = [
-  "Hi, I am Kiki!",
-  "Today we are learning about:",
-  "The Internet — A Big Playground!",
+  "Hi, I'm Kiki!",
+  "Today we are learning about the internet —",
+  "a big playground!",
   "The internet is like a big library and playground.",
   "You can learn, play, and talk to friends.",
   "But just like in a real playground,",
-  "there are rules to stay safe!",
-  "Here is what you need to know:",
+  "there are rules to stay safe.",
+  "Here is what you need to know.",
   "The internet connects computers all around the world.",
-  "You can watch videos, play games,",
+  "You can use it to watch videos, play games,",
   "learn new things, and talk to people.",
-  "It's amazing, but we need to be careful too!",
+  "It's amazing, but we need to be careful too.",
   "Great job today, warrior!",
-  "Stay safe, be kind,",
+  "Remember — stay safe, be kind,",
   "and always tell a grown-up if something feels wrong.",
   "See you in the next lesson!",
 ];
 
-// Evenly divide the 51.6s duration until real timestamps arrive
-const TOTAL_MS = 51600;
-const perChunk = TOTAL_MS / scriptChunks.length;
+// Total voice-over duration (measured with ffprobe on the cleaned m4a).
+const TOTAL_MS = 51590;
+// Small trailing pad so the last caption doesn't cut on the very last frame.
+const END_PAD_MS = 200;
+const SPEAK_MS = TOTAL_MS - END_PAD_MS;
+
+// Distribute time proportional to word count — closer to real timing than an even split.
+const wordCounts = scriptChunks.map((c) => c.split(/\s+/).filter(Boolean).length);
+const totalWords = wordCounts.reduce((a, b) => a + b, 0);
+
+let cursor = 0;
+const captionSegments: CaptionSegment[] = scriptChunks.map((text, i) => {
+  const dur = Math.round((wordCounts[i] / totalWords) * SPEAK_MS);
+  const startMs = cursor;
+  const endMs = i === scriptChunks.length - 1 ? SPEAK_MS : cursor + dur;
+  cursor = endMs;
+  return { text, startMs, endMs };
+});
+
+import audioAsset from "../../src/assets/the-internet-young-m1-l1.m4a.asset.json";
+
+// Absolute URL so Remotion's renderer (headless chromium) can fetch it during bundling.
+const audioUrl = `https://kikiwarrior.com${audioAsset.url}`;
 
 export const lesson_young_m1_l1: LessonVideoProps = {
   title: "The Internet — A Big Playground!",
   moduleTheme: "internet",
-  durationSeconds: 51.6,
-  captionSegments: scriptChunks.map((text, i) => ({
-    text,
-    startMs: Math.round(i * perChunk),
-    endMs: Math.round((i + 1) * perChunk),
-  })),
+  durationSeconds: 51.59,
+  audioUrl,
+  captionSegments,
 };
