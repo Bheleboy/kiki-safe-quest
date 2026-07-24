@@ -242,7 +242,7 @@ const BeatLibraryPlayground: React.FC = () => (
       }}
     >
       <LabelChip text="Library" color={brand.trust} />
-      <div style={{ fontSize: 380, lineHeight: 1 }}>📚</div>
+      <div style={{ fontSize: 380, lineHeight: 1, fontFamily: EMOJI_STACK }}>📚</div>
     </Card>
     <Card
       entryFrame={18}
@@ -258,7 +258,7 @@ const BeatLibraryPlayground: React.FC = () => (
       }}
     >
       <LabelChip text="Playground" color={brand.gold} />
-      <div style={{ fontSize: 360, lineHeight: 1 }}>🎡</div>
+      <div style={{ fontSize: 360, lineHeight: 1, fontFamily: EMOJI_STACK }}>🎡</div>
     </Card>
     <Caption text="The internet is like a big library AND a playground." accent={brand.trust} />
   </AbsoluteFill>
@@ -292,7 +292,7 @@ const BeatLearnPlayTalk: React.FC = () => {
             boxShadow: `0 30px 60px -20px ${brand.ink}55, inset 0 0 0 5px ${it.color}`,
           }}
         >
-          <div style={{ fontSize: 220, lineHeight: 1 }}>{it.icon}</div>
+          <div style={{ fontSize: 220, lineHeight: 1, fontFamily: EMOJI_STACK }}>{it.icon}</div>
           <div
             style={{
               fontFamily: "'Oswald', sans-serif",
@@ -327,6 +327,7 @@ const BeatRulesSafety: React.FC = () => {
         style={{
           fontSize: 480,
           lineHeight: 1,
+          fontFamily: EMOJI_STACK,
           transform: `scale(${scale}) rotate(${rot}deg)`,
           filter: `drop-shadow(0 30px 40px ${brand.primary}55)`,
           marginTop: -40,
@@ -407,6 +408,7 @@ const BeatGlobeNetwork: React.FC = () => {
             inset: 0,
             fontSize: 620,
             lineHeight: 1,
+            fontFamily: EMOJI_STACK,
             textAlign: "center",
             transform: `rotate(${spin}deg)`,
             filter: `drop-shadow(0 20px 30px ${brand.trust}55)`,
@@ -440,6 +442,7 @@ const BeatGlobeNetwork: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 48,
+                fontFamily: EMOJI_STACK,
               }}
             >
               💻
@@ -483,7 +486,7 @@ const BeatFourThings: React.FC = () => {
               boxShadow: `0 30px 60px -20px ${brand.ink}55, inset 0 0 0 5px ${it.color}`,
             }}
           >
-            <div style={{ fontSize: 180, lineHeight: 1 }}>{it.icon}</div>
+            <div style={{ fontSize: 180, lineHeight: 1, fontFamily: EMOJI_STACK }}>{it.icon}</div>
             <div
               style={{
                 fontFamily: "'Oswald', sans-serif",
@@ -520,6 +523,7 @@ const BeatBeCareful: React.FC = () => {
         style={{
           fontSize: 340,
           lineHeight: 1,
+          fontFamily: EMOJI_STACK,
           transform: `scale(${scale}) rotate(${wobble}deg)`,
           opacity,
           filter: `drop-shadow(0 30px 40px ${brand.clay}55)`,
