@@ -1,4 +1,4 @@
-import videoAsset from "@/assets/kiki-lesson1-demo.mp4.asset.json";
+import videoAsset from "@/assets/kiki-lesson-young-m1-l1.mp4.asset.json";
 
 export default function VideoDemo() {
   const url = videoAsset.url;
