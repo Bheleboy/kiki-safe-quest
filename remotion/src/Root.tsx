@@ -3,6 +3,7 @@ import { LessonVideo } from "./LessonVideo";
 import { lesson_young_m1_l1 } from "./lessonData";
 import { HostTestB } from "./scenes/HostTestB";
 import { MiddleScene } from "./scenes/MiddleScene";
+import { BigScreenScene } from "./scenes/BigScreenScene";
 
 const FPS = 30;
 
@@ -23,6 +24,14 @@ export const RemotionRoot: React.FC = () => {
         id="test-b"
         component={HostTestB}
         durationInFrames={11 * FPS}
+        fps={FPS}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="bigscreen"
+        component={BigScreenScene}
+        durationInFrames={Math.round(51.6 * FPS)}
         fps={FPS}
         width={1920}
         height={1080}
