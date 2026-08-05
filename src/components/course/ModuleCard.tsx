@@ -10,12 +10,12 @@ interface ModuleCardProps {
   module: Module;
   index: number;
   progress: number;
-  armourPiece?: ArmourPiece;
-  armourEarned?: boolean;
+  armourPieces?: ArmourPiece[];
+  isPieceEarned?: (pieceId: string) => boolean;
   onClick: () => void;
 }
 
-export function ModuleCard({ module, index, progress, armourPiece, armourEarned, onClick }: ModuleCardProps) {
+export function ModuleCard({ module, index, progress, armourPieces = [], isPieceEarned = () => false, onClick }: ModuleCardProps) {
   const isComplete = progress === 1;
 
   return (
@@ -45,15 +45,22 @@ export function ModuleCard({ module, index, progress, armourPiece, armourEarned,
             </span>
           </p>
 
-          {/* Armour piece indicator */}
-          {armourPiece && (
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <ArmourPieceIcon pieceId={armourPiece.id} earned={armourEarned} size={16} />
-              <span className={`font-display text-[10px] uppercase tracking-wide font-medium ${
-                armourEarned ? "text-primary" : "text-muted-foreground/60"
-              }`}>
-                {armourEarned ? `${armourPiece.name} ✓` : `Unlocks ${armourPiece.name}`}
-              </span>
+          {/* Armour piece indicators — a module can unlock 1-2 pieces */}
+          {armourPieces.length > 0 && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
+              {armourPieces.map((armourPiece) => {
+                const earned = isPieceEarned(armourPiece.id);
+                return (
+                  <div key={armourPiece.id} className="flex items-center gap-1.5">
+                    <ArmourPieceIcon pieceId={armourPiece.id} earned={earned} size={16} />
+                    <span className={`font-display text-[10px] uppercase tracking-wide font-medium ${
+                      earned ? "text-primary" : "text-muted-foreground/60"
+                    }`}>
+                      {earned ? `${armourPiece.name} ✓` : `Unlocks ${armourPiece.name}`}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
 

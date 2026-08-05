@@ -483,11 +483,11 @@ export default function CoursePage() {
         </AnimatePresence>
       </main>
 
-      {/* Armour Unlock Modal */}
+      {/* Armour Unlock Modal — queues one animation per newly earned piece */}
       <ArmourUnlockModal
-        pieceId={unlockingPiece}
-        totalEarned={earnedPieces.length + (unlockingPiece ? 1 : 0)}
-        onClose={() => setUnlockingPiece(null)}
+        pieceId={unlockQueue[0] ?? null}
+        totalEarned={unlockTotal}
+        onClose={() => setUnlockQueue((q) => q.slice(1))}
       />
     </div>
   );
