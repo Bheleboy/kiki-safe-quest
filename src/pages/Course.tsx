@@ -402,24 +402,28 @@ export default function CoursePage() {
                   </button>
 
                   {/* Armour piece indicator */}
-                  {armourPiece && (
-                    <div className="mt-4 card-kiki p-3 text-center space-y-2">
-                      <ArmourPieceIcon
-                        pieceId={armourPiece.id}
-                        earned={isPieceEarned(armourPiece.id)}
-                        size={32}
-                      />
-                      <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
-                        {armourPiece.name}
-                      </p>
-                      <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full gradient-copper rounded-full transition-all"
-                          style={{
-                            width: `${getPieceProgress(armourPiece.id, view.streamId, progress.completedLessons) * 100}%`,
-                          }}
-                        />
-                      </div>
+                  {armourPieces.length > 0 && (
+                    <div className="mt-4 card-kiki p-3 text-center space-y-3">
+                      {armourPieces.map((armourPiece) => (
+                        <div key={armourPiece.id} className="space-y-2">
+                          <ArmourPieceIcon
+                            pieceId={armourPiece.id}
+                            earned={isPieceEarned(armourPiece.id)}
+                            size={32}
+                          />
+                          <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+                            {armourPiece.name}
+                          </p>
+                          <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full gradient-copper rounded-full transition-all"
+                              style={{
+                                width: `${getPieceProgress(armourPiece.id, view.streamId, progress.completedLessons) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
