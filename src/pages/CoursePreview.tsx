@@ -5,7 +5,7 @@ import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import videoPoster from "@/assets/video-poster-kiki-intro.jpg";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
-import { ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
+import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
 import { courseData } from "@/data/courseData";
 
 export default function CoursePreview() {
@@ -142,7 +142,7 @@ export default function CoursePreview() {
               Earn the Armour of God
             </h2>
             <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
-              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards the first 3 pieces!
+              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards all 6 pieces!
             </p>
           </div>
 
@@ -163,21 +163,6 @@ export default function CoursePreview() {
                   </div>
                   <p className="font-display text-[10px] uppercase tracking-wide text-foreground font-semibold">{piece.name}</p>
                   <p className="font-body text-[9px] text-muted-foreground italic">{piece.verse}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Remaining pieces teaser */}
-          <div className="border-t border-border/40 pt-4">
-            <p className="font-display text-[10px] uppercase tracking-widest text-muted-foreground text-center mb-3">Complete the Set in Kiki Christian Academy</p>
-            <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto opacity-50">
-              {CHRISTIAN_ACADEMY_PIECES.map((piece) => (
-                <div key={piece.id} className="text-center space-y-2">
-                  <div className="mx-auto">
-                    <ArmourPieceIcon pieceId={piece.id} earned={false} size={36} />
-                  </div>
-                  <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground/60 font-semibold">{piece.name}</p>
                 </div>
               ))}
             </div>
@@ -279,7 +264,7 @@ export default function CoursePreview() {
           </div>
           <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">Earn Your Armour</h2>
           <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
-            Complete each module and pass the quizzes to earn the Belt of Truth, Shield of Faith, and Helmet of Salvation. Then continue to Kiki Christian Academy to collect the full Armour of God!
+            Complete each module and pass the quizzes to earn all six pieces — the Belt of Truth, Shield of Faith, Helmet of Salvation, Breastplate of Righteousness, Sword of the Spirit, and Shoes of Peace!
           </p>
         </motion.div>
 
