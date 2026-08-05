@@ -119,7 +119,7 @@ export default function CoursePage() {
         }
       }
     },
-    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece]
+    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece, earnedPieces]
   );
 
   const handleLogout = async () => {
@@ -283,9 +283,9 @@ export default function CoursePage() {
                   <ArmourCollection
                     earnedPieces={earnedPieces}
                     pieceProgress={Object.fromEntries(
-                      ["belt-of-truth", "shield-of-faith", "helmet-of-salvation"].map((id) => [
-                        id,
-                        getPieceProgress(id, view.streamId, progress.completedLessons),
+                      ARMOUR_PIECES.map((p) => [
+                        p.id,
+                        getPieceProgress(p.id, view.streamId, progress.completedLessons),
                       ])
                     )}
                   />
@@ -293,15 +293,15 @@ export default function CoursePage() {
 
                 <div className="grid gap-4">
                   {stream.modules.map((mod, i) => {
-                    const armourPiece = getArmourPieceForModule(view.streamId, mod.id);
+                    const armourPieces = getArmourPiecesForModule(view.streamId, mod.id);
                     return (
                       <div key={mod.id}>
                         <ModuleCard
                           module={mod}
                           index={i}
                           progress={getModuleProgress(mod.lessons.map((l) => l.id))}
-                          armourPiece={armourPiece}
-                          armourEarned={armourPiece ? isPieceEarned(armourPiece.id) : false}
+                          armourPieces={armourPieces}
+                          isPieceEarned={isPieceEarned}
                           onClick={() =>
                             setView({
                               type: "lesson",
@@ -373,7 +373,7 @@ export default function CoursePage() {
 
             if (!current) return null;
 
-            const armourPiece = getArmourPieceForModule(view.streamId, current.module.id);
+            const armourPieces = getArmourPiecesForModule(view.streamId, current.module.id);
 
             const handleSelectLesson = (moduleId: string, lessonIndex: number) => {
               setView({
