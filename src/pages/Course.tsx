@@ -6,7 +6,7 @@ import { courseData, type AgeStream } from "@/data/courseData";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { useArmour } from "@/hooks/useArmour";
-import { getArmourPieceForModule } from "@/data/armourData";
+import { ARMOUR_PIECES, getArmourPiecesForModule } from "@/data/armourData";
 import { SearchBar } from "@/components/course/SearchBar";
 import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
@@ -37,7 +37,8 @@ export default function CoursePage() {
   const childId = searchParams.get("child");
   const [child, setChild] = useState<ChildInfo | null>(null);
   const navigate = useNavigate();
-  const [unlockingPiece, setUnlockingPiece] = useState<string | null>(null);
+  const [unlockQueue, setUnlockQueue] = useState<string[]>([]);
+  const [unlockTotal, setUnlockTotal] = useState(0);
   const [showSurvey, setShowSurvey] = useState(false);
   const [surveyDismissed, setSurveyDismissed] = useState(false);
 
@@ -109,15 +110,16 @@ export default function CoursePage() {
         const updatedCompleted = [...progress.completedLessons, lessonId];
         const newPieces = checkUnlocks(updatedCompleted, view.streamId);
         if (newPieces.length > 0) {
-          // Award the pieces and show unlock animation for the first one
+          // Award all newly unlocked pieces, then queue the unlock animations
           for (const piece of newPieces) {
             await earnPiece(piece.id, piece.course);
           }
-          setUnlockingPiece(newPieces[0].id);
+          setUnlockTotal(earnedPieces.length + newPieces.length);
+          setUnlockQueue(newPieces.map((p) => p.id));
         }
       }
     },
-    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece]
+    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece, earnedPieces]
   );
 
   const handleLogout = async () => {
@@ -281,9 +283,9 @@ export default function CoursePage() {
                   <ArmourCollection
                     earnedPieces={earnedPieces}
                     pieceProgress={Object.fromEntries(
-                      ["belt-of-truth", "shield-of-faith", "helmet-of-salvation"].map((id) => [
-                        id,
-                        getPieceProgress(id, view.streamId, progress.completedLessons),
+                      ARMOUR_PIECES.map((p) => [
+                        p.id,
+                        getPieceProgress(p.id, view.streamId, progress.completedLessons),
                       ])
                     )}
                   />
@@ -291,15 +293,15 @@ export default function CoursePage() {
 
                 <div className="grid gap-4">
                   {stream.modules.map((mod, i) => {
-                    const armourPiece = getArmourPieceForModule(view.streamId, mod.id);
+                    const armourPieces = getArmourPiecesForModule(view.streamId, mod.id);
                     return (
                       <div key={mod.id}>
                         <ModuleCard
                           module={mod}
                           index={i}
                           progress={getModuleProgress(mod.lessons.map((l) => l.id))}
-                          armourPiece={armourPiece}
-                          armourEarned={armourPiece ? isPieceEarned(armourPiece.id) : false}
+                          armourPieces={armourPieces}
+                          isPieceEarned={isPieceEarned}
                           onClick={() =>
                             setView({
                               type: "lesson",
@@ -371,7 +373,7 @@ export default function CoursePage() {
 
             if (!current) return null;
 
-            const armourPiece = getArmourPieceForModule(view.streamId, current.module.id);
+            const armourPieces = getArmourPiecesForModule(view.streamId, current.module.id);
 
             const handleSelectLesson = (moduleId: string, lessonIndex: number) => {
               setView({
@@ -400,24 +402,28 @@ export default function CoursePage() {
                   </button>
 
                   {/* Armour piece indicator */}
-                  {armourPiece && (
-                    <div className="mt-4 card-kiki p-3 text-center space-y-2">
-                      <ArmourPieceIcon
-                        pieceId={armourPiece.id}
-                        earned={isPieceEarned(armourPiece.id)}
-                        size={32}
-                      />
-                      <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
-                        {armourPiece.name}
-                      </p>
-                      <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full gradient-copper rounded-full transition-all"
-                          style={{
-                            width: `${getPieceProgress(armourPiece.id, view.streamId, progress.completedLessons) * 100}%`,
-                          }}
-                        />
-                      </div>
+                  {armourPieces.length > 0 && (
+                    <div className="mt-4 card-kiki p-3 text-center space-y-3">
+                      {armourPieces.map((armourPiece) => (
+                        <div key={armourPiece.id} className="space-y-2">
+                          <ArmourPieceIcon
+                            pieceId={armourPiece.id}
+                            earned={isPieceEarned(armourPiece.id)}
+                            size={32}
+                          />
+                          <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+                            {armourPiece.name}
+                          </p>
+                          <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full gradient-copper rounded-full transition-all"
+                              style={{
+                                width: `${getPieceProgress(armourPiece.id, view.streamId, progress.completedLessons) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -477,11 +483,11 @@ export default function CoursePage() {
         </AnimatePresence>
       </main>
 
-      {/* Armour Unlock Modal */}
+      {/* Armour Unlock Modal — queues one animation per newly earned piece */}
       <ArmourUnlockModal
-        pieceId={unlockingPiece}
-        totalEarned={earnedPieces.length + (unlockingPiece ? 1 : 0)}
-        onClose={() => setUnlockingPiece(null)}
+        pieceId={unlockQueue[0] ?? null}
+        totalEarned={unlockTotal}
+        onClose={() => setUnlockQueue((q) => q.slice(1))}
       />
     </div>
   );

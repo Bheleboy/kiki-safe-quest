@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { ARMOUR_PIECES, ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
+import { ARMOUR_PIECES } from "@/data/armourData";
 import { ArmourPieceIcon } from "./ArmourPieceIcon";
 import { ProgressBar } from "@/components/course/ProgressBar";
-import { Lock } from "lucide-react";
 
 interface ArmourCollectionProps {
   earnedPieces: string[];
@@ -47,13 +46,13 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
         </div>
       </div>
 
-      {/* Online Safety pieces */}
+      {/* All 6 pieces — earnable in the Online Safety Course */}
       <div>
         <p className="text-xs font-display font-medium text-muted-foreground uppercase tracking-wide mb-3">
           Online Safety Course
         </p>
         <div className="grid grid-cols-3 gap-3">
-          {ONLINE_SAFETY_PIECES.map((piece, i) => {
+          {ARMOUR_PIECES.map((piece, i) => {
             const earned = earnedPieces.includes(piece.id);
             const progress = pieceProgress[piece.id] ?? (earned ? 1 : 0);
 
@@ -87,39 +86,6 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
                     <ProgressBar progress={progress} />
                   </div>
                 )}
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Christian Academy pieces */}
-      <div>
-        <p className="text-xs font-display font-medium text-muted-foreground uppercase tracking-wide mb-3">
-          Kiki Christian Academy
-        </p>
-        <div className="grid grid-cols-3 gap-3">
-          {CHRISTIAN_ACADEMY_PIECES.map((piece, i) => {
-            const earned = earnedPieces.includes(piece.id);
-
-            return (
-              <motion.div
-                key={piece.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                className="card-kiki text-center space-y-2 opacity-60"
-              >
-                <div className="mx-auto relative">
-                  <ArmourPieceIcon pieceId={piece.id} earned={earned} size={44} />
-                  {!earned && (
-                    <Lock className="absolute -bottom-1 -right-1 w-4 h-4 text-muted-foreground/40" />
-                  )}
-                </div>
-                <p className="font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground/50">
-                  {piece.name}
-                </p>
-                <p className="text-[10px] text-muted-foreground/40 font-body">Coming soon</p>
               </motion.div>
             );
           })}

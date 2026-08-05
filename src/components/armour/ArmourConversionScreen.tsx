@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArmourPieceIcon } from "./ArmourPieceIcon";
 import { KikiWarriorAvatar } from "./KikiWarriorAvatar";
-import { ONLINE_SAFETY_PIECES, CHRISTIAN_ACADEMY_PIECES } from "@/data/armourData";
+import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
 import { ArrowRight } from "lucide-react";
 
 interface ArmourConversionScreenProps {
@@ -10,9 +10,9 @@ interface ArmourConversionScreenProps {
 }
 
 export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConversionScreenProps) {
-  const safetyComplete = ONLINE_SAFETY_PIECES.every((p) => earnedPieces.includes(p.id));
+  const allEarned = ONLINE_SAFETY_PIECES.every((p) => earnedPieces.includes(p.id));
 
-  if (!safetyComplete) return null;
+  if (!allEarned) return null;
 
   return (
     <motion.div
@@ -27,13 +27,13 @@ export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConv
           Congratulations, {learnerName}!
         </p>
         <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
-          3 Armour Pieces Earned!
+          Full Armour of God Earned!
         </h3>
       </div>
 
       {/* Earned pieces */}
       <div className="text-center space-y-3">
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-4 flex-wrap">
           {ONLINE_SAFETY_PIECES.map((piece) => (
             <div key={piece.id} className="text-center space-y-1">
               <ArmourPieceIcon pieceId={piece.id} earned size={40} />
@@ -43,26 +43,9 @@ export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConv
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Remaining pieces */}
-      <div className="border-t border-border/40 pt-4 text-center space-y-3">
-        <h4 className="font-display text-lg font-bold text-foreground uppercase tracking-wide">
-          Complete the Full Armour of God
-        </h4>
-        <p className="font-body text-sm text-muted-foreground">
-          {learnerName} has earned 3 of 6 pieces. Continue the journey in Kiki Christian Academy to unlock the remaining armour!
+        <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
+          {learnerName} has collected all 6 pieces of the Armour of God — a true Kiki Warrior!
         </p>
-        <div className="flex justify-center gap-4">
-          {CHRISTIAN_ACADEMY_PIECES.map((piece) => (
-            <div key={piece.id} className="text-center space-y-1">
-              <ArmourPieceIcon pieceId={piece.id} earned={false} size={40} />
-              <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground/50 font-medium">
-                {piece.name}
-              </p>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* CTA */}
