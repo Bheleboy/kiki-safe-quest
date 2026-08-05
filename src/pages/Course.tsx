@@ -6,7 +6,7 @@ import { courseData, type AgeStream } from "@/data/courseData";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { useArmour } from "@/hooks/useArmour";
-import { getArmourPieceForModule } from "@/data/armourData";
+import { ARMOUR_PIECES, getArmourPiecesForModule } from "@/data/armourData";
 import { SearchBar } from "@/components/course/SearchBar";
 import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
@@ -37,7 +37,8 @@ export default function CoursePage() {
   const childId = searchParams.get("child");
   const [child, setChild] = useState<ChildInfo | null>(null);
   const navigate = useNavigate();
-  const [unlockingPiece, setUnlockingPiece] = useState<string | null>(null);
+  const [unlockQueue, setUnlockQueue] = useState<string[]>([]);
+  const [unlockTotal, setUnlockTotal] = useState(0);
   const [showSurvey, setShowSurvey] = useState(false);
   const [surveyDismissed, setSurveyDismissed] = useState(false);
 
@@ -109,11 +110,12 @@ export default function CoursePage() {
         const updatedCompleted = [...progress.completedLessons, lessonId];
         const newPieces = checkUnlocks(updatedCompleted, view.streamId);
         if (newPieces.length > 0) {
-          // Award the pieces and show unlock animation for the first one
+          // Award all newly unlocked pieces, then queue the unlock animations
           for (const piece of newPieces) {
             await earnPiece(piece.id, piece.course);
           }
-          setUnlockingPiece(newPieces[0].id);
+          setUnlockTotal(earnedPieces.length + newPieces.length);
+          setUnlockQueue(newPieces.map((p) => p.id));
         }
       }
     },
