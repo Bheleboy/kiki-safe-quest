@@ -4,6 +4,7 @@ import { lesson_young_m1_l1 } from "./lessonData";
 import { HostTestB } from "./scenes/HostTestB";
 import { MiddleScene } from "./scenes/MiddleScene";
 import { BigScreenScene } from "./scenes/BigScreenScene";
+import { NewsreaderScene } from "./scenes/NewsreaderScene";
 
 const FPS = 30;
 
@@ -40,6 +41,14 @@ export const RemotionRoot: React.FC = () => {
         id="middle"
         component={MiddleScene}
         durationInFrames={36 * FPS}
+        fps={FPS}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="newsreader"
+        component={NewsreaderScene}
+        durationInFrames={Math.round(51.63 * FPS)}
         fps={FPS}
         width={1920}
         height={1080}
