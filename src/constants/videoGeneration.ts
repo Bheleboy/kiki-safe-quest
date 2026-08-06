@@ -1,13 +1,13 @@
 /**
  * CANONICAL CHARACTER REFERENCES FOR ALL VIDEOGEN CALLS
  *
- * THE canonical Kiki starting frame for all videogen calls is
- * `src/assets/kiki-character-reference.png` (CDN URL below).
+ * V3 PIPELINE (client-approved): every clip's starting frame is generated ENTIRELY
+ * via imagegen as ONE cohesive scene (Kiki + classroom + children together). That
+ * unified image is passed as the videogen `starting_frame`.
  *
- * Every lesson video (all 26 remaining lessons) MUST use this exact file as the
- * `starting_frame` for AI video generation of Kiki host moments.
- * Do NOT use ad-hoc frames (e.g. /mnt/documents/kiki-demo-frame.jpg) — doing so
- * produces a different-looking character and off-brand background scenes.
+ * NEVER PIL-composite KIKI_CANONICAL_REFERENCE (or any static Kiki layer) onto a
+ * background before videogen — it produces TWO Kikis and floating/detached props.
+ * The reference PNG below is a visual style anchor ONLY, not a videogen input.
  */
 
 export const KIKI_CANONICAL_REFERENCE = {
