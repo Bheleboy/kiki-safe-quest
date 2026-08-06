@@ -753,6 +753,10 @@ const KikiPresenter: React.FC = () => {
       }}
     >
       <Video
+        src={staticFile("kiki-newsreader.webm")}
+        muted
+        style={{ width: 616, height: 1080 }}
+      />
     </div>
   );
 };
