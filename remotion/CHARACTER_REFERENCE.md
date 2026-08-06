@@ -11,11 +11,16 @@ coexist, producing TWO Kikis and floating/detached props (the rejected v2 defect
 Rules for every lesson video (all 26 remaining lessons):
 
 1. Generate a per-clip unified starting frame with imagegen, using the locked Kiki
-   description (tall African teen warrior girl, dark brown skin, voluminous dreadlocks
-   + dark headband, black sleeveless top, gold beaded collar, dark belt, maroon skirt,
-   spear right hand, geometric-pattern oval shield left hand — clearly taller than the
-   children) + the locked classroom description (golden-hour classroom, green
-   chalkboard, bunting, bookshelves, globe, plants, diverse kids aged 6-9 seated at desks).
+   description (v4, client-corrected): "A 14-15 year old African teenage girl with a
+   slim athletic build, dark brown skin, large voluminous black dreadlocks past her
+   shoulders with a dark woven headband, black sleeveless fitted top, gold beaded
+   collar necklace, dark leather belt at the waist, maroon/burgundy knee-length skirt,
+   leather sandals, spear right hand, geometric-pattern oval shield left hand, bright
+   youthful expressive eyes, round teenage face with soft features, warm confident
+   smile." She is taller than the 6-9 year old children but CLEARLY STILL A TEENAGER —
+   NEVER say "young woman" or imply adult proportions (v3 defect: rendered as adult).
+   Locked classroom description: golden-hour classroom, green
+   chalkboard, bunting, bookshelves, globe, plants, diverse kids aged 6-9 seated at desks.
 2. `kiki-character-reference.png` remains the visual style anchor ONLY — not a videogen input.
 3. Every videogen prompt must include: "same character, outfit, art style and background
    as the starting image", "no text, no words, no letters, no captions, no signage", and
