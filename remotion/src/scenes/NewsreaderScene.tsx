@@ -1,6 +1,6 @@
 import {
   AbsoluteFill,
-  OffthreadVideo,
+  Video,
   staticFile,
   useCurrentFrame,
   interpolate,
@@ -752,7 +752,7 @@ const KikiPresenter: React.FC = () => {
         transformOrigin: "50% 100%",
       }}
     >
-      <OffthreadVideo
+      <Video
         src={staticFile("kiki-newsreader.webm")}
         transparent
         muted
