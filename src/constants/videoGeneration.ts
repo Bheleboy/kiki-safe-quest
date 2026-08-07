@@ -1,13 +1,20 @@
 /**
  * CANONICAL CHARACTER REFERENCES FOR ALL VIDEOGEN CALLS
  *
- * V3 PIPELINE (client-approved): every clip's starting frame is generated ENTIRELY
+ * V5 PIPELINE (client-approved): every clip's starting frame is generated ENTIRELY
  * via imagegen as ONE cohesive scene (Kiki + classroom + children together). That
  * unified image is passed as the videogen `starting_frame`.
  *
- * NEVER PIL-composite KIKI_CANONICAL_REFERENCE (or any static Kiki layer) onto a
- * background before videogen — it produces TWO Kikis and floating/detached props.
- * The reference PNG below is a visual style anchor ONLY, not a videogen input.
+ * NEVER PIL-composite a static Kiki layer onto a background before videogen — it
+ * produces TWO Kikis and floating/detached props.
+ *
+ * CHARACTER (v5 client correction): Kiki is a YOUNG CHILD (8-10), chibi Pixar
+ * proportions with the distinctive red/blue striped flat-topped woven hat — NOT a
+ * teenager, NOT an adult. The old kiki-character-reference.png below is OUTDATED and
+ * must NOT be used for any new generation. The v5 visual references are the
+ * user-uploaded Kiki_main_avatar.png / Kiki_Pose_Sheet.png. Voice is NEVER baked into
+ * AI clips (no lip sync) — deliver visual + separate voice track. Locked prompt text
+ * lives in remotion/CHARACTER_REFERENCE.md.
  */
 
 export const KIKI_CANONICAL_REFERENCE = {
