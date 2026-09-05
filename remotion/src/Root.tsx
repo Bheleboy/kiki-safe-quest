@@ -57,7 +57,7 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
       />
-      {configs.map((c: any) => (
+      {LESSON_CONFIGS.map((c) => (
         <Composition
           key={c.id}
           id={c.id}
