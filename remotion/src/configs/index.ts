@@ -21,6 +21,15 @@ import privacy_settings from "./ages-10-13_privacy-settings-on-apps.json";
 import scams_fake_websites from "./ages-10-13_scams-and-phishing-fake-websites.json";
 import scams_in_game from "./ages-10-13_scams-and-phishing-in-game.json";
 import scams_social_media from "./ages-10-13_scams-and-phishing-social-media-scams.json";
+import scams_if_scammed from "./ages-10-13_scams-and-phishing-what-to-do-if-you-get-scammed.json";
+import scams_intro from "./ages-10-13_scams-and-phishing.json";
+import screentime from "./ages-10-13_screentime-and-well-being.json";
+import sharing_photos from "./ages-10-13_sharing-photos-safely.json";
+import think_before_post from "./ages-10-13_think-before-you-post.json";
+import two_factor from "./ages-10-13_two-factor-auth.json";
+import what_is_cyberbullying_dc from "./ages-10-13_what-is-cyberbullying.json";
+import what_is_personal_info from "./ages-10-13_what-is-personal-info.json";
+import your_rights from "./ages-10-13_your-rights-online.json";
 
 // Every lesson config in ./configs must be registered here so the bundler
 // picks it up (Remotion's bundler does not support Vite's import.meta.glob).
@@ -46,4 +55,13 @@ export const LESSON_CONFIGS: LessonConfig[] = [
   scams_fake_websites,
   scams_in_game,
   scams_social_media,
+  scams_if_scammed,
+  scams_intro,
+  screentime,
+  sharing_photos,
+  think_before_post,
+  two_factor,
+  what_is_cyberbullying_dc,
+  what_is_personal_info,
+  your_rights,
 ].map((c) => c as unknown as LessonConfig);
