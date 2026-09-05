@@ -60,7 +60,7 @@ export const RemotionRoot: React.FC = () => {
       {LESSON_CONFIGS.map((c) => (
         <Composition
           key={c.id}
-          id={c.id}
+          id={c.id.replace(/_/g, "-")}
           component={() => <LessonScene config={c} />}
           durationInFrames={Math.ceil(c.durationSec * 30) + 30}
           fps={30}
