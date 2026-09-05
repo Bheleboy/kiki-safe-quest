@@ -5,16 +5,20 @@ import { HostTestB } from "./scenes/HostTestB";
 import { MiddleScene } from "./scenes/MiddleScene";
 import { BigScreenScene } from "./scenes/BigScreenScene";
 import { NewsreaderScene } from "./scenes/NewsreaderScene";
+import { LessonScene } from "./scenes/LessonScene";
+import sampleConfig from "./configs/ages-10-13_internet-safety-101.json";
+import type { LessonConfig } from "./types";
 
 const FPS = 30;
 
 export const RemotionRoot: React.FC = () => {
   const duration = Math.round(lesson_young_m1_l1.durationSeconds * FPS);
+  const config = sampleConfig as unknown as LessonConfig;
   return (
     <>
       <Composition
         id="lesson"
-        component={LessonVideo}
+        component={LessonVideo as unknown as React.FC<Record<string, unknown>>}
         durationInFrames={duration}
         fps={FPS}
         width={1920}
@@ -52,6 +56,15 @@ export const RemotionRoot: React.FC = () => {
         fps={FPS}
         width={1920}
         height={1080}
+      />
+      <Composition
+        id={config.id}
+        component={LessonScene}
+        durationInFrames={Math.ceil(config.durationSec * FPS) + 30}
+        fps={FPS}
+        width={1920}
+        height={1080}
+        defaultProps={{ config }}
       />
     </>
   );
