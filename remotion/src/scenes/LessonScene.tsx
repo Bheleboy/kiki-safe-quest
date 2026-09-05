@@ -27,7 +27,7 @@ export const LessonScene: React.FC<{ config: LessonConfig }> = ({ config }) => {
 const CameraRig: React.FC<{ config: LessonConfig; children: React.ReactNode }> = ({ config, children }) => {
   const frame = useCurrentFrame();
   const keyframes: number[] = []; const scales: number[] = [];
-  config.beats.forEach((beat, i) => { const sf = Math.round(beat.startSec * FPS); const ef = Math.round(beat.endSec * FPS); keyframes.push(sf, ef); const push = beat.type === "celebration" ? 0.1 : beat.type === "rules" ? 0.075 : beat.type === "keyword-stamp" ? 0.08 : i % 2 === 0 ? 0.03 : 0.05; scales.push(1.0 + push, 1.0 + push); });
+  config.beats.forEach((beat, i) => { const sf = Math.round(beat.startSec * FPS); const ef = Math.max(Math.round(beat.endSec * FPS), sf); const push = beat.type === "celebration" ? 0.1 : beat.type === "rules" ? 0.075 : beat.type === "keyword-stamp" ? 0.08 : i % 2 === 0 ? 0.03 : 0.05; const s = 1.0 + push; const pushKey = (k: number, v: number) => { if (keyframes.length === 0 || k > keyframes[keyframes.length - 1]) { keyframes.push(k); scales.push(v); } else { scales[scales.length - 1] = v; } }; pushKey(sf, s); pushKey(ef, s); });
   const scale = keyframes.length > 0 ? interpolate(frame, keyframes, scales, { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad) }) : 1.0;
   return <AbsoluteFill style={{ transform: `scale(${scale}) translate(${Math.sin(frame / 210) * 6}px, ${Math.cos(frame / 260) * 4}px)`, transformOrigin: "74% 52%" }}>{children}</AbsoluteFill>;
 };
