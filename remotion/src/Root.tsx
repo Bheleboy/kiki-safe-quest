@@ -10,8 +10,7 @@ import { LessonScene } from "./scenes/LessonScene";
 
 const FPS = 30;
 
-const configModules = import.meta.glob("./configs/*.json", { eager: true });
-const configs = Object.values(configModules).map((m: any) => m.default ?? m);
+import { LESSON_CONFIGS } from "./configs";
 
 export const RemotionRoot: React.FC = () => {
   const duration = Math.round(lesson_young_m1_l1.durationSeconds * FPS);
