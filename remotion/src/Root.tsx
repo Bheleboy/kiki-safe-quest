@@ -1,3 +1,4 @@
+import React from "react";
 import { Composition } from "remotion";
 import { LessonVideo } from "./LessonVideo";
 import { lesson_young_m1_l1 } from "./lessonData";
@@ -6,14 +7,13 @@ import { MiddleScene } from "./scenes/MiddleScene";
 import { BigScreenScene } from "./scenes/BigScreenScene";
 import { NewsreaderScene } from "./scenes/NewsreaderScene";
 import { LessonScene } from "./scenes/LessonScene";
-import sampleConfig from "./configs/ages-10-13_internet-safety-101.json";
-import type { LessonConfig } from "./types";
 
 const FPS = 30;
 
+import { LESSON_CONFIGS } from "./configs";
+
 export const RemotionRoot: React.FC = () => {
   const duration = Math.round(lesson_young_m1_l1.durationSeconds * FPS);
-  const config = sampleConfig as unknown as LessonConfig;
   return (
     <>
       <Composition
@@ -57,15 +57,17 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
       />
-      <Composition
-        id={config.id}
-        component={LessonScene}
-        durationInFrames={Math.ceil(config.durationSec * FPS) + 30}
-        fps={FPS}
-        width={1920}
-        height={1080}
-        defaultProps={{ config }}
-      />
+      {LESSON_CONFIGS.map((c) => (
+        <Composition
+          key={c.id}
+          id={c.id}
+          component={() => <LessonScene config={c} />}
+          durationInFrames={Math.ceil(c.durationSec * 30) + 30}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+      ))}
     </>
   );
 };
