@@ -1,0 +1,21 @@
+{
+  "id": "ages-10-13_internet-safety-101",
+  "title": "Internet Safety 101",
+  "subtitle": "Your Digital Shield",
+  "ageGroup": "10-13",
+  "module": "Internet Safety & Privacy",
+  "lessonNumber": 1,
+  "presenter": "kiki",
+  "audioFile": "ages-10-13_internet-safety-101.m4a",
+  "durationSec": 53.5,
+  "beats": [
+    {"type": "greeting", "startSec": 0, "endSec": 5.35, "heading": "Hi! I'm Kiki!", "icons": [{"emoji": "👋"}]},
+    {"type": "title", "startSec": 5.35, "endSec": 13.38, "heading": "Internet Safety", "subheading": "101", "icons": [{"emoji": "🛡️"}]},
+    {"type": "icon-trio", "startSec": 13.38, "endSec": 21.4, "icons": [{"emoji": "🌐", "label": "WEB", "ring": "#2EA8E0"}, {"emoji": "📱", "label": "APPS", "ring": "#FF8A2A"}, {"emoji": "💬", "label": "CHAT", "ring": "#2FD58A"}]},
+    {"type": "rules", "startSec": 21.4, "endSec": 29.43, "heading": "Stay safe online!", "icons": [{"emoji": "🛡️"}, {"emoji": "🔒"}]},
+    {"type": "icon-grid", "startSec": 29.43, "endSec": 40.13, "icons": [{"emoji": "🔑", "label": "PASSWORDS", "ring": "#FF8A2A"}, {"emoji": "👤", "label": "PRIVACY", "ring": "#2EA8E0"}, {"emoji": "🚫", "label": "STRANGERS", "ring": "#FF5DA2"}, {"emoji": "📢", "label": "TELL SOMEONE", "ring": "#2FD58A"}]},
+    {"type": "celebration", "startSec": 40.13, "endSec": 44.41, "heading": "Great job,", "subheading": "Warrior!", "icons": [{"emoji": "🏆"}]},
+    {"type": "keywords-list", "startSec": 44.41, "endSec": 52.44, "heading": "Remember", "keywords": [{"word": "PROTECT", "icon": "🛡️", "color": "#2FD58A"}, {"word": "RESPECT", "icon": "💛", "color": "#FF8A2A"}, {"word": "REPORT", "icon": "🙋", "color": "#FF5DA2"}]},
+    {"type": "outro", "startSec": 52.44, "endSec": 53.5, "heading": "See you in the", "subheading": "next lesson!", "icons": [{"emoji": "👋"}]}
+  ]
+}
