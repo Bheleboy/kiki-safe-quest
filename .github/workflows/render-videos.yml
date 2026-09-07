@@ -1,0 +1,60 @@
+name: Render Kiki Lesson Videos
+on:
+  workflow_dispatch:
+    inputs:
+      batch_start:
+        description: "Start index (0-29)"
+        required: false
+        default: "0"
+      batch_size:
+        description: "Videos to render"
+        required: false
+        default: "5"
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install deps
+        working-directory: remotion
+        run: bun install
+      - name: Install Chromium
+        working-directory: remotion
+        run: npx playwright install chromium --with-deps
+      - name: Render videos
+        working-directory: remotion
+        run: |
+          mkdir -p out
+          COMPS=(ages-10-13-internet-safety-101 ages-10-13-5-ways-to-stay-private ages-10-13-be-kind-online ages-10-13-being-a-good-digital-friend ages-10-13-catfish-and-fake-profiles ages-10-13-cookies-and-tracking ages-10-13-creating-strong-passwords ages-10-13-cyber-bullying-and-respect-building-a-positive-online-community ages-10-13-cyber-bullying-and-respect-how-to-block-and-report ages-10-13-cyber-bullying-and-respect-standing-up-for-others ages-10-13-cyber-bullying-and-respect-the-impact-of-words ages-10-13-cyber-bullying-and-respect-what-is-cyberbullying ages-10-13-digital-footprint ages-10-13-location-sharing ages-10-13-managing-your-online-reputation ages-10-13-mean-messages ages-10-13-online-vs-offline ages-10-13-privacy-settings-on-apps ages-10-13-scams-and-phishing-fake-websites ages-10-13-scams-and-phishing-in-game ages-10-13-scams-and-phishing-social-media-scams ages-10-13-scams-and-phishing-what-to-do-if-you-get-scammed ages-10-13-scams-and-phishing ages-10-13-screentime-and-well-being ages-10-13-sharing-photos-safely ages-10-13-think-before-you-post ages-10-13-two-factor-auth ages-10-13-what-is-cyberbullying ages-10-13-what-is-personal-info ages-10-13-your-rights-online)
+          START=${{ github.event.inputs.batch_start }}
+          SIZE=${{ github.event.inputs.batch_size }}
+          END=$((START + SIZE))
+          [ "$END" -gt 30 ] && END=30
+          BROWSER=$(find "$HOME" -name "headless_shell" 2>/dev/null | head -1)
+          [ -z "$BROWSER" ] && BROWSER=$(find "$HOME" -name "chrome" 2>/dev/null | head -1)
+          [ -z "$BROWSER" ] && BROWSER="chromium"
+          echo "Browser: $BROWSER"
+          DONE=0; FAILED=0
+          for i in $(seq "$START" "$((END-1))"); do
+            comp="${COMPS[$i]}"
+            fname="${comp//-/_}.mp4"
+            echo "=== [$((i+1))/30] $comp ==="
+            if npx remotion render "$comp" "out/$fname" --codec h264 --crf 18 --browser-executable "$BROWSER" 2>&1; then
+              [ -s "out/$fname" ] && { echo "OK: $fname $(du -h out/$fname|cut -f1)"; DONE=$((DONE+1)); } || { echo "EMPTY: $fname"; FAILED=$((FAILED+1)); }
+            else
+              echo "FAIL: $fname"; FAILED=$((FAILED+1))
+            fi
+          done
+          echo "BATCH DONE - Rendered:$DONE Failed:$FAILED"
+          ls -lhS out/*.mp4 2>/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kiki-renders-batch-${{ github.event.inputs.batch_start }}
+          path: remotion/out/*.mp4
+          retention-days: 30
+          if-no-files-found: warn
