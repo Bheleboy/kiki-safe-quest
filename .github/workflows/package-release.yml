@@ -1,0 +1,49 @@
+name: Package Videos as Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all render artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: kiki-renders-*
+          merge-multiple: true
+          path: videos
+          run-id: ""
+        continue-on-error: true
+
+      - name: Download via gh CLI instead
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p videos
+          # List all artifacts
+          for id in $(gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[].id'); do
+            echo "Downloading artifact $id..."
+            gh api "repos/${{ github.repository }}/actions/artifacts/$id/zip" > "/tmp/artifact-$id.zip" || true
+            unzip -o "/tmp/artifact-$id.zip" -d videos/ 2>/dev/null || true
+            rm -f "/tmp/artifact-$id.zip"
+          done
+          echo "=== Videos collected ==="
+          ls -lhS videos/*.mp4 2>/dev/null
+          ls videos/*.mp4 2>/dev/null | wc -l
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v1.0-renders-$(date +%Y%m%d)"
+          gh release create "$TAG" \
+            --title "Kiki Warrior - 30 Lesson Videos (Ages 10-13)" \
+            --notes "All 30 animated lesson videos for the Ages 10-13 stream with narrated audio. Ready for client review." \
+            videos/*.mp4
+          echo "Release created: $TAG"
