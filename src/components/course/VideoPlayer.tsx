@@ -45,7 +45,8 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
 
   const videoId = getVideoId(videoUrl);
   const embedUrl = ensureEmbedParams(videoUrl);
-  const watchUrl = isMp4 ? (fallbackUrl || undefined) : toFallbackUrl(videoUrl, fallbackUrl);
+  // MP4s are our own rendered Kiki videos — no YouTube fallback link for them.
+  const watchUrl = isMp4 ? undefined : toFallbackUrl(videoUrl, fallbackUrl);
   // YouTube returns a tiny "default.jpg" (120x90) for missing/private videos
   // and a full-resolution image for available ones, so we can probe availability.
   const thumbProbeUrl = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : undefined;
