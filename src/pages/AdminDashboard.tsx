@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { sitecheckerSupabase } from "@/integrations/sitechecker/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
-import { useAuth } from "@/hooks/useAuth";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { Users, Baby, BookOpen, TrendingUp, ArrowLeft, Search, LogOut } from "lucide-react";
+import { Users, Baby, BookOpen, TrendingUp, Search, LogOut } from "lucide-react";
 
 const KIKI_CLIENT_ID = "7a197200-b63e-4a04-80b7-6c3bdcfd93d7";
 
@@ -16,153 +14,27 @@ interface DayCount { date: string; count: number }
 interface GscDaily { date: string; clicks: number; impressions: number; ctr: number; position: number }
 interface GscRow { label: string; clicks: number; impressions: number; ctr: number; position: number }
 
+interface PlatformStats {
+  totalParents: number;
+  newThisWeek: number;
+  newThisMonth: number;
+  ageVerified: number;
+  agePending: number;
+  consentCount: number;
+  totalChildren: number;
+  avgChildrenPerParent: number;
+  courseStarters: number;
+  avgCompletion: number;
+}
+
 function daysAgoIso(days: number) {
   return new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
 }
 
 export default function AdminDashboard() {
-  const { profile } = useAuth();
-  const { adminUser, adminLoading, signOut } = useAdminAuth();
-  const [stats, setStats] = useState({
-    totalParents: 0,
-    newThisWeek: 0,
-    newThisMonth: 0,
-    ageVerified: 0,
-    agePending: 0,
-    consentCount: 0,
-    totalChildren: 0,
-    avgChildrenPerParent: 0,
-    courseStarters: 0,
-    avgCompletion: 0,
-  });
-  const [moduleRates, setModuleRates] = useState<{ module: string; rate: number }[]>([]);
-  const [recentUsers, setRecentUsers] = useState<{ name: string; lastActive: string }[]>([]);
-  const [signupTrend, setSignupTrend] = useState<DayCount[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { adminUser, adminLoading, clientId, signOut } = useAdminAuth();
 
-  useEffect(() => {
-    if (!profile?.is_admin) return;
-    fetchAll();
-  }, [profile]);
-
-  async function fetchAll() {
-    setLoading(true);
-    try {
-      await Promise.all([fetchUserStats(), fetchChildStats(), fetchCourseStats(), fetchSignupTrend()]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchUserStats() {
-    const { data: profiles } = await supabase.from("profiles").select("created_at, age_verified, consent_accepted_at");
-    if (!profiles) return;
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 86400000);
-    const monthAgo = new Date(now.getTime() - 30 * 86400000);
-    setStats(s => ({
-      ...s,
-      totalParents: profiles.length,
-      newThisWeek: profiles.filter(p => new Date(p.created_at) >= weekAgo).length,
-      newThisMonth: profiles.filter(p => new Date(p.created_at) >= monthAgo).length,
-      ageVerified: profiles.filter(p => p.age_verified).length,
-      agePending: profiles.filter(p => !p.age_verified).length,
-      consentCount: profiles.filter(p => p.consent_accepted_at).length,
-    }));
-  }
-
-  async function fetchChildStats() {
-    const { data: children } = await supabase.from("children").select("parent_id");
-    if (!children) return;
-    const uniqueParents = new Set(children.map(c => c.parent_id)).size;
-    setStats(s => ({
-      ...s,
-      totalChildren: children.length,
-      avgChildrenPerParent: uniqueParents > 0 ? Math.round((children.length / uniqueParents) * 10) / 10 : 0,
-    }));
-  }
-
-  async function fetchCourseStats() {
-    const { data: progress } = await supabase.from("progress").select("user_id, child_id, lesson_id, completed_at");
-    if (!progress) return;
-
-    const starters = new Set(progress.map(p => p.child_id || p.user_id));
-
-    const userLessons: Record<string, Set<string>> = {};
-    progress.forEach(p => {
-      const key = p.child_id || p.user_id;
-      if (!userLessons[key]) userLessons[key] = new Set();
-      userLessons[key].add(p.lesson_id);
-    });
-
-    const moduleMap: Record<string, { total: number; completed: Set<string> }> = {};
-    progress.forEach(p => {
-      const parts = p.lesson_id.split("-");
-      if (parts.length >= 2) {
-        const moduleId = parts.slice(0, 2).join("-");
-        if (!moduleMap[moduleId]) moduleMap[moduleId] = { total: 0, completed: new Set() };
-        moduleMap[moduleId].completed.add(`${p.child_id || p.user_id}::${p.lesson_id}`);
-      }
-    });
-
-    const rates = Object.entries(moduleMap).map(([mod, data]) => ({
-      module: mod,
-      rate: Math.round((data.completed.size / Math.max(starters.size, 1)) * 100),
-    }));
-
-    const userActivity: Record<string, { lastActive: string }> = {};
-    progress.forEach(p => {
-      const key = p.user_id;
-      if (!userActivity[key] || p.completed_at > userActivity[key].lastActive) {
-        userActivity[key] = { lastActive: p.completed_at };
-      }
-    });
-
-    const sortedUsers = Object.entries(userActivity)
-      .sort(([, a], [, b]) => b.lastActive.localeCompare(a.lastActive))
-      .slice(0, 10);
-
-    const userIds = sortedUsers.map(([id]) => id);
-    const { data: userProfiles } = await supabase.from("profiles").select("id, first_name").in("id", userIds);
-    const nameMap: Record<string, string> = {};
-    userProfiles?.forEach(p => { nameMap[p.id] = p.first_name || "Unknown"; });
-
-    setRecentUsers(sortedUsers.map(([id, data]) => ({
-      name: nameMap[id] || "Unknown",
-      lastActive: new Date(data.lastActive).toLocaleDateString(),
-    })));
-
-    const totalLessonIds = new Set(progress.map(p => p.lesson_id)).size;
-    const completionRates = Object.values(userLessons).map(s => (s.size / Math.max(totalLessonIds, 1)) * 100);
-    const avgCompletion = completionRates.length > 0
-      ? Math.round(completionRates.reduce((a, b) => a + b, 0) / completionRates.length)
-      : 0;
-
-    setStats(s => ({ ...s, courseStarters: starters.size, avgCompletion }));
-    setModuleRates(rates);
-  }
-
-  async function fetchSignupTrend() {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("created_at")
-      .gte("created_at", thirtyDaysAgo.toISOString());
-
-    if (!profiles) return;
-    const dayCounts: Record<string, number> = {};
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(Date.now() - (29 - i) * 86400000);
-      dayCounts[d.toISOString().slice(0, 10)] = 0;
-    }
-    profiles.forEach(p => {
-      const day = p.created_at.slice(0, 10);
-      if (dayCounts[day] !== undefined) dayCounts[day]++;
-    });
-    setSignupTrend(Object.entries(dayCounts).map(([date, count]) => ({ date: date.slice(5), count })));
-  }
-
-  if (loading) {
+  if (adminLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -170,159 +42,35 @@ export default function AdminDashboard() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/family" className="text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft size={20} />
-            </Link>
-            <ShieldIcon size={28} className="stroke-primary" />
-            <span className="font-display font-bold text-lg uppercase tracking-wider">Admin Dashboard</span>
-          </div>
-          <div className="flex items-center gap-2">
-            {adminUser && (
-              <button
-                onClick={signOut}
-                className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <LogOut size={14} /> Sign Out
-              </button>
-            )}
-            <Link to="/family" className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display">
-              Family View
-            </Link>
-          </div>
+  if (!adminUser) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+        <AdminLoginGate />
+      </div>
+    );
+  }
+
+  if (clientId !== KIKI_CLIENT_ID) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+        <div className="card-kiki p-8 max-w-md mx-auto text-center">
+          <ShieldIcon size={40} className="stroke-primary mx-auto mb-4" />
+          <h3 className="font-display text-lg uppercase tracking-wider mb-2">Admin Dashboard</h3>
+          <p className="text-sm text-muted-foreground mb-5">
+            You don't have admin access. This account is not linked to the Kiki Warrior admin workspace.
+          </p>
+          <button
+            onClick={signOut}
+            className="flex items-center gap-2 mx-auto px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <LogOut size={14} /> Sign Out
+          </button>
         </div>
-      </header>
+      </div>
+    );
+  }
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        {/* Section 1: User Overview */}
-        <section>
-          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Users size={20} className="text-primary" /> User Overview
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <StatCard label="Total Parents" value={stats.totalParents} />
-            <StatCard label="New This Week" value={stats.newThisWeek} />
-            <StatCard label="New This Month" value={stats.newThisMonth} />
-            <StatCard label="Age Verified" value={stats.ageVerified} sub={`${stats.agePending} pending`} />
-            <StatCard label="Consent Given" value={stats.consentCount} />
-          </div>
-        </section>
-
-        {/* Section 2: Child Accounts */}
-        <section>
-          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Baby size={20} className="text-primary" /> Child Accounts
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <StatCard label="Total Children" value={stats.totalChildren} />
-            <StatCard label="Avg per Parent" value={stats.avgChildrenPerParent} />
-          </div>
-        </section>
-
-        {/* Section 3: Course Engagement */}
-        <section>
-          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
-            <BookOpen size={20} className="text-primary" /> Course Engagement
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <StatCard label="Course Starters" value={stats.courseStarters} />
-            <StatCard label="Avg Completion" value={`${stats.avgCompletion}%`} />
-          </div>
-
-          {moduleRates.length > 0 && (
-            <div className="card-kiki p-4 mb-6">
-              <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
-                Module Completion Rates
-              </h3>
-              <div className="space-y-2">
-                {moduleRates.map(m => (
-                  <div key={m.module} className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-muted-foreground w-24 shrink-0">{m.module}</span>
-                    <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${Math.min(m.rate, 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-mono w-10 text-right">{m.rate}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {recentUsers.length > 0 && (
-            <div className="card-kiki p-4">
-              <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
-                Recent Active Users
-              </h3>
-              <div className="space-y-2">
-                {recentUsers.map((u, i) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <span>{u.name}</span>
-                    <span className="text-muted-foreground">{u.lastActive}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* Section 4: Signup Trend */}
-        <section>
-          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
-            <TrendingUp size={20} className="text-primary" /> Signup Trend (30 Days)
-          </h2>
-          <div className="card-kiki p-4">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={signupTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{
-                    background: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    color: "hsl(var(--foreground))",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  dot={{ fill: "hsl(var(--primary))", r: 3 }}
-                  name="Signups"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-
-        {/* Section 5: Google Search Console */}
-        <section>
-          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Search size={20} className="text-primary" /> Google Search Console
-          </h2>
-          {adminLoading ? (
-            <div className="card-kiki p-8 flex justify-center">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : adminUser ? (
-            <GscPanel />
-          ) : (
-            <AdminLoginGate />
-          )}
-        </section>
-      </main>
-    </div>
-  );
+  return <AdminDashboardView />;
 }
 
 function AdminLoginGate() {
@@ -343,9 +91,9 @@ function AdminLoginGate() {
   }
 
   return (
-    <div className="card-kiki p-8 max-w-md mx-auto text-center">
+    <div className="card-kiki p-8 max-w-md w-full text-center">
       <ShieldIcon size={40} className="stroke-primary mx-auto mb-4" />
-      <h3 className="font-display text-lg uppercase tracking-wider mb-2">Search Console Login</h3>
+      <h3 className="font-display text-lg uppercase tracking-wider mb-2">Admin Dashboard</h3>
       {sent ? (
         <p className="text-sm text-muted-foreground">
           Check your email for the login link.
@@ -353,7 +101,7 @@ function AdminLoginGate() {
       ) : (
         <>
           <p className="text-sm text-muted-foreground mb-5">
-            Sign in with a one-time link to view Google Search Console data.
+            Sign in with a one-time link to access the admin dashboard.
           </p>
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
@@ -375,6 +123,211 @@ function AdminLoginGate() {
           {error && <p className="text-xs text-destructive mt-3">{error}</p>}
         </>
       )}
+    </div>
+  );
+}
+
+function AdminDashboardView() {
+  const { signOut } = useAdminAuth();
+  const [stats, setStats] = useState<PlatformStats>({
+    totalParents: 0,
+    newThisWeek: 0,
+    newThisMonth: 0,
+    ageVerified: 0,
+    agePending: 0,
+    consentCount: 0,
+    totalChildren: 0,
+    avgChildrenPerParent: 0,
+    courseStarters: 0,
+    avgCompletion: 0,
+  });
+  const [moduleRates, setModuleRates] = useState<{ module: string; rate: number }[]>([]);
+  const [recentUsers, setRecentUsers] = useState<{ name: string; lastActive: string }[]>([]);
+  const [signupTrend, setSignupTrend] = useState<DayCount[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const [userRes, childRes, trendRes, courseRes] = await Promise.all([
+        supabase.rpc("admin_user_stats"),
+        supabase.rpc("admin_child_stats"),
+        supabase.rpc("admin_signup_trend"),
+        supabase.rpc("admin_course_stats"),
+      ]);
+      if (!mounted) return;
+
+      const u = (userRes.data ?? {}) as Record<string, number>;
+      const c = (childRes.data ?? {}) as Record<string, number>;
+      const course = (courseRes.data ?? {}) as {
+        courseStarters?: number;
+        avgCompletion?: number;
+        moduleRates?: { module: string; rate: number }[];
+        recentUsers?: { name: string; lastActive: string }[];
+      };
+      const trend = (trendRes.data ?? []) as { date: string; count: number }[];
+
+      setStats({
+        totalParents: u.totalParents ?? 0,
+        newThisWeek: u.newThisWeek ?? 0,
+        newThisMonth: u.newThisMonth ?? 0,
+        ageVerified: u.ageVerified ?? 0,
+        agePending: u.agePending ?? 0,
+        consentCount: u.consentCount ?? 0,
+        totalChildren: c.totalChildren ?? 0,
+        avgChildrenPerParent: c.avgChildrenPerParent ?? 0,
+        courseStarters: course.courseStarters ?? 0,
+        avgCompletion: course.avgCompletion ?? 0,
+      });
+      setModuleRates(course.moduleRates ?? []);
+      setRecentUsers(course.recentUsers ?? []);
+      setSignupTrend(trend.map(t => ({ date: String(t.date).slice(5), count: t.count })));
+      setLoading(false);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
+      <header className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShieldIcon size={28} className="stroke-primary" />
+            <span className="font-display font-bold text-lg uppercase tracking-wider">Admin Dashboard</span>
+          </div>
+          <button
+            onClick={signOut}
+            className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <LogOut size={14} /> Sign Out
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        {loading ? (
+          <div className="card-kiki p-8 flex justify-center">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <>
+            {/* Section 1: User Overview */}
+            <section>
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Users size={20} className="text-primary" /> User Overview
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <StatCard label="Total Parents" value={stats.totalParents} />
+                <StatCard label="New This Week" value={stats.newThisWeek} />
+                <StatCard label="New This Month" value={stats.newThisMonth} />
+                <StatCard label="Age Verified" value={stats.ageVerified} sub={`${stats.agePending} pending`} />
+                <StatCard label="Consent Given" value={stats.consentCount} />
+              </div>
+            </section>
+
+            {/* Section 2: Child Accounts */}
+            <section>
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Baby size={20} className="text-primary" /> Child Accounts
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <StatCard label="Total Children" value={stats.totalChildren} />
+                <StatCard label="Avg per Parent" value={stats.avgChildrenPerParent} />
+              </div>
+            </section>
+
+            {/* Section 3: Course Engagement */}
+            <section>
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+                <BookOpen size={20} className="text-primary" /> Course Engagement
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <StatCard label="Course Starters" value={stats.courseStarters} />
+                <StatCard label="Avg Completion" value={`${stats.avgCompletion}%`} />
+              </div>
+
+              {moduleRates.length > 0 && (
+                <div className="card-kiki p-4 mb-6">
+                  <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
+                    Module Completion Rates
+                  </h3>
+                  <div className="space-y-2">
+                    {moduleRates.map(m => (
+                      <div key={m.module} className="flex items-center gap-3">
+                        <span className="text-xs font-mono text-muted-foreground w-24 shrink-0">{m.module}</span>
+                        <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all"
+                            style={{ width: `${Math.min(m.rate, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-mono w-10 text-right">{m.rate}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {recentUsers.length > 0 && (
+                <div className="card-kiki p-4">
+                  <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
+                    Recent Active Users
+                  </h3>
+                  <div className="space-y-2">
+                    {recentUsers.map((u, i) => (
+                      <div key={i} className="flex justify-between text-sm">
+                        <span>{u.name}</span>
+                        <span className="text-muted-foreground">{u.lastActive}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Section 4: Signup Trend */}
+            <section>
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+                <TrendingUp size={20} className="text-primary" /> Signup Trend (30 Days)
+              </h2>
+              <div className="card-kiki p-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={signupTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        color: "hsl(var(--foreground))",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={{ fill: "hsl(var(--primary))", r: 3 }}
+                      name="Signups"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* Section 5: Google Search Console */}
+        <section>
+          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Search size={20} className="text-primary" /> Google Search Console
+          </h2>
+          <GscPanel />
+        </section>
+      </main>
     </div>
   );
 }
