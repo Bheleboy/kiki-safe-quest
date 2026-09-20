@@ -503,6 +503,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_child_stats: { Args: never; Returns: Json }
+      admin_course_stats: { Args: never; Returns: Json }
+      admin_signup_trend: { Args: never; Returns: Json }
+      admin_user_stats: { Args: never; Returns: Json }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
