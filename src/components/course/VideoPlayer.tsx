@@ -40,9 +40,12 @@ function toFallbackUrl(videoUrl: string, fallbackUrl?: string): string | undefin
 const LOAD_TIMEOUT_MS = 6000;
 
 export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, durationMinutes }: VideoPlayerProps) {
+  // Native MP4s (our rendered Kiki lesson videos) play directly in a <video> tag.
+  const isMp4 = videoUrl.toLowerCase().split("?")[0].endsWith(".mp4");
+
   const videoId = getVideoId(videoUrl);
   const embedUrl = ensureEmbedParams(videoUrl);
-  const watchUrl = toFallbackUrl(videoUrl, fallbackUrl);
+  const watchUrl = isMp4 ? toFallbackUrl(fallbackUrl ?? "", fallbackUrl) : toFallbackUrl(videoUrl, fallbackUrl);
   // YouTube returns a tiny "default.jpg" (120x90) for missing/private videos
   // and a full-resolution image for available ones, so we can probe availability.
   const thumbProbeUrl = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : undefined;
