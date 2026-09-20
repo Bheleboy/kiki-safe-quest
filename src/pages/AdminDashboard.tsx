@@ -1,17 +1,28 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { sitecheckerSupabase } from "@/integrations/sitechecker/client";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { Users, Baby, BookOpen, TrendingUp, ArrowLeft } from "lucide-react";
+import { Users, Baby, BookOpen, TrendingUp, ArrowLeft, Search, LogOut } from "lucide-react";
+
+const KIKI_CLIENT_ID = "7a197200-b63e-4a04-80b7-6c3bdcfd93d7";
 
 interface DayCount { date: string; count: number }
+interface GscDaily { date: string; clicks: number; impressions: number; ctr: number; position: number }
+interface GscRow { label: string; clicks: number; impressions: number; ctr: number; position: number }
+
+function daysAgoIso(days: number) {
+  return new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+}
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const { adminUser, adminLoading, signOut } = useAdminAuth();
   const [stats, setStats] = useState({
     totalParents: 0,
     newThisWeek: 0,
@@ -75,11 +86,8 @@ export default function AdminDashboard() {
     const { data: progress } = await supabase.from("progress").select("user_id, child_id, lesson_id, completed_at");
     if (!progress) return;
 
-    // Unique starters
     const starters = new Set(progress.map(p => p.child_id || p.user_id));
-    
-    // For module rates, we need lesson counts from courseData
-    // Using a simplified approach: count unique lessons completed per user
+
     const userLessons: Record<string, Set<string>> = {};
     progress.forEach(p => {
       const key = p.child_id || p.user_id;
@@ -87,10 +95,8 @@ export default function AdminDashboard() {
       userLessons[key].add(p.lesson_id);
     });
 
-    // Module completion rates based on lesson prefixes
     const moduleMap: Record<string, { total: number; completed: Set<string> }> = {};
     progress.forEach(p => {
-      // Extract module prefix e.g. "young-m1" from "young-m1-l1"
       const parts = p.lesson_id.split("-");
       if (parts.length >= 2) {
         const moduleId = parts.slice(0, 2).join("-");
@@ -104,7 +110,6 @@ export default function AdminDashboard() {
       rate: Math.round((data.completed.size / Math.max(starters.size, 1)) * 100),
     }));
 
-    // Recent active users
     const userActivity: Record<string, { lastActive: string }> = {};
     progress.forEach(p => {
       const key = p.user_id;
@@ -117,7 +122,6 @@ export default function AdminDashboard() {
       .sort(([, a], [, b]) => b.lastActive.localeCompare(a.lastActive))
       .slice(0, 10);
 
-    // Fetch names for these users
     const userIds = sortedUsers.map(([id]) => id);
     const { data: userProfiles } = await supabase.from("profiles").select("id, first_name").in("id", userIds);
     const nameMap: Record<string, string> = {};
@@ -128,7 +132,6 @@ export default function AdminDashboard() {
       lastActive: new Date(data.lastActive).toLocaleDateString(),
     })));
 
-    // Average completion: total unique lessons per user / approximate total lessons
     const totalLessonIds = new Set(progress.map(p => p.lesson_id)).size;
     const completionRates = Object.values(userLessons).map(s => (s.size / Math.max(totalLessonIds, 1)) * 100);
     const avgCompletion = completionRates.length > 0
@@ -179,9 +182,19 @@ export default function AdminDashboard() {
             <ShieldIcon size={28} className="stroke-primary" />
             <span className="font-display font-bold text-lg uppercase tracking-wider">Admin Dashboard</span>
           </div>
-          <Link to="/family" className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display">
-            Family View
-          </Link>
+          <div className="flex items-center gap-2">
+            {adminUser && (
+              <button
+                onClick={signOut}
+                className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut size={14} /> Sign Out
+              </button>
+            )}
+            <Link to="/family" className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display">
+              Family View
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -291,7 +304,250 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
           </div>
         </section>
+
+        {/* Section 5: Google Search Console */}
+        <section>
+          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Search size={20} className="text-primary" /> Google Search Console
+          </h2>
+          {adminLoading ? (
+            <div className="card-kiki p-8 flex justify-center">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : adminUser ? (
+            <GscPanel />
+          ) : (
+            <AdminLoginGate />
+          )}
+        </section>
       </main>
+    </div>
+  );
+}
+
+function AdminLoginGate() {
+  const { sendMagicLink } = useAdminAuth();
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSending(true);
+    setError(null);
+    const { error } = await sendMagicLink(email.trim());
+    setSending(false);
+    if (error) setError(error.message);
+    else setSent(true);
+  }
+
+  return (
+    <div className="card-kiki p-8 max-w-md mx-auto text-center">
+      <ShieldIcon size={40} className="stroke-primary mx-auto mb-4" />
+      <h3 className="font-display text-lg uppercase tracking-wider mb-2">Search Console Login</h3>
+      {sent ? (
+        <p className="text-sm text-muted-foreground">
+          Check your email for the login link.
+        </p>
+      ) : (
+        <>
+          <p className="text-sm text-muted-foreground mb-5">
+            Sign in with a one-time link to view Google Search Console data.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full px-4 py-3 rounded-xl bg-muted/40 border border-border text-sm outline-none focus:border-primary transition-colors"
+            />
+            <button
+              type="submit"
+              disabled={sending}
+              className="btn-copper w-full px-5 py-3 text-xs uppercase tracking-widest font-display disabled:opacity-60"
+            >
+              {sending ? "Sending..." : "Send Login Link"}
+            </button>
+          </form>
+          {error && <p className="text-xs text-destructive mt-3">{error}</p>}
+        </>
+      )}
+    </div>
+  );
+}
+
+function GscPanel() {
+  const [daily, setDaily] = useState<GscDaily[]>([]);
+  const [queries, setQueries] = useState<GscRow[]>([]);
+  const [pages, setPages] = useState<GscRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const since30 = daysAgoIso(30);
+      const since7 = daysAgoIso(7);
+
+      const [d, q, p] = await Promise.all([
+        sitecheckerSupabase
+          .from("gsc_daily_metrics")
+          .select("date, clicks, impressions, ctr, position")
+          .eq("client_id", KIKI_CLIENT_ID)
+          .gte("date", since30)
+          .order("date", { ascending: true }),
+        sitecheckerSupabase
+          .from("gsc_queries")
+          .select("query, clicks, impressions, ctr, position")
+          .eq("client_id", KIKI_CLIENT_ID)
+          .gte("date", since7)
+          .order("clicks", { ascending: false })
+          .limit(200),
+        sitecheckerSupabase
+          .from("gsc_pages")
+          .select("page, clicks, impressions, ctr, position")
+          .eq("client_id", KIKI_CLIENT_ID)
+          .gte("date", since7)
+          .order("clicks", { ascending: false })
+          .limit(200),
+      ]);
+
+      if (!mounted) return;
+      setDaily(((d.data ?? []) as GscDaily[]));
+      setQueries(aggregate((q.data ?? []) as Record<string, unknown>[], "query").slice(0, 20));
+      setPages(aggregate((p.data ?? []) as Record<string, unknown>[], "page").slice(0, 10));
+      setLoading(false);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="card-kiki p-8 flex justify-center">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (daily.length === 0 && queries.length === 0 && pages.length === 0) {
+    return (
+      <div className="card-kiki p-6 text-sm text-muted-foreground">
+        No Google Search Console data yet. Data will appear after the daily sync runs and the GSC property for kikiwarrior.com is verified.
+      </div>
+    );
+  }
+
+  const totalClicks = daily.reduce((a, b) => a + (b.clicks || 0), 0);
+  const totalImpressions = daily.reduce((a, b) => a + (b.impressions || 0), 0);
+  const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+  const avgPosition = daily.length > 0
+    ? daily.reduce((a, b) => a + (b.position || 0), 0) / daily.length
+    : 0;
+
+  const chartData = daily.map(d => ({
+    date: d.date.slice(5),
+    clicks: d.clicks || 0,
+    impressions: d.impressions || 0,
+  }));
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard label="Total Clicks" value={totalClicks.toLocaleString()} />
+        <StatCard label="Total Impressions" value={totalImpressions.toLocaleString()} />
+        <StatCard label="Avg CTR" value={`${avgCtr.toFixed(2)}%`} />
+        <StatCard label="Avg Position" value={avgPosition.toFixed(1)} />
+      </div>
+
+      {chartData.length > 0 && (
+        <div className="card-kiki p-4">
+          <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
+            Clicks and Impressions (30 Days)
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+              <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" fontSize={11} allowDecimals={false} />
+              <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" fontSize={11} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{
+                  background: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "8px",
+                  color: "hsl(var(--foreground))",
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line yAxisId="left" type="monotone" dataKey="clicks" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Clicks" />
+              <Line yAxisId="right" type="monotone" dataKey="impressions" stroke="hsl(var(--muted-foreground))" strokeWidth={2} dot={false} name="Impressions" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      <GscTable title="Top Queries (7 Days)" firstCol="Query" rows={queries} />
+      <GscTable title="Top Pages (7 Days)" firstCol="Page" rows={pages} />
+    </div>
+  );
+}
+
+function aggregate(rows: Record<string, unknown>[], key: string): GscRow[] {
+  const map: Record<string, { clicks: number; impressions: number; posSum: number; n: number }> = {};
+  rows.forEach(r => {
+    const label = String(r[key] ?? "");
+    if (!label) return;
+    if (!map[label]) map[label] = { clicks: 0, impressions: 0, posSum: 0, n: 0 };
+    map[label].clicks += Number(r.clicks) || 0;
+    map[label].impressions += Number(r.impressions) || 0;
+    map[label].posSum += Number(r.position) || 0;
+    map[label].n += 1;
+  });
+  return Object.entries(map)
+    .map(([label, v]) => ({
+      label,
+      clicks: v.clicks,
+      impressions: v.impressions,
+      ctr: v.impressions > 0 ? (v.clicks / v.impressions) * 100 : 0,
+      position: v.n > 0 ? v.posSum / v.n : 0,
+    }))
+    .sort((a, b) => b.clicks - a.clicks);
+}
+
+function GscTable({ title, firstCol, rows }: { title: string; firstCol: string; rows: GscRow[] }) {
+  return (
+    <div className="card-kiki p-4">
+      <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">{title}</h3>
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No data for this period yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground font-display">
+                <th className="py-2 pr-3">{firstCol}</th>
+                <th className="py-2 px-3 text-right">Clicks</th>
+                <th className="py-2 px-3 text-right">Impressions</th>
+                <th className="py-2 px-3 text-right">CTR</th>
+                <th className="py-2 pl-3 text-right">Avg Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={i} className="border-t border-border/40">
+                  <td className="py-2 pr-3 max-w-[280px] truncate" title={r.label}>{r.label}</td>
+                  <td className="py-2 px-3 text-right font-mono">{r.clicks.toLocaleString()}</td>
+                  <td className="py-2 px-3 text-right font-mono">{r.impressions.toLocaleString()}</td>
+                  <td className="py-2 px-3 text-right font-mono">{r.ctr.toFixed(2)}%</td>
+                  <td className="py-2 pl-3 text-right font-mono">{r.position.toFixed(1)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
