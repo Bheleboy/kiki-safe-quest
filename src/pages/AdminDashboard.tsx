@@ -208,12 +208,20 @@ function AdminDashboardView() {
             <ShieldIcon size={28} className="stroke-primary" />
             <span className="font-display font-bold text-lg uppercase tracking-wider">Admin Dashboard</span>
           </div>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut size={14} /> Sign Out
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href="/parent"
+              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Users size={14} /> Family View
+            </a>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut size={14} /> Sign Out
+            </button>
+          </div>
         </div>
       </header>
 

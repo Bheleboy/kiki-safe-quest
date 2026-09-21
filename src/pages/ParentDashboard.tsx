@@ -186,6 +186,14 @@ export default function ParentDashboard() {
               {children.length > 0 ? `Tracking ${children.length} learner${children.length > 1 ? "s" : ""}` : "No children added yet"}
             </p>
           </div>
+          {profile?.is_admin && (
+            <a
+              href="/admin"
+              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ShieldIcon size={14} /> Admin
+            </a>
+          )}
           {notifications.length > 0 && (
             <div className="relative">
               <Bell className="w-5 h-5 text-primary" />
