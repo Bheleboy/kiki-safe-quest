@@ -16,6 +16,7 @@ export function useAdminAuth() {
         .from('dashboard_user_clients')
         .select('client_id, role')
         .eq('user_id', userId)
+        .eq('client_id', '7a197200-b63e-4a04-80b7-6c3bdcfd93d7')
         .maybeSingle();
       if (mounted && data) setClientId((data as { client_id: string }).client_id);
     }
