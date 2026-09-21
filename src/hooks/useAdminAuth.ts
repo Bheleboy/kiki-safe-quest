@@ -21,20 +21,23 @@ export function useAdminAuth() {
       if (mounted && data) setClientId((data as { client_id: string }).client_id);
     }
 
-    sitecheckerSupabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      setAdminSession(session);
-      setAdminUser(session?.user ?? null);
-      if (session?.user) checkAdminAccess(session.user.id);
-      setAdminLoading(false);
-    });
-
-    const { data: { subscription } } = sitecheckerSupabase.auth.onAuthStateChange((_event, session) => {
+    (async () => {
+      const { data: { session } } = await sitecheckerSupabase.auth.getSession();
       if (!mounted) return;
       setAdminSession(session);
       setAdminUser(session?.user ?? null);
       if (session?.user) {
-        setTimeout(() => checkAdminAccess(session.user.id), 0);
+        await checkAdminAccess(session.user.id);
+      }
+      setAdminLoading(false);
+    })();
+
+    const { data: { subscription } } = sitecheckerSupabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
+      setAdminSession(session);
+      setAdminUser(session?.user ?? null);
+      if (session?.user) {
+        await checkAdminAccess(session.user.id);
       } else {
         setClientId(null);
       }
