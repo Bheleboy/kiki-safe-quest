@@ -148,43 +148,53 @@ function AdminDashboardView() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { data: { session } } = await sitecheckerSupabase.auth.getSession();
-      if (!session) return;
+      try {
+        const { data: { session } } = await sitecheckerSupabase.auth.getSession();
+        if (!session || !mounted) { setLoading(false); return; }
 
-      const res = await fetch(
-        `${import.meta.env.VITE_SITECHECKER_SUPABASE_URL}/functions/v1/kiki-admin-stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
+        const res = await fetch(
+          `${import.meta.env.VITE_SITECHECKER_SUPABASE_URL}/functions/v1/kiki-admin-stats`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!mounted) return;
+        if (!res.ok) {
+          console.error("Admin stats error:", res.status, await res.text());
+          setLoading(false);
+          return;
         }
-      );
+        const data = await res.json();
 
-      if (!res.ok || !mounted) return;
-      const data = await res.json();
+        const u = data.users ?? {};
+        const c = data.children ?? {};
+        const course = data.course ?? {};
+        const trend = (data.trend ?? []) as { date: string; count: number }[];
 
-      const u = data.users ?? {};
-      const c = data.children ?? {};
-      const course = data.course ?? {};
-      const trend = (data.trend ?? []) as { date: string; count: number }[];
-
-      setStats({
-        totalParents: u.totalParents ?? 0,
-        newThisWeek: u.newThisWeek ?? 0,
-        newThisMonth: u.newThisMonth ?? 0,
-        ageVerified: u.ageVerified ?? 0,
-        agePending: u.agePending ?? 0,
-        consentCount: u.consentCount ?? 0,
-        totalChildren: c.totalChildren ?? 0,
-        avgChildrenPerParent: c.avgChildrenPerParent ?? 0,
-        courseStarters: course.courseStarters ?? 0,
-        avgCompletion: course.avgCompletion ?? 0,
-      });
-      setModuleRates(course.moduleRates ?? []);
-      setRecentUsers(course.recentUsers ?? []);
-      setSignupTrend(trend.map((t: { date: string; count: number }) => ({ date: String(t.date).slice(5), count: t.count })));
-      setLoading(false);
+        setStats({
+          totalParents: u.totalParents ?? 0,
+          newThisWeek: u.newThisWeek ?? 0,
+          newThisMonth: u.newThisMonth ?? 0,
+          ageVerified: u.ageVerified ?? 0,
+          agePending: u.agePending ?? 0,
+          consentCount: u.consentCount ?? 0,
+          totalChildren: c.totalChildren ?? 0,
+          avgChildrenPerParent: c.avgChildrenPerParent ?? 0,
+          courseStarters: course.courseStarters ?? 0,
+          avgCompletion: course.avgCompletion ?? 0,
+        });
+        setModuleRates(course.moduleRates ?? []);
+        setRecentUsers(course.recentUsers ?? []);
+        setSignupTrend(trend.map((t: { date: string; count: number }) => ({ date: String(t.date).slice(5), count: t.count })));
+      } catch (err) {
+        console.error("Admin stats fetch error:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     })();
     return () => { mounted = false; };
   }, []);
