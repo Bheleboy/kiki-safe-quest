@@ -6,7 +6,7 @@ import { useProgress } from "@/hooks/useProgress";
 import { useArmour } from "@/hooks/useArmour";
 import { courseData } from "@/data/courseData";
 import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
-import { CourseIcon } from "@/components/course/CourseIcons";
+import { CourseIcon, ShieldIcon } from "@/components/course/CourseIcons";
 import { ProgressBar } from "@/components/course/ProgressBar";
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
