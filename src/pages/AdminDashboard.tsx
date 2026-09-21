@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { sitecheckerSupabase } from "@/integrations/sitechecker/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { ShieldIcon } from "@/components/course/CourseIcons";
@@ -149,23 +148,26 @@ function AdminDashboardView() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [userRes, childRes, trendRes, courseRes] = await Promise.all([
-        supabase.rpc("admin_user_stats"),
-        supabase.rpc("admin_child_stats"),
-        supabase.rpc("admin_signup_trend"),
-        supabase.rpc("admin_course_stats"),
-      ]);
-      if (!mounted) return;
+      const { data: { session } } = await sitecheckerSupabase.auth.getSession();
+      if (!session) return;
 
-      const u = (userRes.data ?? {}) as Record<string, number>;
-      const c = (childRes.data ?? {}) as Record<string, number>;
-      const course = (courseRes.data ?? {}) as {
-        courseStarters?: number;
-        avgCompletion?: number;
-        moduleRates?: { module: string; rate: number }[];
-        recentUsers?: { name: string; lastActive: string }[];
-      };
-      const trend = (trendRes.data ?? []) as { date: string; count: number }[];
+      const res = await fetch(
+        `${import.meta.env.VITE_SITECHECKER_SUPABASE_URL}/functions/v1/kiki-admin-stats`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok || !mounted) return;
+      const data = await res.json();
+
+      const u = data.users ?? {};
+      const c = data.children ?? {};
+      const course = data.course ?? {};
+      const trend = (data.trend ?? []) as { date: string; count: number }[];
 
       setStats({
         totalParents: u.totalParents ?? 0,
@@ -181,7 +183,7 @@ function AdminDashboardView() {
       });
       setModuleRates(course.moduleRates ?? []);
       setRecentUsers(course.recentUsers ?? []);
-      setSignupTrend(trend.map(t => ({ date: String(t.date).slice(5), count: t.count })));
+      setSignupTrend(trend.map((t: { date: string; count: number }) => ({ date: String(t.date).slice(5), count: t.count })));
       setLoading(false);
     })();
     return () => { mounted = false; };
