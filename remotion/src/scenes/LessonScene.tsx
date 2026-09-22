@@ -61,10 +61,25 @@ const PresenterImage: React.FC<{ config: LessonConfig }> = ({ config }) => {
   const src = config.presenter === "nonala" ? staticFile("images/nala.png") : staticFile("images/kiki.png");
   const visemeData = VISEME_MAP[config.audioFile];
   const cues = visemeData?.mouthCues ?? [];
+  // Kiki: 457x803, Nonala: 1264x848 - calculate rendered size within 540x900 container
+  const isNonala = config.presenter === "nonala";
+  const imgW = isNonala ? 1264 : 457;
+  const imgH = isNonala ? 848 : 803;
+  const aspect = imgW / imgH;
+  // Fit image within the 540x900 slot preserving aspect ratio
+  const maxW = 540, maxH = 900;
+  let renderW: number, renderH: number;
+  if (maxW / maxH > aspect) {
+    renderH = maxH;
+    renderW = maxH * aspect;
+  } else {
+    renderW = maxW;
+    renderH = maxW / aspect;
+  }
   return (
     <div style={{ position: "absolute", right: 20, bottom: 80, width: 540, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-      <div style={{ position: "relative", maxWidth: "100%", maxHeight: "100%" }}>
-        <Img src={src} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} />
+      <div style={{ position: "relative", width: renderW, height: renderH }}>
+        <Img src={src} style={{ width: "100%", height: "100%", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} />
         {cues.length > 0 && <MouthOverlay presenter={config.presenter} cues={cues} />}
       </div>
     </div>
