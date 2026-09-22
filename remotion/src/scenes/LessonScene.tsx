@@ -5,6 +5,8 @@ import { loadFont as loadEmoji } from "@remotion/google-fonts/NotoColorEmoji";
 import type { LessonConfig, ModulePalette } from "../types";
 import { MODULE_PALETTES } from "../types";
 import { CardRenderer } from "../components/CardRenderer";
+import { MouthOverlay } from "../components/MouthOverlay";
+import { VISEME_MAP } from "../visemes";
 
 loadOswald("normal", { weights: ["500", "600", "700"] });
 const { fontFamily: emojiFont } = loadEmoji();
@@ -57,7 +59,16 @@ const BigScreen: React.FC<{ config: LessonConfig; palette: ModulePalette }> = ({
 
 const PresenterImage: React.FC<{ config: LessonConfig }> = ({ config }) => {
   const src = config.presenter === "nonala" ? staticFile("images/nala.png") : staticFile("images/kiki.png");
-  return (<div style={{ position: "absolute", right: 20, bottom: 80, width: 540, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "center" }}><Img src={src} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} /></div>);
+  const visemeData = VISEME_MAP[config.audioFile];
+  const cues = visemeData?.mouthCues ?? [];
+  return (
+    <div style={{ position: "absolute", right: 20, bottom: 80, width: 540, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div style={{ position: "relative", maxWidth: "100%", maxHeight: "100%" }}>
+        <Img src={src} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} />
+        {cues.length > 0 && <MouthOverlay presenter={config.presenter} cues={cues} />}
+      </div>
+    </div>
+  );
 };
 
 const LogoBug: React.FC<{ config: LessonConfig; palette: ModulePalette }> = ({ config, palette }) => {
