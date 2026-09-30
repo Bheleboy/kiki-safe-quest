@@ -55,7 +55,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l1",
             title: "The Internet – A Big Playground!",
-            videoUrl: "https://www.youtube.com/embed/gVoHRKIIFGg",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l1_the_internet_a_big_playground.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -87,7 +87,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l2",
             title: "How Does the Internet Work?",
-            videoUrl: "https://www.youtube.com/embed/Sfzo4xm5eX8",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l2_how_does_the_internet_work.mp4",
             videoCredit: "SciShow Kids",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -119,7 +119,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l3",
             title: "Websites and Apps – What's the Difference?",
-            videoUrl: "https://www.youtube.com/embed/FCBMt55CNOE",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l3_websites_and_apps.mp4",
             videoCredit: "National Cyber Security Centre",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -150,7 +150,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l4",
             title: "Good vs Bad Content Online",
-            videoUrl: "https://www.youtube.com/embed/MQlJ3vOp6nI",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l4_good_vs_bad_content.mp4",
             videoCredit: "Common Sense Education",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -182,7 +182,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l5",
             title: "Screen Time – Balance is Key!",
-            videoUrl: "https://www.youtube.com/embed/hFnYhTn6gHQ",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l5_screen_time.mp4",
             videoCredit: "GoNoodle",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -224,7 +224,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l1",
             title: "S – Stay Safe Online",
-            videoUrl: "https://www.youtube.com/embed/TqPCnOsq_Mo",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l1_s_stay_safe_online.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -266,7 +266,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l2",
             title: "M – Meeting People Online",
-            videoUrl: "https://www.youtube.com/embed/UMjCc4pJfPg",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l2_m_meeting_people_online.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -298,7 +298,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l3",
             title: "A – Accepting Content",
-            videoUrl: "https://www.youtube.com/embed/QKe-aO44R7k",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l3_a_accepting_content.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -329,7 +329,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l4",
             title: "R – Reliable Information",
-            videoUrl: "https://www.youtube.com/embed/MHvY1RfRJSY",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l4_r_reliable_information.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -360,7 +360,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l5",
             title: "T – Tell an Adult",
-            videoUrl: "https://www.youtube.com/embed/6RRyVPmtL9I",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l5_t_tell_an_adult.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -400,7 +400,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l1",
             title: "Kindness on the Internet",
-            videoUrl: "https://www.youtube.com/embed/PGSCnMx0gLo",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l1_kindness_on_the_internet.mp4",
             videoCredit: "BrainPOP",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -432,7 +432,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l2",
             title: "What is Cyberbullying?",
-            videoUrl: "https://www.youtube.com/embed/vtfMzmkYp9E",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l2_what_is_cyberbullying.mp4",
             videoCredit: "Smile and Learn",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -464,7 +464,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l3",
             title: "Being a Good Digital Friend",
-            videoUrl: "https://www.youtube.com/embed/BZhpJBsoL3I",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l3_being_a_good_digital_friend.mp4",
             videoCredit: "Google for Education",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -496,7 +496,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l4",
             title: "Think Before You Post!",
-            videoUrl: "https://www.youtube.com/embed/NI5bMnecv0M",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l4_think_before_you_post.mp4",
             videoCredit: "Common Sense Education",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -527,7 +527,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l5",
             title: "Dealing with Mean Messages",
-            videoUrl: "https://www.youtube.com/embed/mgMkPIRGLcI",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l5_dealing_with_mean_messages.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
