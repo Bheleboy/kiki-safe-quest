@@ -82,4 +82,22 @@ export const MODULE_PALETTES: Record<string, ModulePalette> = {
     accent: "#FF8A2A",
     tint: "#E8FBF1",
   },
+  "What is the Internet?": {
+    primary: "#2EA8E0",
+    secondary: "#FF8A2A",
+    accent: "#2FD58A",
+    tint: "#E3F4FF",
+  },
+  "SMART Rules": {
+    primary: "#EF4E5A",
+    secondary: "#FFB020",
+    accent: "#2EA8E0",
+    tint: "#FFECEE",
+  },
+  "Be Kind Online": {
+    primary: "#2FD58A",
+    secondary: "#8B5CF6",
+    accent: "#FF8A2A",
+    tint: "#E8FBF1",
+  },
 };

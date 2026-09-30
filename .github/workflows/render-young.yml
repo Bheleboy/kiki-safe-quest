@@ -1,0 +1,72 @@
+name: Render Kiki Lesson Videos - Ages 6-9
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "remotion/src/configs/ages-6-9_*.json"
+      - ".github/workflows/render-young.yml"
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        batch: [0, 5, 10]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install deps
+        working-directory: remotion
+        run: bun install
+      - name: Install Chromium
+        working-directory: remotion
+        run: npx playwright install chromium --with-deps
+      - name: Render batch
+        working-directory: remotion
+        run: |
+          mkdir -p out
+          COMPS=(ages-6-9-m1-l1-the-internet-a-big-playground ages-6-9-m1-l2-how-does-the-internet-work ages-6-9-m1-l3-websites-and-apps ages-6-9-m1-l4-good-vs-bad-content ages-6-9-m1-l5-screen-time ages-6-9-m2-l1-s-stay-safe-online ages-6-9-m2-l2-m-meeting-people-online ages-6-9-m2-l3-a-accepting-content ages-6-9-m2-l4-r-reliable-information ages-6-9-m2-l5-t-tell-an-adult ages-6-9-m3-l1-kindness-on-the-internet ages-6-9-m3-l2-what-is-cyberbullying ages-6-9-m3-l3-being-a-good-digital-friend ages-6-9-m3-l4-think-before-you-post ages-6-9-m3-l5-dealing-with-mean-messages)
+          START=${{ matrix.batch }}; END=$((START + 5))
+          BROWSER=$(find "$HOME" -name "headless_shell" 2>/dev/null | head -1)
+          [ -z "$BROWSER" ] && BROWSER=$(find "$HOME" -name "chrome" 2>/dev/null | head -1)
+          [ -z "$BROWSER" ] && BROWSER="chromium"
+          FAILED=0
+          for i in $(seq "$START" "$((END-1))"); do
+            comp="${COMPS[$i]}"; fname="${comp//-/_}.mp4"
+            echo "=== [$((i+1))/15] $comp ==="
+            if npx remotion render "$comp" "out/$fname" --codec h264 --crf 18 --browser-executable "$BROWSER" && [ -s "out/$fname" ]; then
+              echo "OK: $fname $(du -h out/$fname | cut -f1)"
+            else
+              echo "FAIL: $fname"; FAILED=$((FAILED+1))
+            fi
+          done
+          [ "$FAILED" -eq 0 ]
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kiki-young-batch-${{ matrix.batch }}
+          path: remotion/out/*.mp4
+          retention-days: 30
+  release:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: kiki-young-batch-*
+          merge-multiple: true
+          path: mp4
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -lh mp4
+          TAG="v1.0-young-renders"
+          gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" -y --cleanup-tag || true
+          gh release create "$TAG" mp4/*.mp4 --repo "$GITHUB_REPOSITORY" --title "Ages 6-9 lesson renders" --notes "15 ages 6-9 lesson videos (Modules 1-3)"
