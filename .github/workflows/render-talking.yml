@@ -8,59 +8,63 @@ on:
 permissions:
   contents: write
 jobs:
-  plan:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.plan.outputs.matrix }}
-      tag: ${{ steps.plan.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: plan
-        run: |
-          REQ=$(tr -d '\r' < remotion/render-request.txt | sed '/^\s*$/d')
-          if [ "$(echo "$REQ" | head -1 | xargs)" = "all" ]; then
-            echo 'matrix={"batch":[0,5,10,15,20,25,30,35,40]}' >> "$GITHUB_OUTPUT"
-            echo "tag=v2.0-talking-renders" >> "$GITHUB_OUTPUT"
-          else
-            echo 'matrix={"batch":[-1]}' >> "$GITHUB_OUTPUT"
-            echo "tag=v2.0-talking-test" >> "$GITHUB_OUTPUT"
-          fi
   render:
-    needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 90
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+      matrix:
+        batch: [0, 5, 10, 15, 20, 25, 30, 35, 40]
     steps:
       - uses: actions/checkout@v4
+      - id: work
+        name: Decide work
+        run: |
+          REQ=$(tr -d '\r' < remotion/render-request.txt | sed '/^\s*$/d' | sed '/^\s*#/d')
+          if [ "$(echo "$REQ" | head -1 | xargs)" = "all" ]; then
+            mapfile -t ALL < <(for f in remotion/src/configs/*.json; do node -e 'console.log(require(process.argv[1]).id)' "$PWD/$f"; done | sort)
+            IDS=("${ALL[@]:${{ matrix.batch }}:5}")
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "ids=${IDS[*]}" >> "$GITHUB_OUTPUT"
+          else
+            if [ "${{ matrix.batch }}" = "0" ]; then
+              mapfile -t IDS < <(echo "$REQ" | xargs -n1)
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+              echo "ids=${IDS[*]}" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "ids=" >> "$GITHUB_OUTPUT"
+            fi
+          fi
       - uses: oven-sh/setup-bun@v2
+        if: steps.work.outputs.skip == 'false'
         with:
           bun-version: latest
       - name: Install deps
+        if: steps.work.outputs.skip == 'false'
         working-directory: remotion
         run: bun install
       - name: Install Chromium
+        if: steps.work.outputs.skip == 'false'
         working-directory: remotion
         run: npx playwright install chromium --with-deps
       - name: Ensure ffmpeg
+        if: steps.work.outputs.skip == 'false'
         run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - name: Fetch talking clips
+        if: steps.work.outputs.skip == 'false'
         working-directory: remotion
+        timeout-minutes: 20
         env:
           HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
         run: node scripts/fetch-talking-clips.mjs
       - name: Render
+        if: steps.work.outputs.skip == 'false'
         working-directory: remotion
+        timeout-minutes: 60
         run: |
           mkdir -p out
-          BATCH=${{ matrix.batch }}
-          if [ "$BATCH" = "-1" ]; then
-            mapfile -t IDS < <(tr -d '\r' < render-request.txt | sed '/^\s*$/d' | xargs -n1)
-          else
-            mapfile -t ALL < <(for f in src/configs/*.json; do node -e 'console.log(require(process.argv[1]).id)' "$PWD/$f"; done | sort)
-            IDS=("${ALL[@]:$BATCH:5}")
-          fi
+          read -ra IDS <<< "${{ steps.work.outputs.ids }}"
           BROWSER=$(find "$HOME" -name "headless_shell" 2>/dev/null | head -1)
           [ -z "$BROWSER" ] && BROWSER=$(find "$HOME" -name "chrome" 2>/dev/null | head -1)
           [ -z "$BROWSER" ] && BROWSER="chromium"
@@ -77,7 +81,7 @@ jobs:
           cp src/talking-manifest.json out/talking-manifest.json
           [ "$FAILED" -eq 0 ]
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.work.outputs.skip == 'false'
         with:
           name: kiki-talking-batch-${{ matrix.batch }}
           path: |
@@ -85,10 +89,12 @@ jobs:
             remotion/out/talking-manifest.json
           retention-days: 30
   release:
-    needs: [plan, render]
-    if: always() && needs.plan.result == 'success'
+    needs: render
+    if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           pattern: kiki-talking-batch-*
@@ -99,7 +105,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ls -lh mp4
-          TAG="${{ needs.plan.outputs.tag }}"
+          REQ=$(tr -d '\r' < remotion/render-request.txt | sed '/^\s*$/d' | sed '/^\s*#/d')
+          if [ "$(echo "$REQ" | head -1 | xargs)" = "all" ]; then
+            TAG="v2.0-talking-renders"
+          else
+            TAG="v2.0-talking-test"
+          fi
+          if ! ls mp4/*.mp4 >/dev/null 2>&1; then
+            echo "ERROR: no mp4 files rendered - refusing to create an empty release"
+            exit 1
+          fi
           gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" -y --cleanup-tag || true
           FILES=(mp4/*.mp4)
           [ -f mp4/talking-manifest.json ] && FILES+=(mp4/talking-manifest.json)
