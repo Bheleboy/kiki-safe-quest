@@ -1,0 +1,106 @@
+name: Render Kiki Lessons - Talking Presenter
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "remotion/render-request.txt"
+permissions:
+  contents: write
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      tag: ${{ steps.plan.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        run: |
+          REQ=$(tr -d '\r' < remotion/render-request.txt | sed '/^\s*$/d')
+          if [ "$(echo "$REQ" | head -1 | xargs)" = "all" ]; then
+            echo 'matrix={"batch":[0,5,10,15,20,25,30,35,40]}' >> "$GITHUB_OUTPUT"
+            echo "tag=v2.0-talking-renders" >> "$GITHUB_OUTPUT"
+          else
+            echo 'matrix={"batch":[-1]}' >> "$GITHUB_OUTPUT"
+            echo "tag=v2.0-talking-test" >> "$GITHUB_OUTPUT"
+          fi
+  render:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install deps
+        working-directory: remotion
+        run: bun install
+      - name: Install Chromium
+        working-directory: remotion
+        run: npx playwright install chromium --with-deps
+      - name: Ensure ffmpeg
+        run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: Fetch talking clips
+        working-directory: remotion
+        env:
+          HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
+        run: node scripts/fetch-talking-clips.mjs
+      - name: Render
+        working-directory: remotion
+        run: |
+          mkdir -p out
+          BATCH=${{ matrix.batch }}
+          if [ "$BATCH" = "-1" ]; then
+            mapfile -t IDS < <(tr -d '\r' < render-request.txt | sed '/^\s*$/d' | xargs -n1)
+          else
+            mapfile -t ALL < <(for f in src/configs/*.json; do node -e 'console.log(require(process.argv[1]).id)' "$PWD/$f"; done | sort)
+            IDS=("${ALL[@]:$BATCH:5}")
+          fi
+          BROWSER=$(find "$HOME" -name "headless_shell" 2>/dev/null | head -1)
+          [ -z "$BROWSER" ] && BROWSER=$(find "$HOME" -name "chrome" 2>/dev/null | head -1)
+          [ -z "$BROWSER" ] && BROWSER="chromium"
+          FAILED=0
+          for id in "${IDS[@]}"; do
+            comp="${id//_/-}"; fname="${comp//-/_}.mp4"
+            echo "=== $comp ==="
+            if npx remotion render "$comp" "out/$fname" --codec h264 --crf 18 --browser-executable "$BROWSER" && [ -s "out/$fname" ]; then
+              echo "OK: $fname $(du -h out/$fname | cut -f1)"
+            else
+              echo "FAIL: $fname"; FAILED=$((FAILED+1))
+            fi
+          done
+          cp src/talking-manifest.json out/talking-manifest.json
+          [ "$FAILED" -eq 0 ]
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kiki-talking-batch-${{ matrix.batch }}
+          path: |
+            remotion/out/*.mp4
+            remotion/out/talking-manifest.json
+          retention-days: 30
+  release:
+    needs: [plan, render]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: kiki-talking-batch-*
+          merge-multiple: true
+          path: mp4
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -lh mp4
+          TAG="${{ needs.plan.outputs.tag }}"
+          gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" -y --cleanup-tag || true
+          FILES=(mp4/*.mp4)
+          [ -f mp4/talking-manifest.json ] && FILES+=(mp4/talking-manifest.json)
+          gh release create "$TAG" "${FILES[@]}" --repo "$GITHUB_REPOSITORY" --title "Talking presenter renders ($TAG)" --notes "Kiki lesson renders with HeyGen talking-presenter clips"
