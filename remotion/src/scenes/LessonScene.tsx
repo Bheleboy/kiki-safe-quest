@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Img, useCurrentFrame, interpolate, spring, Easing, Audio, staticFile } from "remotion";
+import { AbsoluteFill, Img, useCurrentFrame, interpolate, spring, Easing, Audio, staticFile, OffthreadVideo } from "remotion";
+import talkingManifest from "../talking-manifest.json";
 import { loadFont as loadOswald } from "@remotion/google-fonts/Oswald";
 import { loadFont as loadEmoji } from "@remotion/google-fonts/NotoColorEmoji";
 import type { LessonConfig, ModulePalette } from "../types";
@@ -59,6 +60,8 @@ const BigScreen: React.FC<{ config: LessonConfig; palette: ModulePalette }> = ({
 
 const PresenterImage: React.FC<{ config: LessonConfig }> = ({ config }) => {
   const src = config.presenter === "nonala" ? staticFile("images/nala.png") : staticFile("images/kiki.png");
+  const slug = config.audioFile.replace(/\.m4a$/, "");
+  const hasTalking = (talkingManifest as string[]).includes(slug);
   const visemeData = VISEME_MAP[config.audioFile];
   const cues = visemeData?.mouthCues ?? [];
   // Kiki: 457x803, Nonala: 1264x848 - calculate rendered size within 540x900 container
@@ -79,8 +82,14 @@ const PresenterImage: React.FC<{ config: LessonConfig }> = ({ config }) => {
   return (
     <div style={{ position: "absolute", right: 20, bottom: 80, width: 540, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div style={{ position: "relative", width: renderW, height: renderH }}>
-        <Img src={src} style={{ width: "100%", height: "100%", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} />
-        {cues.length > 0 && <MouthOverlay presenter={config.presenter} cues={cues} />}
+        {hasTalking ? (
+          <OffthreadVideo src={staticFile(`talking/${slug}.webm`)} muted transparent style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} />
+        ) : (
+          <>
+            <Img src={src} style={{ width: "100%", height: "100%", filter: "drop-shadow(0 20px 40px rgba(22,48,91,0.4))" }} />
+            {cues.length > 0 && <MouthOverlay presenter={config.presenter} cues={cues} />}
+          </>
+        )}
       </div>
     </div>
   );
