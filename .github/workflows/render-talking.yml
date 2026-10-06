@@ -57,7 +57,7 @@ jobs:
         timeout-minutes: 20
         env:
           HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
-        run: node scripts/fetch-talking-clips.mjs
+        run: node scripts/fetch-talking-clips.mjs ${{ steps.work.outputs.ids }}
       - name: Render
         if: steps.work.outputs.skip == 'false'
         working-directory: remotion
