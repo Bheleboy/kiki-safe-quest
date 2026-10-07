@@ -42,6 +42,30 @@ jobs:
           print("plate:", out.size)
           PY
 
+            elif [ "$line" = "fullplate" ]; then
+              echo "== fullplate =="
+              python3 - <<'PY'
+          from PIL import Image
+          src = Image.open("remotion/public/images/kiki.png").convert("RGBA")
+          box = src.split()[3].point(lambda p: 255 if p > 10 else 0).getbbox()
+          crop = src.crop(box)
+          h = 1700
+          w = max(1, round(crop.width * h / crop.height))
+          if w > 1180:
+              w = 1180
+              h = max(1, round(crop.height * w / crop.width))
+          kiki = crop.resize((w, h), Image.LANCZOS)
+          canvas = Image.new("RGBA", (1280, 1920), (0, 0, 0, 0))
+          x = (1280 - w) // 2
+          y = 1920 - 110 - h
+          canvas.paste(kiki, (x, y), kiki)
+          canvas.save("public/hero/kiki-full.png")
+          green = Image.new("RGB", (1280, 1920), (0, 255, 0))
+          green.paste(canvas, (0, 0), canvas)
+          green.save("public/hero/kiki-full-green.png")
+          print("fullplate: crop", crop.size, "-> kiki", kiki.size, "at", (x, y))
+          PY
+
             elif [[ "$line" == key\ * ]]; then
               url="${line#key }"
               echo "== key $url =="
