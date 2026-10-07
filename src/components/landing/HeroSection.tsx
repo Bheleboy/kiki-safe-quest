@@ -117,15 +117,15 @@ function QuoteBlock({ reduce }: { reduce: boolean }) {
   return (
     <div>
       <motion.div {...item(0)}><Pill className="hidden lg:inline-flex" /></motion.div>
-      <motion.span {...item(1)} aria-hidden className="font-display text-6xl leading-none h-9 block mt-4 text-primary/50">
+      <motion.span {...item(1)} aria-hidden className="font-display text-6xl leading-none h-9 lg:h-7 block mt-4 lg:mt-2 text-primary/50">
         &ldquo;
       </motion.span>
       {LINES.map((l, i) => (
-        <motion.p key={l} {...item(i + 2)} className="font-body text-[17px] leading-[1.6] text-foreground/80">
+        <motion.p key={l} {...item(i + 2)} className="font-body text-[17px] lg:text-[15px] xl:text-[17px] leading-[1.6] text-foreground/80">
           {l}
         </motion.p>
       ))}
-      <motion.div {...item(6)} className="mt-6 flex flex-wrap gap-3">
+      <motion.div {...item(6)} className="mt-6 lg:mt-4 flex flex-wrap gap-3">
         <Link to="/courses/internet-safety" className="btn-copper inline-flex items-center gap-2 px-6 py-3.5 text-sm uppercase tracking-widest rounded-xl font-display">
           <PlayCircle size={18} /> Start your quest
         </Link>
@@ -248,7 +248,7 @@ export default function HeroSection() {
         {/* KIKI word */}
         <KikiWord
           reduce={reduce}
-          className="justify-center mt-4 text-[40vw] lg:mt-0 lg:justify-start lg:absolute lg:top-[6%] lg:left-6 lg:text-[clamp(9rem,24vw,18rem)] xl:text-[clamp(9rem,24vw,24rem)]"
+          className="justify-center mt-4 text-[40vw] lg:mt-0 lg:justify-start lg:absolute lg:top-[6%] lg:left-6 lg:text-[clamp(9rem,20vw,16rem)] xl:text-[clamp(9rem,20vw,22rem)]"
         />
 
         {/* WARRIOR word, desktop */}
@@ -274,18 +274,17 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Quote */}
-        <div className="relative z-30 mt-8 lg:mt-0 lg:absolute lg:left-6 lg:top-[calc(6%+min(24vw,18rem)*0.8+24px)] xl:top-[calc(6%+min(24vw,24rem)*0.8+24px)] lg:max-w-[18rem] xl:max-w-[22rem]">
-          <QuoteBlock reduce={reduce} />
+        {/* Left column: quote then video tile (desktop stacks between KIKI and the bottom edge so they never collide) */}
+        <div className="relative z-30 lg:absolute lg:left-6 lg:bottom-7 lg:top-[calc(6%+min(20vw,16rem)*0.8+20px)] xl:top-[calc(6%+min(20vw,22rem)*0.8+24px)] lg:flex lg:flex-col lg:gap-5">
+          <div className="mt-8 lg:mt-0 lg:max-w-[18rem] xl:max-w-[22rem]">
+            <QuoteBlock reduce={reduce} />
+          </div>
+          <motion.div {...fade(0.8, 0, 16)} className="mt-8 lg:mt-0 lg:flex-1 lg:min-h-0 lg:flex lg:items-end">
+            <div className="w-full aspect-video lg:w-auto lg:h-full lg:max-h-[162px] xl:max-h-[187px] lg:aspect-[16/10]">
+              <HelloTile />
+            </div>
+          </motion.div>
         </div>
-
-        {/* Video tile */}
-        <motion.div
-          {...fade(0.8, 0, 16)}
-          className="relative z-30 w-full aspect-video mt-8 lg:mt-0 lg:absolute lg:left-6 lg:bottom-7 lg:w-[260px] xl:w-[300px] lg:aspect-[16/10]"
-        >
-          <HelloTile />
-        </motion.div>
 
         {/* Quest card */}
         <div className="relative z-30 mt-6 lg:mt-0 lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2 lg:w-[270px] xl:w-[300px]">
