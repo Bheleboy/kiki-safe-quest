@@ -1,176 +1,297 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { PlayCircle, RotateCcw, Volume2 } from "lucide-react";
+import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Play, PlayCircle, ShieldCheck, Star, Target } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const CAPTIONS = [
-  "Hi, I'm Kiki!",
-  "Today we're learning about the internet, a big playground.",
+const MANIFESTO = [
+  "Learn to be safe online.",
+  "Stand strong against bullies and scams.",
+  "Be kind wherever you click.",
+  "Earn the Armour of God, one quest at a time.",
 ];
-const FACTS = ["40 video lessons", "Ages 6-9 and 10-13", "Parent dashboard included"];
+const STREAMS = {
+  "6-9": { label: "Ages 6-9", count: 15, copy: "Short, playful video lessons on staying safe, smart and kind online." },
+  "10-13": { label: "Ages 10-13", count: 25, copy: "Real-world skills: privacy, scams, cyberbullying and your digital footprint." },
+} as const;
+type Stream = keyof typeof STREAMS;
 
-type SoundState = "idle" | "playing" | "ended";
+const tri = "polygon(50% 0%, 100% 100%, 0% 100%)";
 
-export default function HeroSection() {
-  const reduce = useReducedMotion();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [captionIdx, setCaptionIdx] = useState(0);
-  const [sound, setSound] = useState<SoundState>("idle");
+function Triangle({ className }: { className: string }) {
+  return <div aria-hidden className={`absolute bg-primary ${className}`} style={{ clipPath: tri }} />;
+}
 
+function Warrior({ reduce }: { reduce: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className="font-display font-bold uppercase text-primary leading-[0.82] tracking-[-0.02em] text-[22vw] lg:text-[clamp(5.5rem,16vw,16rem)] flex select-none"
+    >
+      {"WARRIOR".split("").map((ch, i) => (
+        <span key={i} className="inline-block overflow-hidden pb-[0.04em]">
+          <motion.span
+            className="inline-block"
+            initial={reduce ? false : { y: "100%" }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.7, delay: i * 0.04, ease: EASE }}
+          >
+            {ch}
+          </motion.span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function Kiki({ reduce }: { reduce: boolean }) {
+  const [safari, setSafari] = useState(false);
+  const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
-    const v = videoRef.current;
+    setSafari(/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent));
+  }, []);
+  useEffect(() => {
+    const v = ref.current;
     if (!v) return;
-    const onTime = () => setCaptionIdx(v.currentTime >= 2.3 ? 1 : 0);
-    const onEnded = () => setSound("ended");
-    v.addEventListener("timeupdate", onTime);
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const onEnded = () => {
+      t = setTimeout(() => {
+        v.currentTime = 0;
+        v.play().catch(() => {});
+      }, 2500);
+    };
     v.addEventListener("ended", onEnded);
     return () => {
-      v.removeEventListener("timeupdate", onTime);
       v.removeEventListener("ended", onEnded);
+      if (t) clearTimeout(t);
     };
-  }, []);
+  }, [safari, reduce]);
 
-  const playWithSound = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = false;
-    v.currentTime = 0;
-    setCaptionIdx(0);
-    setSound("playing");
-    v.play().catch(() => setSound("idle"));
+  const useImg = safari || reduce;
+  return (
+    <div className="relative w-full h-full">
+      <div aria-hidden className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-8 rounded-[50%] bg-black/10 blur-2xl" />
+      {useImg ? (
+        <motion.img
+          src="/images/kiki-warrior-3d.png"
+          alt="Kiki, the young warrior, holding a shield"
+          className="relative w-full h-full object-contain object-bottom"
+          animate={safari && !reduce ? { y: [0, -6, 0] } : undefined}
+          transition={safari && !reduce ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
+        />
+      ) : (
+        <video
+          ref={ref}
+          src="/hero/kiki-idle.webm"
+          poster="/images/kiki-warrior-3d.png"
+          muted
+          playsInline
+          autoPlay
+          preload="auto"
+          aria-label="Kiki, the young warrior, smiling"
+          className="relative w-full h-full object-contain object-bottom"
+        />
+      )}
+    </div>
+  );
+}
+
+function HearKiki() {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <div className="relative mt-8 w-full lg:w-[260px] aspect-video lg:aspect-[16/10] rounded-3xl overflow-hidden shadow-lg bg-black/10">
+      {playing ? (
+        <video
+          src="/hero/kiki-hello.mp4"
+          autoPlay
+          playsInline
+          onEnded={() => setPlaying(false)}
+          aria-label="Kiki says: Hi, I'm Kiki! Today we're learning about the internet, a big playground."
+          className="w-full h-full object-cover object-[center_20%]"
+        />
+      ) : (
+        <button type="button" onClick={() => setPlaying(true)} aria-label="Play Kiki's hello message with sound" className="group absolute inset-0 w-full h-full">
+          <img src="/hero/kiki-hello-poster.jpg" alt="" className="w-full h-full object-cover object-[center_20%]" />
+          <span className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <span className="absolute left-4 bottom-3 font-display text-xs uppercase tracking-widest text-white">Hear Kiki say hello</span>
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-md transition-transform group-hover:scale-105">
+            <Play className="w-5 h-5 text-primary fill-primary ml-0.5" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function CountUp({ value, reduce }: { value: number; reduce: boolean }) {
+  const [n, setN] = useState(value);
+  const prev = useRef(value);
+  useEffect(() => {
+    if (reduce) { setN(value); prev.current = value; return; }
+    const c = animate(prev.current, value, { duration: 0.6, ease: EASE, onUpdate: (v) => setN(Math.round(v)) });
+    prev.current = value;
+    return () => c.stop();
+  }, [value, reduce]);
+  return <>{n}</>;
+}
+
+function QuestCard({ reduce }: { reduce: boolean }) {
+  const [stream, setStream] = useState<Stream>("6-9");
+  const s = STREAMS[stream];
+  return (
+    <motion.div
+      initial={reduce ? false : { x: 30, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
+      className="rounded-[2rem] bg-white/85 backdrop-blur-md border border-black/5 shadow-[0_30px_80px_-20px_rgba(60,40,20,0.25)] p-5 flex gap-4"
+    >
+      <div aria-hidden className="flex flex-col gap-5 pt-1">
+        <Star className="w-4 h-4 text-foreground/40" />
+        <Target className="w-4 h-4 text-foreground/40" />
+        <ShieldCheck className="w-4 h-4 text-foreground/40" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-display text-xs tracking-[0.3em] text-foreground/50">THE QUEST</p>
+        <div className="flex gap-2 mt-3">
+          {(Object.keys(STREAMS) as Stream[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={stream === k}
+              onClick={() => setStream(k)}
+              className={`rounded-full px-3 py-1.5 font-display text-[11px] uppercase tracking-wider transition-colors ${
+                stream === k ? "bg-primary text-white" : "bg-black/5 text-foreground/70 hover:bg-black/10"
+              }`}
+            >
+              {STREAMS[k].label}
+            </button>
+          ))}
+        </div>
+        <div className="relative mt-3 min-h-[3.75rem]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.p
+              key={stream}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="font-body text-sm text-foreground/70"
+            >
+              {s.copy}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+        <img
+          src="/images/kiki-armour-of-god.png"
+          alt="Kiki and the Armour of God book cover"
+          className="h-36 object-contain mx-auto my-4 -rotate-[4deg] drop-shadow-xl"
+        />
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="font-body text-xs text-foreground/50">Video lessons</p>
+            <p className="font-display text-5xl font-bold text-foreground leading-none mt-1">
+              <CountUp value={s.count} reduce={reduce} />
+            </p>
+          </div>
+          <Link
+            to="/courses/internet-safety"
+            aria-label="Explore the internet safety course"
+            className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center transition-transform hover:scale-105"
+          >
+            <ArrowUpRight className="w-6 h-6" />
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function HeroSection() {
+  const reduce = !!useReducedMotion();
+
+  const pill = (
+    <span className="inline-flex items-center gap-2 rounded-full bg-white/70 border border-black/5 px-3 py-1 font-display text-[11px] uppercase tracking-widest text-foreground/70">
+      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+      Pre-launch - join the first families
+    </span>
+  );
+
+  const copy = (
+    <>
+      <h1 className="font-display text-sm uppercase tracking-[0.3em] text-foreground/50 mt-4">Kiki Warrior Online Academy</h1>
+      <div className="mt-4">
+        <span aria-hidden className="block font-display text-5xl leading-none text-primary/60 h-8">&ldquo;</span>
+        {MANIFESTO.map((l) => (
+          <p key={l} className="font-body text-[17px] leading-relaxed text-foreground/80">{l}</p>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-3 mt-6">
+        <Link to="/courses/internet-safety" className="btn-copper inline-flex items-center gap-2 px-7 py-3.5 text-sm uppercase tracking-widest">
+          <PlayCircle className="w-5 h-5" /> Start your quest
+        </Link>
+        <Link
+          to="/auth?mode=signup"
+          className="inline-flex items-center rounded-xl px-7 py-3.5 text-sm font-display uppercase tracking-widest bg-foreground text-background hover:bg-foreground/90 transition-colors"
+        >
+          Join the pre-launch
+        </Link>
+      </div>
+      <HearKiki />
+    </>
+  );
+
+  const kikiMotion = {
+    initial: reduce ? false : { y: 60, opacity: 0 },
+    animate: { y: 0, opacity: 1 },
+    transition: { type: "spring" as const, stiffness: 90, damping: 18, delay: 0.25 },
   };
 
-  const container = reduce
-    ? {}
-    : {
-        initial: "hidden",
-        animate: "show",
-        variants: { hidden: {}, show: { transition: { staggerChildren: 0.08 } } },
-      };
-  const item = reduce
-    ? {}
-    : {
-        variants: {
-          hidden: { opacity: 0, y: 16 },
-          show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-        },
-      };
-
-  const btnLabel =
-    sound === "playing" ? "Playing..." : sound === "ended" ? "Hear Kiki again" : "Hear Kiki";
-
   return (
-    <section className="relative lg:min-h-[88vh] flex items-center overflow-x-clip">
-      <div className="max-w-6xl mx-auto px-4 py-16 lg:py-20 w-full grid lg:grid-cols-[1.2fr_1fr] gap-12 items-center">
-        {/* Copy */}
-        <motion.div {...container} className="space-y-6 min-w-0">
-          <motion.div {...item}>
-            <span className="inline-block rounded-full bg-primary/10 text-primary px-4 py-1.5 font-display text-xs uppercase tracking-widest">
-              Pre-launch - join the first families
-            </span>
-          </motion.div>
-          <motion.h1
-            {...item}
-            className="font-display normal-case text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] tracking-tight text-foreground"
-          >
-            Safe, smart and kind
-            <br />
-            <span className="text-primary">online.</span>
-          </motion.h1>
-          <motion.p {...item} className="font-body text-lg text-muted-foreground max-w-[34rem] leading-relaxed">
-            Meet Kiki, the young warrior who teaches children aged 6 to 13 how to stay safe on the
-            internet. Short talking video lessons, quick quizzes, and pieces of the Armour of God to
-            earn along the way.
-          </motion.p>
-          <motion.div {...item} className="flex flex-wrap gap-4 pt-2">
-            <Link
-              to="/courses/internet-safety"
-              className="touch-target inline-flex items-center gap-2 btn-copper px-8 py-4 text-sm uppercase tracking-widest"
-            >
-              Watch a free lesson <PlayCircle className="w-5 h-5" />
-            </Link>
-            <Link
-              to="/auth?mode=signup"
-              className="touch-target inline-flex items-center gap-2 border-2 border-foreground/15 hover:border-primary rounded-xl px-8 py-4 text-sm font-display uppercase tracking-widest text-foreground transition-colors"
-            >
-              Join the pre-launch
-            </Link>
-          </motion.div>
-          <motion.ul {...item} className="flex flex-wrap items-center gap-x-3 gap-y-2 font-body text-sm text-muted-foreground">
-            {FACTS.map((f, i) => (
-              <li key={f} className="flex items-center gap-3">
-                {i > 0 && <span aria-hidden className="w-1.5 h-1.5 rounded-full bg-primary" />}
-                {f}
-              </li>
-            ))}
-          </motion.ul>
+    <section className="relative overflow-hidden bg-[#F4EEE6] pt-24 lg:pt-20">
+      {/* Ghost word */}
+      <motion.div
+        aria-hidden
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        className="absolute bottom-[-2%] right-4 z-0 font-display font-bold uppercase leading-[0.82] tracking-[-0.02em] text-[22vw] lg:text-[clamp(5.5rem,16vw,16rem)] text-[hsl(30_20%_20%/0.06)] select-none pointer-events-none"
+      >
+        ONLINE
+      </motion.div>
+
+      {/* Mobile / tablet */}
+      <div className="lg:hidden relative max-w-7xl mx-auto px-4 pb-16">
+        <Triangle className="w-4 h-4 opacity-30 right-6 top-2" />
+        {pill}
+        <div className="relative z-10 mt-4"><Warrior reduce={reduce} /></div>
+        <motion.div {...kikiMotion} className="relative z-20 mx-auto h-[62vh] aspect-[2/3] max-w-full -mt-[6vw]">
+          <Kiki reduce={reduce} />
+        </motion.div>
+        <div className="relative z-30 mt-6">{copy}</div>
+        <div className="relative z-30 mt-10"><QuestCard reduce={reduce} /></div>
+      </div>
+
+      {/* Desktop */}
+      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 min-h-[92vh] h-[calc(92vh-5rem)] max-h-[960px] min-h-[720px]">
+        <div className="absolute top-[8%] left-4 z-10"><Warrior reduce={reduce} /></div>
+        <Triangle className="w-5 h-5 opacity-40 top-[6%] left-[58%]" />
+        <Triangle className="w-[14px] h-[14px] opacity-25 top-[52%] left-1" />
+        <Triangle className="w-[22px] h-[22px] opacity-30 top-[8%] right-[340px]" />
+
+        <motion.div
+          {...kikiMotion}
+          className="absolute bottom-0 z-20 aspect-[2/3] left-[30%] xl:left-[34%] h-[min(80vh,640px)] xl:h-[min(90vh,880px)]"
+        >
+          <Kiki reduce={reduce} />
         </motion.div>
 
-        {/* Stage */}
-        <div className="relative min-w-0">
-          <div
-            aria-hidden
-            className="absolute -inset-y-10 inset-x-0 lg:-inset-10 pointer-events-none"
-            style={{ background: "radial-gradient(circle, hsl(25 85% 55% / 0.10) 0%, transparent 70%)" }}
-          />
-          <motion.div
-            initial={reduce ? false : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 120, damping: 20, delay: 0.15 }}
-            className="relative overflow-hidden rounded-[2rem] w-full h-[60vh] lg:h-auto lg:aspect-[4/5] lg:max-h-[70vh] mx-auto"
-            style={{ backgroundColor: "#F1DDC4" }}
-          >
-            <video
-              ref={videoRef}
-              src="/hero/kiki-hello.mp4"
-              poster="/hero/kiki-hello-poster.jpg"
-              muted
-              playsInline
-              autoPlay={!reduce}
-              preload="metadata"
-              aria-label="Kiki says: Hi, I'm Kiki! Today we're learning about the internet, a big playground."
-              className="absolute left-1/2 -translate-x-1/2 bottom-[28px] h-[calc(92%-28px)] w-full object-contain object-bottom"
-            />
+        <div className="absolute left-4 bottom-[10%] z-30 max-w-[20rem] xl:max-w-[24rem]">
+          {pill}
+          {copy}
+        </div>
 
-            <div className="absolute top-5 inset-x-0 flex justify-center px-4 pointer-events-none">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={captionIdx}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="bg-white/90 rounded-full px-4 py-2 font-body font-medium text-sm text-foreground shadow-sm text-center max-w-full"
-                >
-                  {CAPTIONS[captionIdx]}
-                </motion.span>
-              </AnimatePresence>
-            </div>
-
-            <button
-              type="button"
-              onClick={playWithSound}
-              disabled={sound === "playing"}
-              aria-label={sound === "ended" ? "Replay Kiki's greeting with sound" : "Play Kiki's greeting with sound"}
-              className="absolute right-4 bottom-[40px] inline-flex items-center gap-2 rounded-full bg-foreground text-white px-4 py-2 font-display text-xs uppercase tracking-widest shadow-sm disabled:opacity-80 transition-opacity"
-            >
-              {sound === "ended" ? <RotateCcw className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              {btnLabel}
-            </button>
-
-            <svg aria-hidden className="absolute bottom-0 left-0 w-full h-[28px]">
-              <defs>
-                <pattern id="kiki-shield-band" width="28" height="28" patternUnits="userSpaceOnUse">
-                  <rect width="28" height="28" fill="#5A3A28" />
-                  <polygon points="0,28 14,4 28,28" fill="hsl(25 85% 55%)" />
-                  <polygon points="14,4 28,28 28,4" fill="#5A3A28" />
-                  <polygon points="-14,4 0,28 14,4" fill="#5A3A28" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="28" fill="url(#kiki-shield-band)" />
-            </svg>
-          </motion.div>
+        <div className="absolute right-4 top-[12%] z-30 w-[300px]">
+          <QuestCard reduce={reduce} />
         </div>
       </div>
     </section>
