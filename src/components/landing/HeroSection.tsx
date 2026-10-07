@@ -26,7 +26,7 @@ function Warrior({ reduce }: { reduce: boolean }) {
   return (
     <div
       aria-hidden
-      className="font-display font-bold uppercase text-primary leading-[0.82] tracking-[-0.02em] text-[22vw] lg:text-[clamp(5.5rem,16vw,16rem)] flex select-none"
+      className="font-display font-bold uppercase text-primary leading-[0.82] tracking-[-0.02em] text-[22vw] lg:text-[clamp(5.5rem,14vw,15rem)] flex select-none"
     >
       {"WARRIOR".split("").map((ch, i) => (
         <span key={i} className="inline-block overflow-hidden pb-[0.04em]">
@@ -272,18 +272,17 @@ export default function HeroSection() {
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 h-[max(92vh,880px)]">
+      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 h-[92vh] min-h-[760px]">
         <div className="absolute top-[4%] left-4 z-10"><Warrior reduce={reduce} /></div>
         <Triangle className="w-5 h-5 opacity-40 top-[6%] left-[58%]" />
         <Triangle className="w-[14px] h-[14px] opacity-25 top-[52%] left-1" />
         <Triangle className="w-[22px] h-[22px] opacity-30 top-[8%] right-[340px]" />
 
-        <motion.div
-          {...kikiMotion}
-          className="absolute bottom-0 z-20 aspect-[2/3] left-1/2 -translate-x-1/2 h-[min(64vh,560px)] xl:h-[min(72vh,640px)]"
-        >
-          <Kiki reduce={reduce} />
-        </motion.div>
+        <div className="absolute bottom-0 z-20 aspect-[2/3] left-1/2 -translate-x-1/2 h-[min(64vh,560px)] xl:h-[min(72vh,640px)]">
+          <motion.div {...kikiMotion} className="w-full h-full">
+            <Kiki reduce={reduce} />
+          </motion.div>
+        </div>
 
         <div className="absolute left-4 bottom-[6%] z-30 max-w-[20rem] xl:max-w-[24rem]">
           {pill}
