@@ -111,7 +111,7 @@ export default function HeroSection() {
         <div className="relative min-w-0">
           <div
             aria-hidden
-            className="absolute -inset-10 pointer-events-none"
+            className="absolute -inset-y-10 inset-x-0 lg:-inset-10 pointer-events-none"
             style={{ background: "radial-gradient(circle, hsl(25 85% 55% / 0.10) 0%, transparent 70%)" }}
           />
           <motion.div
