@@ -261,11 +261,11 @@ export default function HeroSection() {
         </motion.div>
 
         {/* Kiki */}
-        <div className="relative mx-auto max-w-full h-[70vh] max-h-[640px] aspect-[2/3] -mt-[18vw] lg:mt-0 lg:max-h-none lg:absolute lg:bottom-0 lg:left-1/2 lg:-translate-x-[46%] lg:h-[86%] xl:h-[94%] z-20">
+        <div className="relative mx-auto h-[min(70vh,130vw)] max-h-[640px] aspect-[2/3] -mt-[18vw] lg:mt-0 lg:max-h-none lg:absolute lg:bottom-0 lg:left-1/2 lg:-translate-x-[46%] lg:h-[86%] xl:h-[94%] z-20">
           <motion.div
             {...fade(0.3, 0, 30)}
             aria-hidden
-            className={`${wordBase} lg:hidden absolute bottom-[4%] left-1/2 -translate-x-1/2 whitespace-nowrap text-[21vw] text-[#E6DBCC] z-0`}
+            className={`${wordBase} lg:hidden absolute bottom-[4%] left-1/2 w-screen -ml-[50vw] text-center whitespace-nowrap text-[21vw] text-[#E6DBCC] z-0`}
           >
             WARRIOR
           </motion.div>
