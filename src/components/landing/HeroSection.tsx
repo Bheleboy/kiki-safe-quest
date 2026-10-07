@@ -275,7 +275,7 @@ export default function HeroSection() {
         </div>
 
         {/* Quote */}
-        <div className="relative z-30 mt-8 lg:mt-0 lg:absolute lg:left-6 lg:top-[52%] lg:max-w-[18rem] xl:max-w-[22rem]">
+        <div className="relative z-30 mt-8 lg:mt-0 lg:absolute lg:left-6 lg:top-[calc(6%+min(24vw,18rem)*0.8+24px)] xl:top-[calc(6%+min(24vw,24rem)*0.8+24px)] lg:max-w-[18rem] xl:max-w-[22rem]">
           <QuoteBlock reduce={reduce} />
         </div>
 
