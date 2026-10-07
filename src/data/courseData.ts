@@ -55,7 +55,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l1",
             title: "The Internet – A Big Playground!",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l1_the_internet_a_big_playground.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m1_l1_the_internet_a_big_playground.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -87,7 +87,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l2",
             title: "How Does the Internet Work?",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l2_how_does_the_internet_work.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m1_l2_how_does_the_internet_work.mp4",
             videoCredit: "SciShow Kids",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -119,7 +119,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l3",
             title: "Websites and Apps – What's the Difference?",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l3_websites_and_apps.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m1_l3_websites_and_apps.mp4",
             videoCredit: "National Cyber Security Centre",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -150,7 +150,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l4",
             title: "Good vs Bad Content Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l4_good_vs_bad_content.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m1_l4_good_vs_bad_content.mp4",
             videoCredit: "Common Sense Education",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -182,7 +182,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m1-l5",
             title: "Screen Time – Balance is Key!",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m1_l5_screen_time.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m1_l5_screen_time.mp4",
             videoCredit: "GoNoodle",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -224,7 +224,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l1",
             title: "S – Stay Safe Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l1_s_stay_safe_online.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m2_l1_s_stay_safe_online.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -266,7 +266,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l2",
             title: "M – Meeting People Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l2_m_meeting_people_online.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m2_l2_m_meeting_people_online.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -298,7 +298,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l3",
             title: "A – Accepting Content",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l3_a_accepting_content.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m2_l3_a_accepting_content.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -329,7 +329,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l4",
             title: "R – Reliable Information",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l4_r_reliable_information.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m2_l4_r_reliable_information.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -360,7 +360,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m2-l5",
             title: "T – Tell an Adult",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m2_l5_t_tell_an_adult.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m2_l5_t_tell_an_adult.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -400,7 +400,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l1",
             title: "Kindness on the Internet",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l1_kindness_on_the_internet.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m3_l1_kindness_on_the_internet.mp4",
             videoCredit: "BrainPOP",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -432,7 +432,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l2",
             title: "What is Cyberbullying?",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l2_what_is_cyberbullying.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m3_l2_what_is_cyberbullying.mp4",
             videoCredit: "Smile and Learn",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -464,7 +464,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l3",
             title: "Being a Good Digital Friend",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l3_being_a_good_digital_friend.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m3_l3_being_a_good_digital_friend.mp4",
             videoCredit: "Google for Education",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -496,7 +496,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l4",
             title: "Think Before You Post!",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l4_think_before_you_post.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m3_l4_think_before_you_post.mp4",
             videoCredit: "Common Sense Education",
             videoDurationMinutes: 3,
             estimatedMinutes: 8,
@@ -527,7 +527,7 @@ export const courseData: AgeStream[] = [
           {
             id: "young-m3-l5",
             title: "Dealing with Mean Messages",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-young-renders/ages_6_9_m3_l5_dealing_with_mean_messages.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_6_9_m3_l5_dealing_with_mean_messages.mp4",
             videoCredit: "Childnet International",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
@@ -577,7 +577,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m1-l1",
             title: "What is the Internet?",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_internet_safety_101.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_internet_safety_101.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "The internet is a global network connecting billions of devices. It's an incredible tool for learning, communication, and entertainment — but it comes with responsibilities.",
@@ -609,7 +609,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m1-l2",
             title: "Your Digital Footprint",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_digital_footprint.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_digital_footprint.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Every time you go online, you leave a trail called a digital footprint. Posts, comments, photos, likes – they all build up a picture of who you are. Future schools and employers might see it!",
@@ -640,7 +640,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m1-l3",
             title: "Online vs Offline – Knowing the Difference",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_online_vs_offline.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_online_vs_offline.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "The online world can feel very different from real life. People might act differently behind a screen. Remember that real people with real feelings are behind every profile!",
@@ -671,7 +671,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m1-l4",
             title: "Screen Time and Wellbeing",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_screentime_and_well_being.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_screentime_and_well_being.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Too much screen time can affect your sleep, mood, and even your friendships. Learning to balance your online and offline life is a superpower!",
@@ -702,7 +702,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m1-l5",
             title: "Your Rights Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_your_rights_online.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_your_rights_online.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "You have rights online, just like offline! You have the right to be safe, to privacy, and to access information. You also have the right to say no and to get help if something goes wrong.",
@@ -742,7 +742,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m2-l1",
             title: "Creating Strong Passwords",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_creating_strong_passwords.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_creating_strong_passwords.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Your password is like a key to your digital life. A strong password uses a mix of letters, numbers, and symbols. Never share your passwords with friends!",
@@ -783,7 +783,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m2-l2",
             title: "What is Personal Information?",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_what_is_personal_info.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_what_is_personal_info.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Personal information is any data that can identify you – your full name, address, phone number, school, birthday, and even photos. Protecting it keeps you safe online!",
@@ -814,7 +814,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m2-l3",
             title: "Two-Factor Authentication",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_two_factor_auth.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_two_factor_auth.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Two-factor authentication adds an extra lock to your accounts. Even if someone guesses your password, they still can't get in without the second step!",
@@ -845,7 +845,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m2-l4",
             title: "Privacy Settings on Apps",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_privacy_settings_on_apps.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_privacy_settings_on_apps.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Every app and social media platform has privacy settings. Taking a few minutes to adjust them can make a huge difference in who sees your information!",
@@ -876,7 +876,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m2-l5",
             title: "Cookies and Tracking",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_cookies_and_tracking.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_cookies_and_tracking.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Have you noticed websites asking about cookies? Not the chocolate kind! Digital cookies track what you do online. Understanding them helps you protect your privacy.",
@@ -916,7 +916,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m3-l1",
             title: "5 Ways to Stay Private Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_5_ways_to_stay_private.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_5_ways_to_stay_private.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Your online profile tells the world about you. Make sure you're only sharing what you want everyone to see. Check your privacy settings on every app and social media!",
@@ -956,7 +956,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m3-l2",
             title: "Sharing Photos Safely",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_sharing_photos_safely.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_sharing_photos_safely.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Photos can reveal more than you think! Location data, school uniforms, street signs – all these details in the background can give away where you are.",
@@ -987,7 +987,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m3-l3",
             title: "Managing Your Online Reputation",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_managing_your_online_reputation.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_managing_your_online_reputation.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Your online reputation is what people think of you based on what they see online. It's like a first impression that lasts forever! Keep it positive by being thoughtful about what you share.",
@@ -1018,7 +1018,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m3-l4",
             title: "Catfishing and Fake Profiles",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_catfish_and_fake_profiles.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_catfish_and_fake_profiles.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Not everyone online is who they claim to be. Catfishing is when someone creates a fake profile to trick others. Learn to spot the warning signs!",
@@ -1049,7 +1049,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m3-l5",
             title: "Location Sharing – Hidden Dangers",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_location_sharing.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_location_sharing.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Many apps track and share your location without you realising. This can tell strangers exactly where you are – at school, at home, or hanging out with friends!",
@@ -1089,7 +1089,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m4-l1",
             title: "Standing Up to Cyberbullying",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_cyber_bullying_and_respect_what_is_cyberbullying.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_cyber_bullying_and_respect_what_is_cyberbullying.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Cyberbullying is when someone uses technology to hurt, embarrass, or threaten others. If it happens to you, don't respond — save the evidence and tell a trusted adult.",
@@ -1120,7 +1120,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m4-l2",
             title: "Being an Upstander, Not a Bystander",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_cyber_bullying_and_respect_standing_up_for_others.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_cyber_bullying_and_respect_standing_up_for_others.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "When you see someone being bullied online, you have a choice: be a bystander and watch, or be an upstander and help. Standing up for others takes courage, but it makes a real difference!",
@@ -1151,7 +1151,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m4-l3",
             title: "The Impact of Words Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_cyber_bullying_and_respect_the_impact_of_words.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_cyber_bullying_and_respect_the_impact_of_words.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Words online can hurt just as much as words in person – sometimes even more, because they stay there forever. Think before you type, and always choose kindness!",
@@ -1181,7 +1181,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m4-l4",
             title: "How to Block and Report",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_cyber_bullying_and_respect_how_to_block_and_report.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_cyber_bullying_and_respect_how_to_block_and_report.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Every social media app and game has tools to block and report people who are being harmful. Learning how to use these tools is an important skill for staying safe!",
@@ -1212,7 +1212,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m4-l5",
             title: "Building a Positive Online Community",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_cyber_bullying_and_respect_building_a_positive_online_community.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_cyber_bullying_and_respect_building_a_positive_online_community.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "The internet can be an amazing, positive place when we all do our part! By being kind, respectful, and inclusive, you help build a community where everyone feels welcome.",
@@ -1252,7 +1252,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m5-l1",
             title: "Spotting Scams Online",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_scams_and_phishing.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_scams_and_phishing.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Scammers try to trick you into giving away your information or money. They might pretend to be a company you trust. Learn to spot the signs!",
@@ -1283,7 +1283,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m5-l2",
             title: "Fake Websites – How to Tell",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_scams_and_phishing_fake_websites.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_scams_and_phishing_fake_websites.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Scammers create fake websites that look almost identical to real ones. They want you to enter your login details or payment information. Learning to spot fakes protects you!",
@@ -1314,7 +1314,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m5-l3",
             title: "Social Media Scams",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_scams_and_phishing_social_media_scams.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_scams_and_phishing_social_media_scams.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Scammers love social media! They create fake competitions, impersonate celebrities, and send messages with dodgy links. Knowing the tricks helps you avoid getting caught!",
@@ -1344,7 +1344,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m5-l4",
             title: "In-Game Scams",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_scams_and_phishing_in_game.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_scams_and_phishing_in_game.mp4",
             videoDurationMinutes: 4,
             estimatedMinutes: 10,
             narrationText: "Online games are full of scams too! People might offer free skins, coins, or upgrades in exchange for your login details. Don't fall for it – they just want to steal your account!",
@@ -1374,7 +1374,7 @@ export const courseData: AgeStream[] = [
           {
             id: "teen-m5-l5",
             title: "What To Do If You Get Scammed",
-            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v1.0-renders-20260911/ages_10_13_scams_and_phishing_what_to_do_if_you_get_scammed.mp4",
+            videoUrl: "https://github.com/Bheleboy/kiki-safe-quest/releases/download/v2.0-talking-renders/ages_10_13_scams_and_phishing_what_to_do_if_you_get_scammed.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "If you think you've been scammed, don't panic! There are steps you can take right away to protect yourself and prevent more damage.",
