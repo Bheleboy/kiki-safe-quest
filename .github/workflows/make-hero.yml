@@ -1,0 +1,65 @@
+name: Make hero greeting clip
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["remotion/hero-request.txt"]
+
+permissions:
+  contents: write
+
+jobs:
+  hero:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ensure ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+
+      - name: Fetch talking clip
+        working-directory: remotion
+        env:
+          HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
+        run: node scripts/fetch-talking-clips.mjs ages-6-9_m1-l1_the-internet-a-big-playground
+
+      - name: Check source clip
+        run: |
+          SRC=/tmp/talk/ages-6-9_m1-l1_the-internet-a-big-playground.mp4
+          if [ ! -f "$SRC" ]; then
+            echo "::error::Source clip $SRC is missing - HeyGen fetch failed or no matching video found."
+            exit 1
+          fi
+
+      - name: Build hero assets
+        run: |
+          SRC=/tmp/talk/ages-6-9_m1-l1_the-internet-a-big-playground.mp4
+          mkdir -p public/hero
+          ffmpeg -y -i $SRC -t 7.4 -filter_complex "[0:v]chromakey=0x00FF00:0.16:0.06,despill=type=green,scale=-2:1080[k];color=c=0xF1DDC4:s=2x2[bg];[bg][k]scale2ref[bg2][k2];[bg2][k2]overlay=0:0:format=auto,format=yuv420p[v]" -map "[v]" -map 0:a -af "afade=t=out:st=7.0:d=0.4" -c:v libx264 -crf 22 -preset slow -c:a aac -b:a 128k -movflags +faststart public/hero/kiki-hello.mp4
+          ffmpeg -y -ss 0.2 -i public/hero/kiki-hello.mp4 -frames:v 1 -q:v 3 public/hero/kiki-hello-poster.jpg
+          ls -l public/hero
+          ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 public/hero/kiki-hello.mp4
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/hero/kiki-hello.mp4 public/hero/kiki-hello-poster.jpg
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add hero greeting clip"
+          git push origin HEAD:main
