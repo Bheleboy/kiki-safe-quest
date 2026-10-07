@@ -272,7 +272,7 @@ export default function HeroSection() {
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 h-[92vh] min-h-[760px]">
+      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 h-[92vh] min-h-[880px] xl:min-h-[780px]">
         <div className="absolute top-[4%] left-4 z-10"><Warrior reduce={reduce} /></div>
         <Triangle className="w-5 h-5 opacity-40 top-[6%] left-[58%]" />
         <Triangle className="w-[14px] h-[14px] opacity-25 top-[52%] left-1" />
