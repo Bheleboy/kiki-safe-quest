@@ -126,10 +126,10 @@ function QuoteBlock({ reduce }: { reduce: boolean }) {
         </motion.p>
       ))}
       <motion.div {...item(6)} className="mt-6 lg:mt-4 flex flex-wrap gap-3">
-        <Link to="/courses/internet-safety" className="btn-copper inline-flex items-center gap-2 px-6 py-3.5 text-sm uppercase tracking-widest rounded-xl font-display">
+        <Link to="/courses/internet-safety" className="btn-copper inline-flex items-center gap-2 px-6 py-3.5 lg:py-3 xl:py-3.5 text-sm uppercase tracking-widest rounded-xl font-display">
           <PlayCircle size={18} /> Start your quest
         </Link>
-        <Link to="/auth?mode=signup" className="inline-flex items-center gap-2 bg-foreground text-background rounded-xl px-6 py-3.5 text-sm uppercase tracking-widest font-display hover:opacity-90 transition-opacity">
+        <Link to="/auth?mode=signup" className="inline-flex items-center gap-2 bg-foreground text-background rounded-xl px-6 py-3.5 lg:py-3 xl:py-3.5 text-sm uppercase tracking-widest font-display hover:opacity-90 transition-opacity">
           Join the pre-launch
         </Link>
       </motion.div>
@@ -261,11 +261,11 @@ export default function HeroSection() {
         </motion.div>
 
         {/* Kiki */}
-        <div className="relative mx-auto h-[70vh] max-h-[640px] aspect-[2/3] -mt-[18vw] lg:mt-0 lg:max-h-none lg:absolute lg:bottom-0 lg:left-1/2 lg:-translate-x-[46%] lg:h-[86%] xl:h-[94%] z-20">
+        <div className="relative mx-auto max-w-full h-[70vh] max-h-[640px] aspect-[2/3] -mt-[18vw] lg:mt-0 lg:max-h-none lg:absolute lg:bottom-0 lg:left-1/2 lg:-translate-x-[46%] lg:h-[86%] xl:h-[94%] z-20">
           <motion.div
             {...fade(0.3, 0, 30)}
             aria-hidden
-            className={`${wordBase} lg:hidden absolute bottom-[4%] left-1/2 -translate-x-1/2 text-[21vw] text-[#E6DBCC] z-0`}
+            className={`${wordBase} lg:hidden absolute bottom-[4%] left-1/2 -translate-x-1/2 whitespace-nowrap text-[21vw] text-[#E6DBCC] z-0`}
           >
             WARRIOR
           </motion.div>
@@ -276,10 +276,10 @@ export default function HeroSection() {
 
         {/* Left column: quote then video tile (desktop stacks between KIKI and the bottom edge so they never collide) */}
         <div className="relative z-30 lg:absolute lg:left-6 lg:bottom-7 lg:top-[calc(6%+min(20vw,16rem)*0.8+20px)] xl:top-[calc(6%+min(20vw,22rem)*0.8+24px)] lg:flex lg:flex-col lg:gap-5">
-          <div className="mt-8 lg:mt-0 lg:max-w-[18rem] xl:max-w-[22rem]">
+          <div className="mt-8 lg:mt-0 lg:max-w-[20rem] xl:max-w-[22rem]">
             <QuoteBlock reduce={reduce} />
           </div>
-          <motion.div {...fade(0.8, 0, 16)} className="mt-8 lg:mt-0 lg:flex-1 lg:min-h-0 lg:flex lg:items-end">
+          <motion.div {...fade(0.8, 0, 16)} className="mt-8 lg:mt-0 lg:flex-1 lg:min-h-[128px] lg:flex lg:items-end">
             <div className="w-full aspect-video lg:w-auto lg:h-full lg:max-h-[162px] xl:max-h-[187px] lg:aspect-[16/10]">
               <HelloTile />
             </div>
