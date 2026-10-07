@@ -1,4 +1,4 @@
-name: Build hero assets
+name: Hero assets
 
 on:
   workflow_dispatch:
@@ -18,64 +18,57 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Ensure ffmpeg + python3-pil
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg python3-pil
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg python3-pil
 
       - name: Build requested assets
         run: |
-          set -euo pipefail
+          set -e
           mkdir -p public/hero
-
-          while IFS= read -r raw || [ -n "$raw" ]; do
-            line="${raw//$'\r'/}"
-            line="${line#"${line%%[![:space:]]*}"}"
-            line="${line%"${line##*[![:space:]]}"}"
-
+          while IFS= read -r line; do
+            line="${line%$'\r'}"
             [ -z "$line" ] && continue
-            case "$line" in \#*) continue ;; esac
+            case "$line" in \#*) continue;; esac
 
-            case "$line" in
-              plate)
-                echo ">> plate"
-                SRC=public/images/kiki-warrior-3d.png
-                if [ ! -f "$SRC" ]; then
-                  echo "::error::$SRC is missing"
-                  exit 1
-                fi
-                python3 -c 'from PIL import Image; im = Image.open("public/images/kiki-warrior-3d.png").convert("RGBA"); bg = Image.new("RGBA", im.size, (0, 255, 0, 255)); out = Image.alpha_composite(bg, im).convert("RGB"); out.save("public/hero/kiki-3d-green.png"); out.save("public/hero/kiki-3d-green.jpg", quality=92); print("plate size:", im.size)'
-                ;;
-              key\ *)
-                URL="${line#key }"
-                echo ">> key $URL"
-                curl -L --fail "$URL" -o /tmp/kiki-anim.mp4
-                ffmpeg -y -i /tmp/kiki-anim.mp4 -vf "chromakey=0x00FF00:0.18:0.08,despill=type=green,scale=-2:1200,format=yuva420p" -c:v libvpx-vp9 -pix_fmt yuva420p -auto-alt-ref 0 -b:v 2.5M -an -deadline good -cpu-used 2 public/hero/kiki-idle.webm
-                DUR=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /tmp/kiki-anim.mp4)
-                FPS=$(awk "BEGIN{printf \"%.6f\", 8/$DUR}")
-                ffmpeg -y -i /tmp/kiki-anim.mp4 -vf "chromakey=0x00FF00:0.18:0.08,despill=type=green,fps=$FPS,scale=-2:500,tile=8x1" -frames:v 1 -an public/hero/kiki-idle-sheet.jpg
-                if [ ! -f public/hero/kiki-idle-sheet.jpg ]; then
-                  echo "::error::Contact sheet was not produced"
-                  exit 1
-                fi
-                echo "source duration: $DUR"
-                ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 /tmp/kiki-anim.mp4
-                ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 public/hero/kiki-idle.webm
-                ;;
-              *)
-                echo "::warning::Unknown request line: $line"
-                ;;
-            esac
+            if [ "$line" = "plate" ]; then
+              echo "== plate =="
+              python3 - <<'PY'
+          from PIL import Image
+          src = Image.open("public/images/kiki-warrior-3d.png").convert("RGBA")
+          bg = Image.new("RGBA", src.size, (0, 255, 0, 255))
+          out = Image.alpha_composite(bg, src).convert("RGB")
+          out.save("public/hero/kiki-3d-green.png")
+          out.save("public/hero/kiki-3d-green.jpg", quality=92)
+          print("plate:", out.size)
+          PY
+
+            elif [[ "$line" == key\ * ]]; then
+              url="${line#key }"
+              echo "== key $url =="
+              curl -L --fail "$url" -o /tmp/kiki-anim.mp4
+              ffmpeg -y -i /tmp/kiki-anim.mp4 \
+                -vf "chromakey=0x00FF00:0.18:0.08,despill=type=green,scale=-2:1200,format=yuva420p" \
+                -c:v libvpx-vp9 -pix_fmt yuva420p -auto-alt-ref 0 -b:v 2.5M -an \
+                public/hero/kiki-idle.webm
+              D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 /tmp/kiki-anim.mp4)
+              ffmpeg -y -f lavfi -i color=c=0xF3EEE7:s=2000x2000 -i /tmp/kiki-anim.mp4 \
+                -filter_complex "[1:v]chromakey=0x00FF00:0.18:0.08,despill=type=green[k];[0:v][k]scale2ref[b][k2];[b][k2]overlay=shortest=1,fps=8/$D,scale=-2:500,tile=8x1" \
+                -frames:v 1 public/hero/kiki-idle-sheet.jpg
+              ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 public/hero/kiki-idle.webm
+
+            else
+              echo "Unknown request line: $line"
+            fi
           done < remotion/hero-assets-request.txt
 
-      - name: Commit and push
+      - name: Commit assets
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/hero
           if git diff --cached --quiet; then
             echo "No changes to commit"
-            exit 0
+          else
+            git commit -m "Hero assets"
+            git push origin main
           fi
-          git commit -m "Hero assets"
-          git push origin HEAD:main
