@@ -35,7 +35,6 @@ Gold #D4A017, Sand #C9B08A, Olive #56B2F.
 
 **LIP SYNC (v5 decision):** do NOT bake voice into AI clips — AI video cannot lip sync.
 Deliver the visual video with music + SFX only, plus the voice track as a separate file
-(`src/assets/demo-classroom-v5-voice.m4a`) for post-production syncing.
 
 Rules for every lesson video (all remaining lessons):
 

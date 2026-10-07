@@ -4,7 +4,6 @@ import ProductCards from "@/components/landing/ProductCards";
 import SafetyAppSection from "@/components/landing/SafetyAppSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import TrustSection from "@/components/landing/TrustSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FooterSection from "@/components/landing/FooterSection";
 
 export default function Index() {
@@ -16,7 +15,6 @@ export default function Index() {
       <SafetyAppSection />
       <HowItWorks />
       <TrustSection />
-      <TestimonialsSection />
       <FooterSection />
     </div>
   );
