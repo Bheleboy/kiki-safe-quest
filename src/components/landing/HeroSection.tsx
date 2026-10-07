@@ -61,7 +61,7 @@ export default function HeroSection() {
     sound === "playing" ? "Playing..." : sound === "ended" ? "Hear Kiki again" : "Hear Kiki";
 
   return (
-    <section className="relative lg:min-h-[88vh] flex items-center">
+    <section className="relative lg:min-h-[88vh] flex items-center overflow-x-clip">
       <div className="max-w-6xl mx-auto px-4 py-16 lg:py-20 w-full grid lg:grid-cols-[1.2fr_1fr] gap-12 items-center">
         {/* Copy */}
         <motion.div {...container} className="space-y-6 min-w-0">
