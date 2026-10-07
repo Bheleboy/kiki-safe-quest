@@ -272,20 +272,20 @@ export default function HeroSection() {
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 min-h-[92vh] h-[calc(92vh-5rem)] max-h-[960px] min-h-[720px]">
-        <div className="absolute top-[8%] left-4 z-10"><Warrior reduce={reduce} /></div>
+      <div className="hidden lg:block relative max-w-7xl mx-auto px-4 h-[max(92vh,880px)]">
+        <div className="absolute top-[4%] left-4 z-10"><Warrior reduce={reduce} /></div>
         <Triangle className="w-5 h-5 opacity-40 top-[6%] left-[58%]" />
         <Triangle className="w-[14px] h-[14px] opacity-25 top-[52%] left-1" />
         <Triangle className="w-[22px] h-[22px] opacity-30 top-[8%] right-[340px]" />
 
         <motion.div
           {...kikiMotion}
-          className="absolute bottom-0 z-20 aspect-[2/3] left-[30%] xl:left-[34%] h-[min(80vh,640px)] xl:h-[min(90vh,880px)]"
+          className="absolute bottom-0 z-20 aspect-[2/3] left-1/2 -translate-x-1/2 h-[min(64vh,560px)] xl:h-[min(72vh,640px)]"
         >
           <Kiki reduce={reduce} />
         </motion.div>
 
-        <div className="absolute left-4 bottom-[10%] z-30 max-w-[20rem] xl:max-w-[24rem]">
+        <div className="absolute left-4 bottom-[6%] z-30 max-w-[20rem] xl:max-w-[24rem]">
           {pill}
           {copy}
         </div>
