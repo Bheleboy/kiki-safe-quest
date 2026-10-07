@@ -237,7 +237,7 @@ export default function HeroSection() {
   });
 
   return (
-    <section className="relative overflow-hidden bg-[#F4EEE6] pt-24 pb-12 lg:pb-0 lg:h-screen lg:min-h-[760px] lg:max-h-[1000px]">
+    <section className="relative overflow-hidden bg-[#F4EEE6] pt-10 pb-12 lg:pt-6 lg:pb-0 lg:h-[calc(100vh-58px)] lg:min-h-[700px] lg:max-h-[1000px]">
       <h1 className="sr-only">Kiki Warrior Online Academy</h1>
       <div className="max-w-[1400px] mx-auto px-6 h-full relative">
         {/* Mobile pill */}
