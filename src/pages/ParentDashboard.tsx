@@ -1,3 +1,5 @@
+import { Eyebrow } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2, ArrowRight, ClipboardList, Bell, Shield, AlertCircle } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -102,10 +104,10 @@ function ChildProgressSection({ userId, child }: { userId: string; child: ChildI
                     <CourseIcon name={mod.icon || "shield"} size={18} className="stroke-primary-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-display text-sm font-bold text-foreground uppercase tracking-wide truncate">
+                    <h4 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide break-words">
                       {mod.title}
                     </h4>
-                    <p className="text-xs text-muted-foreground font-body">
+                    <p className="text-xs text-charcoal/70 font-body">
                       {completedCount}/{lessonIds.length} lessons
                     </p>
                   </div>
@@ -163,7 +165,7 @@ export default function ParentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-dark flex items-center justify-center">
+      <div className="editorial-page min-h-screen bg-cream bg-tech-grid flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -172,24 +174,19 @@ export default function ParentDashboard() {
   const selectedChild = children.find((c) => c.id === selectedChildId) || children[0];
 
   return (
-    <div className="min-h-screen gradient-dark">
-      <header className="sticky top-0 z-50 glass-overlay border-b border-border/60 px-4 py-3">
+    <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
+      <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-primary/15 px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <button onClick={() => navigate("/family")} className="touch-target p-2 rounded-lg hover:bg-muted transition-colors">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
+          <Button variant="ghost" onClick={() => navigate("/family")} className="touch-target p-2 rounded-lg hover:bg-primary/10 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-charcoal" />
+          </Button>
           <div className="flex-1">
-            <h1 className="font-display text-lg font-bold text-foreground uppercase tracking-wider">
-              Parent Dashboard
-            </h1>
-            <p className="text-xs text-muted-foreground font-body">
-              {children.length > 0 ? `Tracking ${children.length} learner${children.length > 1 ? "s" : ""}` : "No children added yet"}
-            </p>
+            <span className="font-display font-bold text-lg uppercase text-charcoal">Kiki<span className="text-primary">Warrior</span></span>
           </div>
           {profile?.is_admin && (
             <a
               href="/admin"
-              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-border rounded-full text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-widest font-display border border-primary/20 rounded-full text-charcoal/70 hover:text-charcoal transition-colors"
             >
               <ShieldIcon size={14} /> Admin
             </a>
@@ -206,25 +203,33 @@ export default function ParentDashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <div>            <Eyebrow>For parents</Eyebrow>
+          <h1 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider">
+              Parent Dashboard
+            </h1>
+            <p className="text-xs text-charcoal/70 font-body">
+              {children.length > 0 ? `Tracking ${children.length} learner${children.length > 1 ? "s" : ""}` : "No children added yet"}
+            </p>
+</div>
         {notifications.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <h2 className="font-display text-base font-bold text-foreground uppercase tracking-wide flex items-center gap-2">
+            <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide flex items-center gap-2">
               <Bell className="w-4 h-4 text-primary" /> Notifications
             </h2>
             {notifications.map((notif) => (
               <div key={notif.id} className="card-kiki border-primary/30 bg-primary/5 flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-display text-sm font-bold text-foreground">{notif.title}</p>
-                  <p className="font-body text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                  <p className="font-display text-sm font-bold text-charcoal">{notif.title}</p>
+                  <p className="font-body text-xs text-charcoal/70 mt-0.5">{notif.message}</p>
                 </div>
                 {notif.type === "survey_review" && (
-                  <button
+                  <Button variant="ghost"
                     onClick={() => handleReviewSurvey(notif)}
-                    className="btn-copper px-3 py-1.5 text-xs uppercase tracking-widest shrink-0"
+                    className="btn-copper adventure-button px-3 py-1.5 text-xs uppercase tracking-widest shrink-0"
                   >
                     Review
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
@@ -234,26 +239,26 @@ export default function ParentDashboard() {
         {children.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
             {children.map((child) => (
-              <button
+              <Button variant="ghost"
                 key={child.id}
                 onClick={() => { setSelectedChildId(child.id); setShowSurveyReview(false); setShowParentSurvey(false); }}
                 className={`px-4 py-2 rounded-lg font-display text-sm font-bold uppercase tracking-wide transition-all whitespace-nowrap ${
                   (selectedChild?.id === child.id)
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    ? "bg-primary text-charcoal"
+                    : "bg-primary/10 text-charcoal/70 hover:bg-primary/10/80"
                 }`}
               >
                 {child.first_name}
-              </button>
+              </Button>
             ))}
           </div>
         )}
 
         {selectedChild && user && (
           <motion.div key={selectedChild.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+            <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
               {selectedChild.first_name}'s Progress
-              <span className="text-sm font-normal text-muted-foreground ml-2">Ages {selectedChild.age_band}</span>
+              <span className="text-sm font-normal text-charcoal/70 ml-2">Ages {selectedChild.age_band}</span>
             </h2>
             <ChildProgressSection userId={user.id} child={selectedChild} />
           </motion.div>
@@ -261,50 +266,50 @@ export default function ParentDashboard() {
 
         {children.length === 0 && (
           <div className="card-kiki text-center py-8 space-y-3">
-            <Shield className="w-12 h-12 text-muted-foreground mx-auto" />
-            <p className="font-body text-muted-foreground">No children added yet.</p>
-            <button onClick={() => navigate("/family")} className="btn-copper px-6 py-2.5 text-sm uppercase tracking-widest">
+            <Shield className="w-12 h-12 text-charcoal/70 mx-auto" />
+            <p className="font-body text-charcoal/70">No children added yet.</p>
+            <Button variant="ghost" onClick={() => navigate("/family")} className="btn-copper adventure-button px-6 py-2.5 text-sm uppercase tracking-widest">
               Add Children
-            </button>
+            </Button>
           </div>
         )}
 
         {selectedChild && user && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-4">
-            <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+            <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
               Surveys & Feedback
             </h2>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <button
+              <Button variant="ghost"
                 onClick={() => { setShowSurveyReview(true); setShowParentSurvey(false); }}
-                className="card-kiki text-left hover:border-primary/30 transition-colors group"
+                className="card-kiki adventure-card text-left hover:border-primary/30 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-trust/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                     <ClipboardList className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Review {selectedChild.first_name}'s Surveys</p>
-                    <p className="text-xs text-muted-foreground font-body">Approve and review feedback</p>
+                    <p className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Review {selectedChild.first_name}'s Surveys</p>
+                    <p className="text-xs text-charcoal/70 font-body">Approve and review feedback</p>
                   </div>
                 </div>
-              </button>
+              </Button>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { setShowParentSurvey(true); setShowSurveyReview(false); }}
-                className="card-kiki text-left hover:border-primary/30 transition-colors group"
+                className="card-kiki adventure-card text-left hover:border-primary/30 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-trust/10 flex items-center justify-center shrink-0 group-hover:bg-trust/10 transition-colors">
                     <Star className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Share Your Feedback</p>
-                    <p className="text-xs text-muted-foreground font-body">Help us improve Kiki Warrior</p>
+                    <p className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Share Your Feedback</p>
+                    <p className="text-xs text-charcoal/70 font-body">Help us improve Kiki Warrior</p>
                   </div>
                 </div>
-              </button>
+              </Button>
             </div>
 
             {showSurveyReview && (
@@ -336,8 +341,8 @@ function SummaryCard({ icon, label, value, color }: { icon: React.ReactNode; lab
   return (
     <div className="card-kiki text-center space-y-1">
       <div className={`inline-flex ${color}`}>{icon}</div>
-      <p className="font-display text-lg font-bold text-foreground">{value}</p>
-      <p className="text-[10px] text-muted-foreground font-body uppercase tracking-wide">{label}</p>
+      <p className="font-display text-lg font-bold text-charcoal">{value}</p>
+      <p className="text-[10px] text-charcoal/70 font-body uppercase tracking-wide">{label}</p>
     </div>
   );
 }

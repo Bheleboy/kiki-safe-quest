@@ -1,3 +1,6 @@
+import { Eyebrow } from "@/components/ui/editorial";
+import { MotionButton } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { useState, useCallback, useEffect } from "react";
 import { ChildSurvey } from "@/components/survey/ChildSurvey";
 import { motion, AnimatePresence } from "framer-motion";
@@ -106,7 +109,7 @@ export default function CoursePage() {
           if (allDone) earnBadge(`module-${moduleId}`);
         }
 
-        // Check armour unlocks — include the just-completed lesson
+        // Check armour unlocks -- include the just-completed lesson
         const updatedCompleted = [...progress.completedLessons, lessonId];
         const newPieces = checkUnlocks(updatedCompleted, view.streamId);
         if (newPieces.length > 0) {
@@ -134,40 +137,40 @@ export default function CoursePage() {
     : courseData;
 
   return (
-    <div className="min-h-screen gradient-dark">
+    <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 glass-overlay border-b border-border/60 px-4 py-3">
-        <div className={`mx-auto flex items-center gap-3 ${view.type === "lesson" ? "max-w-7xl" : "max-w-2xl"}`}>
+      <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-primary/15 px-4 py-3">
+        <div className={`editorial-course-bar mx-auto flex items-center gap-3 ${view.type === "lesson" ? "max-w-7xl" : "max-w-4xl"}`}>
           <div className="flex items-center gap-2 shrink-0">
             <ShieldIcon size={24} className="stroke-primary" />
-            <span className="font-display font-bold text-sm text-foreground uppercase tracking-wider hidden sm:inline">
-              Kiki Warrior
+            <span className="font-display font-bold text-sm text-charcoal uppercase tracking-wider">
+              Kiki<span className="text-primary">Warrior</span>
             </span>
           </div>
           <div className="flex-1">
             <SearchBar onNavigate={handleSearchNavigate} />
           </div>
-          <button
+          <Button variant="ghost"
             onClick={() => navigate("/family")}
-            className="text-muted-foreground hover:text-foreground transition-colors p-2"
+            className="text-charcoal/70 hover:text-charcoal transition-colors p-2"
             title="Family Hub"
           >
             <Home className="w-5 h-5" />
-          </button>
-          <button
+          </Button>
+          <Button variant="ghost"
             onClick={() => navigate("/parent")}
-            className="text-muted-foreground hover:text-foreground transition-colors p-2"
+            className="text-charcoal/70 hover:text-charcoal transition-colors p-2"
             title="Parent Dashboard"
           >
             <Users className="w-5 h-5" />
-          </button>
-          <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors p-2">
+          </Button>
+          <Button variant="ghost" onClick={handleLogout} className="text-charcoal/70 hover:text-charcoal transition-colors p-2">
             <LogOut className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
       </header>
 
-      <main className={`mx-auto px-4 py-6 ${view.type === "lesson" ? "max-w-7xl" : "max-w-2xl"}`}>
+      <main className={`mx-auto px-4 py-6 ${view.type === "lesson" ? "max-w-7xl" : "max-w-4xl"}`}>
         <AnimatePresence mode="wait">
           {/* HOME */}
           {view.type === "home" && (
@@ -179,13 +182,14 @@ export default function CoursePage() {
               className="space-y-6"
             >
               <div className="text-center space-y-3 py-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-copper float">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary float">
                   <ShieldIcon size={32} className="stroke-primary-foreground" />
                 </div>
-                <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider">
+                <Eyebrow>Learning journey</Eyebrow>
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-charcoal uppercase tracking-wider">
                   Internet Safety
                 </h1>
-                <p className="font-body text-muted-foreground max-w-sm mx-auto">
+                <p className="font-body text-charcoal/70 max-w-sm mx-auto">
                   {child
                     ? `${learnerName}'s learning journey`
                     : `Choose your learning path, ${learnerName}.`}
@@ -206,23 +210,23 @@ export default function CoursePage() {
                   const complete = isStreamComplete(allIds);
 
                   return (
-                    <motion.button
+                    <MotionButton variant="ghost"
                       key={stream.id}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       onClick={() => setView({ type: "stream", streamId: stream.id })}
-                      className="card-kiki text-left relative overflow-hidden group"
+                      className="card-kiki adventure-card text-left relative overflow-hidden group"
                     >
                       <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className="w-12 h-12 rounded-lg gradient-copper flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
                             <CourseIcon name={stream.id === "6-9" ? "shield" : "eye"} size={24} className="stroke-primary-foreground" />
                           </div>
                           <div className="flex-1">
-                            <h2 className="font-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-wide">
+                            <h2 className="font-display text-xl md:text-2xl font-bold text-charcoal uppercase tracking-wide">
                               {stream.label}
                             </h2>
-                            <p className="font-body text-muted-foreground text-sm">
+                            <p className="font-body text-charcoal/70 text-sm">
                               {stream.description}
                             </p>
                           </div>
@@ -237,7 +241,7 @@ export default function CoursePage() {
                       <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
                         <CourseIcon name="shield" size={100} className="stroke-foreground" />
                       </div>
-                    </motion.button>
+                    </MotionButton>
                   );
                 })}
               </div>
@@ -259,17 +263,17 @@ export default function CoursePage() {
                 className="space-y-5"
               >
                 <div className="flex items-center gap-3">
-                  <button
+                  <Button variant="ghost"
                     onClick={() => setView({ type: "home" })}
-                    className="touch-target p-2 rounded-lg hover:bg-muted transition-colors"
+                    className="touch-target p-2 rounded-lg hover:bg-primary/10 transition-colors"
                   >
-                    <ArrowLeft className="w-6 h-6 text-foreground" />
-                  </button>
+                    <ArrowLeft className="w-6 h-6 text-charcoal" />
+                  </Button>
                   <div>
-                    <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+                    <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
                       {stream.label}
                     </h2>
-                    <p className="text-xs text-muted-foreground font-body">{stream.description}</p>
+                    <p className="text-xs text-charcoal/70 font-body">{stream.description}</p>
                   </div>
                 </div>
 
@@ -326,10 +330,10 @@ export default function CoursePage() {
                       <div className="bounce-in mb-2">
                         <CertBadgeIcon size={48} className="stroke-primary mx-auto" />
                       </div>
-                      <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+                      <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
                         Congratulations!
                       </h3>
-                      <p className="text-sm text-muted-foreground font-body">
+                      <p className="text-sm text-charcoal/70 font-body">
                         You completed all modules and earned your armour pieces!
                       </p>
                     </div>
@@ -393,13 +397,13 @@ export default function CoursePage() {
                 className="flex gap-6"
               >
                 <div className="hidden lg:block w-48 shrink-0 pt-2">
-                  <button
+                  <Button variant="ghost"
                     onClick={() => setView({ type: "stream", streamId: view.streamId })}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-display uppercase tracking-wide"
+                    className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-charcoal transition-colors font-display uppercase tracking-wide"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Back to modules
-                  </button>
+                  </Button>
 
                   {/* Armour piece indicator */}
                   {armourPieces.length > 0 && (
@@ -411,12 +415,12 @@ export default function CoursePage() {
                             earned={isPieceEarned(armourPiece.id)}
                             size={32}
                           />
-                          <p className="font-display text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+                          <p className="font-display text-[10px] uppercase tracking-wide text-charcoal/70 font-medium">
                             {armourPiece.name}
                           </p>
-                          <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                          <div className="h-1 w-full bg-primary/15 rounded-full overflow-hidden">
                             <div
-                              className="h-full gradient-copper rounded-full transition-all"
+                              className="h-full bg-primary rounded-full transition-all"
                               style={{
                                 width: `${getPieceProgress(armourPiece.id, view.streamId, progress.completedLessons) * 100}%`,
                               }}
@@ -483,7 +487,7 @@ export default function CoursePage() {
         </AnimatePresence>
       </main>
 
-      {/* Armour Unlock Modal — queues one animation per newly earned piece */}
+      {/* Armour Unlock Modal -- queues one animation per newly earned piece */}
       <ArmourUnlockModal
         pieceId={unlockQueue[0] ?? null}
         totalEarned={unlockTotal}

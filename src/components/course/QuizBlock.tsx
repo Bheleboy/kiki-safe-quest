@@ -1,3 +1,5 @@
+import { MotionButton } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
@@ -54,7 +56,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
         setSelected(null);
         setShowResult(false);
       } else {
-        // Quiz finished — calculate final score
+        // Quiz finished -- calculate final score
         const finalCorrect = newAnswers.filter((a, i) => a === questions[i]?.correctIndex).length;
         const finalScore = Math.round((finalCorrect / questions.length) * 100);
         setFinished(true);
@@ -90,7 +92,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
           </span>
         </div>
 
-        <p className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <p className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           {alreadyCompleted
             ? "Already Completed"
             : didPass
@@ -100,7 +102,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
             : "Not Quite There"}
         </p>
 
-        <p className="text-muted-foreground font-body">
+        <p className="text-charcoal/70 font-body">
           {alreadyCompleted
             ? "You already aced this quiz!"
             : `You got ${displayCorrect}/${questions.length} correct (${displayScore}%). ${
@@ -119,7 +121,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
                   <p className="font-semibold text-destructive">
                     Q{i + 1}: {q.question}
                   </p>
-                  <p className="text-muted-foreground mt-1">
+                  <p className="text-charcoal/70 mt-1">
                     Your answer: <span className="text-destructive">{q.options[answers[i]!]?.label}</span>
                     {" · "}
                     Correct: <span className="text-success">{q.options[q.correctIndex]?.label}</span>
@@ -131,12 +133,12 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
         )}
 
         {!alreadyCompleted && !didPass && (
-          <button
+          <Button variant="ghost"
             onClick={resetQuiz}
-            className="btn-copper px-6 py-3 text-sm uppercase tracking-widest"
+            className="btn-copper adventure-button px-6 py-3 text-sm uppercase tracking-widest"
           >
             Try Again
-          </button>
+          </Button>
         )}
       </motion.div>
     );
@@ -145,7 +147,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
   return (
     <div className="card-kiki space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground font-display uppercase tracking-wide">
+        <span className="text-sm font-medium text-charcoal/70 font-display uppercase tracking-wide">
           Question {currentQ + 1} of {questions.length}
         </span>
         <div className="flex gap-1">
@@ -159,7 +161,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
                   !answered
                     ? i === currentQ
                       ? "bg-primary"
-                      : "bg-muted"
+                      : "bg-primary/10"
                     : correct
                     ? "bg-success"
                     : "bg-destructive"
@@ -170,32 +172,32 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
         </div>
       </div>
 
-      <h3 className="font-display text-base font-semibold text-foreground">{question.question}</h3>
+      <h3 className="font-display text-base font-semibold text-charcoal">{question.question}</h3>
 
       <div className="grid gap-3">
         <AnimatePresence mode="wait">
           {question.options.map((opt, i) => (
-            <motion.button
+            <MotionButton variant="ghost"
               key={`${currentQ}-${i}`}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: i * 0.1 }}
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`touch-target w-full text-left rounded-lg p-4 font-body font-medium text-sm transition-all border ${
+              className={`editorial-quiz-option touch-target w-full text-left rounded-lg p-4 font-body font-medium text-sm transition-all border ${
                 selected === null
-                  ? "border-border bg-muted hover:border-primary/50 active:scale-[0.98]"
+                  ? "border-primary/20 bg-card hover:border-primary/50 active:scale-[0.98]"
                   : selected === i
                   ? isCorrect
                     ? "border-success bg-success/10 text-success"
                     : "border-destructive bg-destructive/10 text-destructive"
                   : i === question.correctIndex && showResult
                   ? "border-success bg-success/10"
-                  : "border-border bg-muted opacity-40"
+                  : "border-primary/20 bg-card opacity-40"
               }`}
             >
               {opt.label}
-            </motion.button>
+            </MotionButton>
           ))}
         </AnimatePresence>
       </div>
@@ -216,7 +218,7 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
       </AnimatePresence>
 
       {/* Pass threshold info */}
-      <p className="text-xs text-muted-foreground font-body text-center">
+      <p className="text-xs text-charcoal/70 font-body text-center">
         Score {PASS_THRESHOLD}% or higher to unlock the next lesson
       </p>
     </div>

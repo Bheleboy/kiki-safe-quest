@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Loader2, PlayCircle } from "lucide-react";
 
@@ -45,7 +46,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
 
   const videoId = getVideoId(videoUrl);
   const embedUrl = ensureEmbedParams(videoUrl);
-  // MP4s are our own rendered Kiki videos — no YouTube fallback link for them.
+  // MP4s are our own rendered Kiki videos -- no YouTube fallback link for them.
   const watchUrl = isMp4 ? undefined : toFallbackUrl(videoUrl, fallbackUrl);
   // YouTube returns a tiny "default.jpg" (120x90) for missing/private videos
   // and a full-resolution image for available ones, so we can probe availability.
@@ -92,21 +93,21 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
 
   return (
     <div className="space-y-2">
-      <div className="w-full rounded-xl overflow-hidden bg-muted aspect-video relative border border-border/40">
+      <div className="editorial-video w-full rounded-[1.5rem] overflow-hidden bg-primary/10 aspect-video relative border border-primary/15">
         {isMp4 ? (
           <video
             src={videoUrl}
             controls
             playsInline
             preload="metadata"
-            className="absolute inset-0 w-full h-full bg-black"
+            className="absolute inset-0 w-full h-full bg-charcoal"
           />
         ) : showUnavailable ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center bg-muted">
-            <p className="font-body text-foreground font-medium">
+          <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center bg-primary/10">
+            <p className="font-body text-charcoal font-medium">
               This video can't play here.
             </p>
-            <p className="text-sm font-body text-muted-foreground max-w-sm">
+            <p className="text-sm font-body text-charcoal/70 max-w-sm">
               The video owner has restricted embedding, or the video is no longer available on YouTube. You can still watch it on YouTube.
             </p>
             {watchUrl && (
@@ -114,7 +115,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
                 href={watchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="touch-target inline-flex items-center gap-2 btn-copper px-6 py-3 text-sm uppercase tracking-wide mt-1"
+                className="touch-target inline-flex items-center gap-2 btn-copper adventure-button px-6 py-3 text-sm uppercase tracking-wide mt-1"
               >
                 Watch on YouTube <ExternalLink className="w-4 h-4" />
               </a>
@@ -123,7 +124,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
         ) : !activated ? (
           // Show poster + play button until user clicks. Avoids loading broken iframes
           // and keeps the page fast on mobile.
-          <button
+          <Button variant="ghost"
             type="button"
             onClick={() => setActivated(true)}
             className="group absolute inset-0 w-full h-full flex items-center justify-center"
@@ -137,19 +138,19 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
                 loading="lazy"
               />
             )}
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+            <div className="absolute inset-0 bg-charcoal/30 group-hover:bg-charcoal/40 transition-colors" />
             <PlayCircle
-              className="relative w-20 h-20 text-white drop-shadow-lg group-hover:scale-110 transition-transform"
+              className="relative w-20 h-20 text-card drop-shadow-none group-hover:scale-110 transition-transform"
               strokeWidth={1.25}
             />
             {available === null && (
-              <Loader2 className="absolute top-3 right-3 w-5 h-5 text-white/80 animate-spin" />
+              <Loader2 className="absolute top-3 right-3 w-5 h-5 text-card/80 animate-spin" />
             )}
-          </button>
+          </Button>
         ) : (
           <>
             {!iframeLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 bg-muted">
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-primary/10">
                 <Loader2 className="w-8 h-8 text-primary animate-spin" />
               </div>
             )}
@@ -167,7 +168,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
       </div>
       <div className="flex items-center justify-between px-1">
         {(videoCredit || durationMinutes) && (
-          <p className="text-[11px] font-body text-muted-foreground/70">
+          <p className="text-[11px] font-body text-charcoal/70">
             {durationMinutes && <span>🎬 {durationMinutes} min</span>}
             {durationMinutes && videoCredit && <span> · </span>}
             {videoCredit && <span>📹 {videoCredit} · Used under Creative Commons licence</span>}

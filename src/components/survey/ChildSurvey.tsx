@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Send, CheckCircle2, AlertTriangle } from "lucide-react";
@@ -43,15 +44,15 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card-kiki text-center space-y-4 py-6">
         <AlertTriangle className="w-12 h-12 text-primary mx-auto" />
-        <h3 className="font-display text-lg font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-lg font-bold text-charcoal uppercase tracking-wide">
           Complete the course first!
         </h3>
-        <p className="font-body text-sm text-muted-foreground max-w-sm mx-auto">
-          {childName} needs to finish all lessons and quizzes before the survey becomes available. Keep going — you're doing great!
+        <p className="font-body text-sm text-charcoal/70 max-w-sm mx-auto">
+          {childName} needs to finish all lessons and quizzes before the survey becomes available. Keep going -- you're doing great!
         </p>
-        <button onClick={onSkip} className="text-xs font-body text-muted-foreground hover:text-foreground transition-colors">
+        <Button variant="ghost" onClick={onSkip} className="text-xs font-body text-charcoal/70 hover:text-charcoal transition-colors">
           Go back
-        </button>
+        </Button>
       </motion.div>
     );
   }
@@ -122,10 +123,10 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
     return (
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="card-kiki text-center space-y-4 py-8">
         <CheckCircle2 className="w-16 h-16 text-success mx-auto" />
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           {isYounger ? "Thank you, warrior! 🌟" : "Thanks for your feedback!"}
         </h3>
-        <p className="font-body text-muted-foreground text-sm">
+        <p className="font-body text-charcoal/70 text-sm">
           {isYounger
             ? "Your answers help us make things even better! Your parent will review your responses."
             : "Your feedback helps us improve the platform. Your parent will be notified to review."}
@@ -137,10 +138,10 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card-kiki space-y-5">
       <div className="text-center space-y-2">
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           {isYounger ? `Great job, ${childName}! 🎉` : `Well done, ${childName}!`}
         </h3>
-        <p className="font-body text-sm text-muted-foreground">
+        <p className="font-body text-sm text-charcoal/70">
           {isYounger
             ? "Can you answer a few quick questions for us?"
             : "We'd love your quick feedback to make this even better."}
@@ -153,7 +154,7 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
           <div
             key={i}
             className={`w-2.5 h-2.5 rounded-full transition-colors ${
-              i < step ? "bg-success" : i === step ? "bg-primary" : "bg-muted"
+              i < step ? "bg-success" : i === step ? "bg-primary" : "bg-primary/10"
             }`}
           />
         ))}
@@ -170,13 +171,13 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
           >
             <div className="text-center">
               <span className="text-4xl block mb-2">{currentQ.emoji}</span>
-              <p className="font-body text-lg font-medium text-foreground">
+              <p className="font-body text-lg font-medium text-charcoal">
                 {isYounger ? currentQ.younger : currentQ.older}
               </p>
             </div>
 
             <div className="flex justify-center gap-4">
-              <button
+              <Button variant="ghost"
                 onClick={() => handleAnswer(true)}
                 className="touch-target flex flex-col items-center gap-2 rounded-xl border-2 border-success/30 bg-success/5 px-8 py-4 hover:bg-success/15 hover:border-success transition-all"
               >
@@ -184,8 +185,8 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
                 <span className="font-display text-sm font-bold text-success uppercase tracking-wide">
                   {isYounger ? "Yes!" : "Yes"}
                 </span>
-              </button>
-              <button
+              </Button>
+              <Button variant="ghost"
                 onClick={() => handleAnswer(false)}
                 className="touch-target flex flex-col items-center gap-2 rounded-xl border-2 border-destructive/30 bg-destructive/5 px-8 py-4 hover:bg-destructive/15 hover:border-destructive transition-all"
               >
@@ -193,7 +194,7 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
                 <span className="font-display text-sm font-bold text-destructive uppercase tracking-wide">
                   {isYounger ? "No" : "No"}
                 </span>
-              </button>
+              </Button>
             </div>
           </motion.div>
         )}
@@ -207,7 +208,7 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
             className="space-y-4"
           >
             <div>
-              <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+              <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">
                 {isYounger ? "What did you like the most? 🌟" : "What was your favourite part?"}
               </label>
               <textarea
@@ -216,11 +217,11 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
                 placeholder={isYounger ? "I liked when..." : "My favourite part was..."}
                 rows={2}
                 maxLength={500}
-                className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
+                className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none transition-colors resize-none"
               />
             </div>
             <div>
-              <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+              <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">
                 {isYounger ? "What could be better? 🤔" : "Anything we could improve?"}
               </label>
               <textarea
@@ -229,18 +230,18 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
                 placeholder={isYounger ? "Maybe you could..." : "It would be better if..."}
                 rows={2}
                 maxLength={500}
-                className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
+                className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none transition-colors resize-none"
               />
             </div>
 
-            <button
+            <Button variant="ghost"
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-full touch-target btn-copper py-3 text-sm uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Send className="w-4 h-4" />
               {submitting ? "Sending..." : isYounger ? "Send my answers!" : "Submit feedback"}
-            </button>
+            </Button>
             {submitError && (
               <p className="text-sm text-destructive text-center font-body mt-2">
                 {submitError}
@@ -251,9 +252,9 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
       </AnimatePresence>
 
       <div className="text-center">
-        <button onClick={onSkip} className="text-xs font-body text-muted-foreground hover:text-foreground transition-colors">
+        <Button variant="ghost" onClick={onSkip} className="text-xs font-body text-charcoal/70 hover:text-charcoal transition-colors">
           {isYounger ? "Skip for now" : "Skip survey"}
-        </button>
+        </Button>
       </div>
     </motion.div>
   );

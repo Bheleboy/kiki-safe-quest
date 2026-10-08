@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 
@@ -30,7 +31,7 @@ export function NarrationToggle({ text }: NarrationToggleProps) {
   }, [text]);
 
   return (
-    <button
+    <Button variant="ghost"
       onClick={speaking ? stop : speak}
       className={`touch-target inline-flex items-center gap-2 rounded-lg px-5 py-3 font-display font-medium text-sm uppercase tracking-wide transition-all ${
         speaking
@@ -40,6 +41,6 @@ export function NarrationToggle({ text }: NarrationToggleProps) {
     >
       {speaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
       {speaking ? "Stop" : "Listen"}
-    </button>
+    </Button>
   );
 }

@@ -15,7 +15,7 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="editorial-compact-armour flex items-center gap-2">
         {ARMOUR_PIECES.map((piece) => (
           <ArmourPieceIcon
             key={piece.id}
@@ -24,7 +24,7 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
             size={28}
           />
         ))}
-        <span className="text-xs font-display font-medium text-muted-foreground ml-1">
+        <span className="text-xs font-display font-medium text-charcoal/70 ml-1">
           {totalEarned}/6
         </span>
       </div>
@@ -35,10 +35,10 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           Armour of God
         </h3>
-        <p className="text-sm text-muted-foreground font-body mt-1">
+        <p className="text-sm text-charcoal/70 font-body mt-1">
           {totalEarned}/6 pieces collected
         </p>
         <div className="mt-3 max-w-xs mx-auto">
@@ -46,12 +46,12 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
         </div>
       </div>
 
-      {/* All 6 pieces — earnable in the Online Safety Course */}
+      {/* All 6 pieces -- earnable in the Online Safety Course */}
       <div>
-        <p className="text-xs font-display font-medium text-muted-foreground uppercase tracking-wide mb-3">
+        <p className="text-xs font-display font-medium text-charcoal/70 uppercase tracking-wide mb-3">
           Online Safety Course
         </p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="editorial-armour-grid grid grid-cols-3 gap-3">
           {ARMOUR_PIECES.map((piece, i) => {
             const earned = earnedPieces.includes(piece.id);
             const progress = pieceProgress[piece.id] ?? (earned ? 1 : 0);
@@ -69,15 +69,15 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
                 {earned && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-success flex items-center justify-center">
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M2 6l3 3 5-5" stroke="hsl(var(--success-foreground))" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                   </div>
                 )}
-                <div className={`mx-auto ${earned ? "pulse-glow rounded-full p-1" : ""}`}>
+                <div className={`editorial-armour-badge clip-badge mx-auto ${earned ? "pulse-glow rounded-full p-1" : ""}`}>
                   <ArmourPieceIcon pieceId={piece.id} earned={earned} size={44} />
                 </div>
                 <p className={`font-display text-xs font-semibold uppercase tracking-wide ${
-                  earned ? "text-foreground" : "text-muted-foreground/50"
+                  earned ? "text-charcoal" : "text-charcoal/60"
                 }`}>
                   {piece.name}
                 </p>

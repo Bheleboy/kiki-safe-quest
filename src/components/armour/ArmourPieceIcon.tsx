@@ -99,8 +99,8 @@ export function ArmourPieceIcon({ pieceId, earned, size = 48, className = "", ..
       size={size}
       className={`transition-all duration-300 ${
         earned
-          ? "text-primary drop-shadow-[0_0_8px_hsl(25_85%_55%/0.5)]"
-          : "text-muted-foreground/30"
+          ? "text-primary"
+          : "text-charcoal/40"
       } ${className}`}
       {...props}
     />

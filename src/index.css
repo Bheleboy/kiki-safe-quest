@@ -1,8 +1,15 @@
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/oswald-400.ttf") format("truetype"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/oswald-500.ttf") format("truetype"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/oswald-600.ttf") format("truetype"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 700; font-display: swap; src: url("/fonts/oswald-700.ttf") format("truetype"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/dm-sans-400.ttf") format("truetype"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/dm-sans-500.ttf") format("truetype"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/dm-sans-600.ttf") format("truetype"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("/fonts/dm-sans-700.ttf") format("truetype"); }
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -202,3 +209,69 @@
     .adventure-card, .adventure-button, .quest-arrow { transform: none !important; }
   }
 }
+
+/* Scoped non-home presentation preserves homepage and admin control styling. */
+.editorial-page { color: hsl(var(--charcoal)); font-family: var(--font-body); }
+.editorial-page > main, .editorial-page > div:not(header, footer) { min-width: 0; }
+.editorial-page > main { padding-top: 3rem; padding-bottom: 4rem; }
+.editorial-page .editorial-focus { min-height: calc(100svh - 4rem); }
+.editorial-page > header { border-radius: 0; border-color: hsl(var(--primary) / .15); background: hsl(var(--cream) / .96); }
+.editorial-page main :is(h1, h2, h3, h4) { color: hsl(var(--charcoal)); text-transform: uppercase; overflow-wrap: anywhere; letter-spacing: 0; }
+.editorial-page main h1 { font-size: 1.875rem; line-height: .95; font-weight: 700; margin-bottom: 1rem; }
+.editorial-page main :is(h2, h3) { font-size: 1.25rem; line-height: 1.2; }
+.editorial-page main p:not(.editorial-eyebrow) { line-height: 1.65; }
+.editorial-page .card-kiki { border: 1px solid hsl(var(--primary) / .15); border-radius: 1rem; background: hsl(var(--card)); padding: 1.25rem; box-shadow: none; min-width: 0; white-space: normal; }
+.editorial-page .card-kiki .card-kiki { background: transparent; border-radius: 0; border-width: 0 0 1px; padding: 1rem 0; }
+.editorial-page :is(button, a):not(header *, footer *) { min-height: 44px; min-width: 44px; white-space: normal; height: auto; }
+.editorial-page button:not(.card-kiki) { border-radius: 9999px; }
+.editorial-page .btn-copper { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: 9999px; min-height: 3rem; padding: .75rem 1.5rem; background: hsl(var(--primary)); color: hsl(var(--charcoal)); font-family: var(--font-display); text-transform: uppercase; letter-spacing: .08em; box-shadow: none; }
+.editorial-page :is(input:not([type=checkbox]), select, textarea) { min-width: 0; min-height: 3rem; border-radius: .75rem; border: 1px solid hsl(var(--primary) / .2); background: hsl(var(--card)); color: hsl(var(--charcoal)); font-family: var(--font-body); }
+.editorial-page :is(input, select, textarea):focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
+.editorial-page input[type=checkbox] { accent-color: hsl(var(--primary)); }
+.editorial-page label:has(input[type=checkbox]) { min-height: 44px; }
+.editorial-page label :is(a, button) { display: inline-flex; align-items: center; }
+.editorial-page .editorial-search input { border: 0; background: transparent; min-height: 44px; }
+.editorial-page .editorial-search > div:first-child { padding-top: 0; padding-bottom: 0; border-radius: .75rem; background: hsl(var(--card)); }
+.editorial-page .editorial-search button { justify-content: flex-start; }
+.editorial-page .editorial-search > div:not(:first-child) { border-radius: 1rem; }
+.editorial-page .editorial-video { border-radius: 1.5rem; border-color: hsl(var(--primary) / .15); }
+.editorial-page .editorial-lesson-title { overflow: visible; white-space: normal; }
+.editorial-page .editorial-armour-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.editorial-page .editorial-armour-grid .card-kiki { border: 0; padding: .75rem .25rem; }
+.editorial-page .editorial-armour-badge { clip-path: polygon(50% 0,100% 18%,100% 62%,50% 100%,0 62%,0 18%); background: hsl(var(--primary) / .15); padding: .75rem; width: fit-content; }
+.editorial-page .editorial-compact-armour { flex-wrap: wrap; }
+.editorial-page .editorial-book-cover { width: min(20rem, 75vw); }
+.editorial-page .editorial-quiz-option { justify-content: flex-start; text-align: left; border-radius: .75rem; }
+.editorial-page .editorial-survey-row { flex-wrap: wrap; }
+.editorial-page .editorial-survey-row > p { min-width: 10rem; }
+.editorial-page .editorial-survey-row > div:last-child { margin-left: auto; }
+.editorial-page .editorial-dialog { max-height: calc(100dvh - 2rem); overflow-y: auto; border-radius: 2rem; padding: 1.25rem; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+.editorial-page .editorial-family-card { display: grid; grid-template-columns: 4rem minmax(0, 1fr) 44px; gap: .75rem; }
+.editorial-page .editorial-family-card > div:first-child { grid-row: span 2; }
+.editorial-page .editorial-family-card > div:first-child :is(.w-24) { width: 4rem; }
+.editorial-page .editorial-family-card > .btn-copper { grid-column: 2 / 4; }
+.editorial-page .editorial-course-bar { flex-wrap: wrap; gap: .5rem; }
+.editorial-page .editorial-course-bar > div:nth-child(2) { order: 2; flex-basis: 100%; min-width: 0; }
+.editorial-page .editorial-course-bar > div:first-child { margin-right: auto; }
+.editorial-page .editorial-course-bar > div:first-child span { display: inline; }
+.editorial-page .editorial-course-bar button { padding: .5rem; }
+.editorial-page .editorial-stat-grid { gap: .5rem; }
+.editorial-page .editorial-stat-grid .card-kiki { padding: .75rem; }
+.editorial-page .editorial-legal section { border-top: 1px solid hsl(var(--primary) / .15); padding-top: 1.75rem; }
+.editorial-page .editorial-public-band { border-radius: 0; border-width: 0; background: hsl(var(--peach)); }
+.editorial-page button:hover:not(.btn-copper):not([class*="destructive"]):not([class*="success"]) { color: hsl(var(--charcoal)); }
+.editorial-page .editorial-search > div:not(:first-child) button { display: block; border-radius: 0; }
+.editorial-page .editorial-search > div:not(:first-child) button p { overflow-wrap: anywhere; }
+.editorial-page [class*="fixed"][class*="bottom-0"] { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+@media (min-width: 640px) {
+  .editorial-page main h1 { font-size: 2.25rem; }
+  .editorial-page main :is(h2, h3) { font-size: 1.5rem; }
+  .editorial-page .card-kiki { padding: 1.5rem; }
+  .editorial-page .editorial-armour-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .editorial-page .editorial-family-card { display: flex; gap: 1rem; }
+  .editorial-page .editorial-family-card > div:first-child :is(.w-24) { width: 6rem; }
+  .editorial-page .editorial-course-bar { flex-wrap: nowrap; }
+  .editorial-page .editorial-course-bar > div:nth-child(2) { order: 0; flex-basis: auto; }
+  .editorial-page .editorial-stat-grid { gap: 1rem; }
+}
+@media (min-width: 1024px) { .editorial-page main h1 { font-size: 3rem; } }

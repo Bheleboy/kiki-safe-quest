@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
@@ -53,15 +54,15 @@ export function LessonView({
     >
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="touch-target p-2 rounded-lg hover:bg-muted transition-colors">
-          <ArrowLeft className="w-6 h-6 text-foreground" />
-        </button>
+        <Button variant="ghost" onClick={onBack} className="touch-target p-2 rounded-lg hover:bg-primary/10 transition-colors">
+          <ArrowLeft className="w-6 h-6 text-charcoal" />
+        </Button>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-muted-foreground font-display font-medium uppercase tracking-wide truncate">
+          <p className="text-xs text-charcoal/70 font-display font-medium uppercase tracking-wide break-words">
             {module.title}
           </p>
-          <h2 className="font-display text-lg font-bold text-foreground truncate">{lesson.title}</h2>
-          <p className="text-xs text-muted-foreground/80 font-body mt-0.5">
+          <h2 className="editorial-lesson-title font-display text-xl sm:text-2xl font-bold uppercase text-charcoal break-words">{lesson.title}</h2>
+          <p className="text-xs text-charcoal/70 font-body mt-0.5">
             🎬 {lesson.videoDurationMinutes} min video · ⏱ ~{lesson.estimatedMinutes} min total
           </p>
         </div>
@@ -77,30 +78,30 @@ export function LessonView({
       <div className="space-y-3">
         <NarrationToggle text={lesson.narrationText} />
         <div className="card-kiki">
-          <p className="font-body text-foreground leading-relaxed">{lesson.explanationText}</p>
+          <p className="font-body text-charcoal leading-relaxed">{lesson.explanationText}</p>
         </div>
       </div>
 
       {/* Parent Tip */}
-      <button
+      <Button variant="ghost"
         onClick={() => setShowParentTip(!showParentTip)}
-        className="w-full flex items-center gap-2 rounded-lg bg-secondary/20 p-3 text-sm font-display font-medium text-secondary-foreground uppercase tracking-wide hover:bg-secondary/30 transition-colors"
+        className="w-full flex items-center gap-2 rounded-xl border border-trust/15 bg-trust/10 p-3 text-sm font-display font-medium text-trust uppercase tracking-wide hover:bg-trust/15 transition-colors"
       >
         Parent Tip
-      </button>
+      </Button>
       {showParentTip && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
-          className="rounded-lg bg-secondary/10 p-4"
+          className="rounded-xl border border-trust/15 bg-trust/10 p-4"
         >
-          <p className="text-sm font-body text-secondary-foreground">{lesson.parentTip}</p>
+          <p className="text-sm font-body text-charcoal/70">{lesson.parentTip}</p>
         </motion.div>
       )}
 
       {/* Quiz */}
       <div>
-        <h3 className="font-display text-lg font-bold text-foreground mb-3 uppercase tracking-wide">Quiz Time</h3>
+        <h3 className="font-display text-lg font-bold text-charcoal mb-3 uppercase tracking-wide">Quiz Time</h3>
         <QuizBlock
           questions={lesson.quiz}
           onComplete={handleQuizComplete}
@@ -110,21 +111,21 @@ export function LessonView({
       </div>
 
       {/* Navigation - inline instead of fixed */}
-      <div className="border-t border-border/40 pt-4 mt-6 flex items-center justify-between">
-        <button
+      <div className="border-t border-primary/15 pt-4 mt-6 flex items-center justify-between">
+        <Button variant="ghost"
           onClick={onPrev}
           disabled={lessonIndex === 0}
-          className="touch-target flex items-center gap-2 rounded-lg px-5 py-3 font-display font-medium text-sm bg-muted text-muted-foreground disabled:opacity-30 hover:bg-muted/80 transition-all uppercase tracking-wide"
+          className="touch-target flex items-center gap-2 rounded-lg px-5 py-3 font-display font-medium text-sm bg-primary/10 text-charcoal/70 disabled:opacity-30 hover:bg-primary/10/80 transition-all uppercase tracking-wide"
         >
           <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-        <button
+        </Button>
+        <Button variant="ghost"
           onClick={onNext}
           disabled={!canAdvance}
-          className="touch-target flex items-center gap-2 btn-copper px-6 py-3 text-sm uppercase tracking-wide disabled:opacity-30 disabled:cursor-not-allowed"
+          className="touch-target flex items-center gap-2 btn-copper adventure-button px-6 py-3 text-sm uppercase tracking-wide disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {lessonIndex === totalLessons - 1 ? "Finish" : "Next"} <ArrowRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </motion.div>
   );

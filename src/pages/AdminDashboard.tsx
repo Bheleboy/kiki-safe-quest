@@ -35,7 +35,7 @@ export default function AdminDashboard() {
 
   if (adminLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
   if (!adminUser) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+      <div className="min-h-screen bg-cream text-foreground flex items-center justify-center px-4">
         <AdminLoginGate />
       </div>
     );
@@ -51,10 +51,10 @@ export default function AdminDashboard() {
 
   if (clientId !== KIKI_CLIENT_ID) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
-        <div className="card-kiki p-8 max-w-md mx-auto text-center">
+      <div className="min-h-screen bg-cream text-foreground flex items-center justify-center px-4">
+        <div className="card-kiki border-primary/15 p-8 max-w-md mx-auto text-center">
           <ShieldIcon size={40} className="stroke-primary mx-auto mb-4" />
-          <h3 className="font-display text-lg uppercase tracking-wider mb-2">Admin Dashboard</h3>
+          <h3 className="font-display text-lg uppercase tracking-wider mb-2 text-charcoal font-bold">Admin Dashboard</h3>
           <p className="text-sm text-muted-foreground mb-5">
             You don't have admin access. This account is not linked to the Kiki Warrior admin workspace.
           </p>
@@ -90,9 +90,9 @@ function AdminLoginGate() {
   }
 
   return (
-    <div className="card-kiki p-8 max-w-md w-full text-center">
+    <div className="card-kiki border-primary/15 p-8 max-w-md w-full text-center">
       <ShieldIcon size={40} className="stroke-primary mx-auto mb-4" />
-      <h3 className="font-display text-lg uppercase tracking-wider mb-2">Admin Dashboard</h3>
+      <h3 className="font-display text-lg uppercase tracking-wider mb-2 text-charcoal font-bold">Admin Dashboard</h3>
       {sent ? (
         <p className="text-sm text-muted-foreground">
           Check your email for the login link.
@@ -200,7 +200,7 @@ function AdminDashboardView() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-cream text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -227,14 +227,14 @@ function AdminDashboardView() {
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         {loading ? (
-          <div className="card-kiki p-8 flex justify-center">
+          <div className="card-kiki border-primary/15 p-8 flex justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>
             {/* Section 1: User Overview */}
             <section>
-              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
                 <Users size={20} className="text-primary" /> User Overview
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -248,7 +248,7 @@ function AdminDashboardView() {
 
             {/* Section 2: Child Accounts */}
             <section>
-              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
                 <Baby size={20} className="text-primary" /> Child Accounts
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -259,7 +259,7 @@ function AdminDashboardView() {
 
             {/* Section 3: Course Engagement */}
             <section>
-              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
                 <BookOpen size={20} className="text-primary" /> Course Engagement
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -268,8 +268,8 @@ function AdminDashboardView() {
               </div>
 
               {moduleRates.length > 0 && (
-                <div className="card-kiki p-4 mb-6">
-                  <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
+                <div className="card-kiki border-primary/15 p-4 mb-6">
+                  <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground text-charcoal font-bold">
                     Module Completion Rates
                   </h3>
                   <div className="space-y-2">
@@ -290,8 +290,8 @@ function AdminDashboardView() {
               )}
 
               {recentUsers.length > 0 && (
-                <div className="card-kiki p-4">
-                  <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
+                <div className="card-kiki border-primary/15 p-4">
+                  <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground text-charcoal font-bold">
                     Recent Active Users
                   </h3>
                   <div className="space-y-2">
@@ -308,10 +308,10 @@ function AdminDashboardView() {
 
             {/* Section 4: Signup Trend */}
             <section>
-              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
                 <TrendingUp size={20} className="text-primary" /> Signup Trend (30 Days)
               </h2>
-              <div className="card-kiki p-4">
+              <div className="card-kiki border-primary/15 p-4">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={signupTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -342,7 +342,7 @@ function AdminDashboardView() {
 
         {/* Section 5: Google Search Console */}
         <section>
-          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2">
+          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
             <Search size={20} className="text-primary" /> Google Search Console
           </h2>
           <GscPanel />
@@ -398,7 +398,7 @@ function GscPanel() {
 
   if (loading) {
     return (
-      <div className="card-kiki p-8 flex justify-center">
+      <div className="card-kiki border-primary/15 p-8 flex justify-center">
         <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -406,7 +406,7 @@ function GscPanel() {
 
   if (daily.length === 0 && queries.length === 0 && pages.length === 0) {
     return (
-      <div className="card-kiki p-6 text-sm text-muted-foreground">
+      <div className="card-kiki border-primary/15 p-6 text-sm text-muted-foreground">
         No Google Search Console data yet. Data will appear after the daily sync runs and the GSC property for kikiwarrior.com is verified.
       </div>
     );
@@ -435,8 +435,8 @@ function GscPanel() {
       </div>
 
       {chartData.length > 0 && (
-        <div className="card-kiki p-4">
-          <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">
+        <div className="card-kiki border-primary/15 p-4">
+          <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground text-charcoal font-bold">
             Clicks and Impressions (30 Days)
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -491,8 +491,8 @@ function aggregate(rows: Record<string, unknown>[], key: string): GscRow[] {
 
 function GscTable({ title, firstCol, rows }: { title: string; firstCol: string; rows: GscRow[] }) {
   return (
-    <div className="card-kiki p-4">
-      <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground">{title}</h3>
+    <div className="card-kiki border-primary/15 p-4">
+      <h3 className="font-display text-sm uppercase tracking-wider mb-3 text-muted-foreground text-charcoal font-bold">{title}</h3>
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No data for this period yet.</p>
       ) : (
@@ -527,7 +527,7 @@ function GscTable({ title, firstCol, rows }: { title: string; firstCol: string; 
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="card-kiki p-4">
+    <div className="card-kiki border-primary/15 p-4">
       <p className="text-xs text-muted-foreground uppercase tracking-wider font-display">{label}</p>
       <p className="text-2xl font-bold mt-1">{value}</p>
       {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
