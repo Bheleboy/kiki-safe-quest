@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, BookOpen, CheckCircle2, Clock, Lock, Mail, ShieldCheck, Trophy, Users } from "lucide-react";
+import { ArrowUpRight, BookOpen, CheckCircle2, Clock, Lock, Mail, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { courseData } from "@/data/courseData";
 import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
@@ -78,7 +78,7 @@ export function Rewards() {
   return <RevealSection id="rewards" className="bg-background py-20 lg:py-28"><div className={`${container} grid lg:grid-cols-12 gap-10 items-center`}>
     <div className="lg:col-span-5"><Eyebrow n="04">Rewards</Eyebrow><h2 className={heading}>Collect the full Armour of God.</h2><p className={`${body} mt-6`}>Completing missions unlocks armour pieces, and your child's avatar changes as it fills up. Finishing the course unlocks a printable certificate of completion.</p><div className="mt-6 flex items-center gap-3 rounded-2xl bg-cream p-4"><Trophy className="w-6 h-6 text-primary shrink-0" /><p className="font-body text-sm text-charcoal">6 armour pieces, 1 completion certificate per course</p></div></div>
     <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {ONLINE_SAFETY_PIECES.map((piece, i) => <div key={piece.id} className="rounded-2xl bg-cream bg-tech-grid border border-primary/15 p-4 text-center flex flex-col items-center"><div className={`clip-badge w-14 h-16 flex items-center justify-center text-charcoal ${i % 2 ? "bg-secondary" : "bg-primary/20"}`}><ShieldCheck aria-hidden className="w-7 h-7" /></div><h3 className="font-display text-sm uppercase text-charcoal mt-4 min-h-10 flex items-center justify-center">{piece.name}</h3><p className="text-[11px] font-body text-charcoal/60 mt-1">{piece.verse}</p></div>)}
+      {ONLINE_SAFETY_PIECES.map((piece) => <div key={piece.id} className="group rounded-2xl bg-cream bg-tech-grid border border-primary/15 p-4 text-center flex flex-col items-center"><img src={`/images/armour/${piece.id}.webp`} alt={piece.name} loading="lazy" width={112} height={112} className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-[0_10px_12px_rgba(60,35,15,0.18)] motion-safe:transition-transform motion-safe:duration-300 group-hover:-translate-y-1 group-hover:scale-105" /><h3 className="font-display text-sm uppercase text-charcoal mt-4 min-h-10 flex items-center justify-center">{piece.name}</h3><p className="text-[11px] font-body text-charcoal/60 mt-1">{piece.verse}</p></div>)}
     </div>
   </div></RevealSection>;
 }
