@@ -165,3 +165,40 @@
     50% { box-shadow: 0 0 20px 6px hsl(25 85% 55% / 0.12); }
   }
 }
+
+@layer base {
+  :root {
+    --cream: 34 45% 97%;
+    --peach: 25 65% 95%;
+    --charcoal: 24 10% 12%;
+    --charcoal-foreground: 34 38% 95%;
+    --shadow-keyart: 0 16px 40px -20px hsl(var(--charcoal) / 0.22);
+  }
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}
+@layer utilities {
+  .bg-tech-grid {
+    background-image: linear-gradient(hsl(var(--primary) / 0.035) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .clip-badge { clip-path: polygon(50% 0, 100% 18%, 100% 62%, 50% 100%, 0 62%, 0 18%); }
+}
+@layer components {
+  .adventure-button { transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease; }
+  .adventure-button:active { transform: translateY(1px); }
+  .adventure-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  .quest-arrow { transition: transform .25s ease; }
+  .adventure-card:focus-visible, header a:focus-visible, footer a:focus-visible, main a:focus-visible, main button:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 4px; }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .adventure-card:hover { transform: translateY(-4px); border-color: hsl(var(--primary) / .65); box-shadow: var(--shadow-keyart); }
+    .group:hover .quest-arrow { transform: translate(2px, -2px); }
+    .adventure-button:hover { transform: translateY(-2px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .adventure-card, .adventure-button, .quest-arrow { transform: none !important; }
+  }
+}

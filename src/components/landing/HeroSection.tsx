@@ -213,8 +213,8 @@ function QuestCard({ reduce }: { reduce: boolean }) {
           </motion.p>
         </AnimatePresence>
       </div>
-      <img src="/images/kiki-armour-of-god.png" alt="Kiki and the Armour of God book cover" className="h-44 object-contain mx-auto my-5 -rotate-3 drop-shadow-xl" />
-      <p className="font-body text-xs text-foreground/50 text-center">Earn every piece of the Armour of God</p>
+      <img src="/images/kiki-warrior-learning.png" alt="Kiki, Nonala and Ma learning together in the lounge" className="w-full aspect-[3/2] object-cover rounded-2xl my-5 shadow-sm" />
+      <p className="font-body text-xs text-foreground/50 text-center">Learning together at home</p>
       <div className="flex items-end justify-between mt-5">
         <div>
           <p className="font-body text-xs text-foreground/50">Video lessons</p>

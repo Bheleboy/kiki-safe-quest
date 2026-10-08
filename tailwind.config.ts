@@ -18,6 +18,9 @@ export default {
         body: ['DM Sans', 'sans-serif'],
       },
       colors: {
+        cream: "hsl(var(--cream))",
+        peach: "hsl(var(--peach))",
+        charcoal: { DEFAULT: "hsl(var(--charcoal))", foreground: "hsl(var(--charcoal-foreground))" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
