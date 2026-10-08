@@ -24,7 +24,7 @@ function lessonCount(id: string) {
   return courseData.find((stream) => stream.id === id)?.modules.reduce((sum, module) => sum + module.lessons.length, 0) ?? 0;
 }
 const paths = [
-  { id: "6-9", age: "Ages 6-9", title: "Young Warriors", note: "Narration plays automatically, so early readers can follow along.", image: "/images/kiki-warrior-3d.png", alt: "Kiki the young warrior" },
+  { id: "6-9", age: "Ages 6-9", title: "Young Warriors", note: "Narration plays automatically, so early readers can follow along.", image: "/images/young-warriors-kids.webp", alt: "Three young warriors ready for their first mission" },
   { id: "10-13", age: "Ages 10-13", title: "Warrior Trainees", note: "Deeper missions on privacy, scams and digital footprint.", image: "/images/kiki-safety-warrior.png", alt: "Kiki ready for an online safety adventure" },
 ];
 export function AgePaths() {
