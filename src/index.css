@@ -195,6 +195,18 @@
   .clip-badge { clip-path: polygon(50% 0, 100% 18%, 100% 62%, 50% 100%, 0 62%, 0 18%); }
 }
 @layer components {
+  .hero-warrior-3d {
+    background-image: linear-gradient(180deg, hsl(var(--cream)) 0%, hsl(40 88% 78%) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 2px hsl(var(--primary) / 0.85);
+    filter: drop-shadow(0 10px 16px hsl(var(--charcoal) / 0.18));
+  }
+  @media (max-width: 1023px) {
+    .hero-warrior-3d { -webkit-text-stroke-width: 1.4px; }
+  }
   .adventure-button { transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease; }
   .adventure-button:active { transform: translateY(1px); }
   .adventure-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
