@@ -259,6 +259,10 @@
 .editorial-page .editorial-stat-grid .card-kiki { padding: .75rem; }
 .editorial-page .editorial-legal section { border-top: 1px solid hsl(var(--primary) / .15); padding-top: 1.75rem; }
 .editorial-page .editorial-public-band { border-radius: 0; border-width: 0; background: hsl(var(--peach)); }
+.editorial-page button:hover:not(.btn-copper):not([class*="destructive"]):not([class*="success"]) { color: hsl(var(--charcoal)); }
+.editorial-page .editorial-search > div:not(:first-child) button { display: block; border-radius: 0; }
+.editorial-page .editorial-search > div:not(:first-child) button p { overflow-wrap: anywhere; }
+.editorial-page [class*="fixed"][class*="bottom-0"] { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 @media (min-width: 640px) {
   .editorial-page main h1 { font-size: 2.25rem; }
   .editorial-page main :is(h2, h3) { font-size: 1.5rem; }

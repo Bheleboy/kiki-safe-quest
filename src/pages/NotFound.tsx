@@ -1,4 +1,6 @@
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -10,16 +12,18 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex editorial-page min-h-screen items-center justify-center bg-primary/10">
+    <PublicPage>
+      <main className="editorial-focus flex items-center justify-center bg-cream bg-tech-grid px-4">
       <div className="text-center">
         <Eyebrow>Find your way</Eyebrow>
-          <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-charcoal/70">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
+          <h1 className="mb-4 font-display text-4xl font-bold uppercase text-charcoal">404</h1>
+        <p className="mb-6 font-body text-xl text-charcoal/70">Oops! Page not found</p>
+        <Button asChild className="btn-copper adventure-button">
+          <a href="/">Return to Home <span className="flex h-9 w-9 items-center justify-center rounded-full bg-card"><ArrowUpRight /></span></a>
+        </Button>
       </div>
-    </div>
+      </main>
+    </PublicPage>
   );
 };
 
