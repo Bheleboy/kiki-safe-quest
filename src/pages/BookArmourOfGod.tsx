@@ -1,3 +1,5 @@
+import { Eyebrow, PublicPage } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
@@ -103,11 +105,11 @@ export default function BookArmourOfGod() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <PublicPage>
       {/* Nav */}
-      <nav className="border-b border-border/60 bg-card/80 backdrop-blur-sm sticky top-0 z-30">
+      <div className="border-b border-primary/15 bg-peach">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/" className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-charcoal transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="font-display uppercase tracking-wide">Back to Home</span>
           </Link>
@@ -121,7 +123,7 @@ export default function BookArmourOfGod() {
             </Link>
           )}
         </div>
-      </nav>
+      </div>
 
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-12 items-start">
@@ -133,14 +135,14 @@ export default function BookArmourOfGod() {
             className="flex justify-center"
           >
             <div className="relative">
-              <div className="w-72 md:w-80 rounded-2xl overflow-hidden shadow-xl border border-border/40">
+              <div className="w-72 md:w-80 rounded-2xl overflow-hidden shadow-none border border-primary/15">
                 <img
                   src="/images/kiki-armour-of-god.png"
                   alt="Kiki's Armour of God workbook cover"
                   className="w-full h-auto object-cover"
                 />
               </div>
-              <div className="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-lg">
+              <div className="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-none">
                 <span className="font-display text-primary-foreground text-xs text-center leading-tight uppercase font-bold">Ages<br />4–12</span>
               </div>
             </div>
@@ -155,51 +157,52 @@ export default function BookArmourOfGod() {
           >
             <div>
               <p className="font-display text-xs text-primary uppercase tracking-widest mb-2">By Nonala Tose Dagada</p>
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wide leading-tight">
+              <Eyebrow>Companion book</Eyebrow>
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-charcoal uppercase tracking-wide leading-tight">
                 Kiki's Armour of God
               </h1>
-              <p className="font-body text-muted-foreground mt-3 leading-relaxed">
+              <p className="font-body text-charcoal/70 mt-3 leading-relaxed">
                 A Christian workbook for children aged 4–12 that teaches biblical concepts like the Belt of Truth, Breastplate of Righteousness, and Shield of Faith. It uses activities, prayers, and Bible verses to help kids build mental health awareness and a stronger relationship with God.
               </p>
             </div>
 
             {/* Key Features */}
             <div className="card-kiki space-y-3">
-              <h2 className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Key Features</h2>
-              <ul className="space-y-2 font-body text-sm text-muted-foreground">
+              <h2 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Key Features</h2>
+              <ul className="space-y-2 font-body text-sm text-charcoal/70">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                  <span><strong className="text-foreground">Target Audience:</strong> Children aged 4–12.</span>
+                  <span><strong className="text-charcoal">Target Audience:</strong> Children aged 4–12.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                  <span><strong className="text-foreground">Focus:</strong> Empowering children to become "superheroes of faith."</span>
+                  <span><strong className="text-charcoal">Focus:</strong> Empowering children to become "superheroes of faith."</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                  <span><strong className="text-foreground">Content:</strong> Combines fun, interactive activities with scriptural teaching based on Ephesians 6.</span>
+                  <span><strong className="text-charcoal">Content:</strong> Combines fun, interactive activities with scriptural teaching based on Ephesians 6.</span>
                 </li>
               </ul>
             </div>
 
             {/* Buy Links */}
             <div className="space-y-3">
-              <h2 className="font-display text-sm font-bold text-foreground uppercase tracking-wide">Get Your Copy</h2>
+              <h2 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Get Your Copy</h2>
               <div className="grid grid-cols-2 gap-3">
                 {bookLinks.map((link) => {
                   const alreadyPurchased = purchasedStores.includes(link.name);
                   return (
-                    <button
+                    <Button variant="ghost"
                       key={link.name}
                       onClick={() => handleBuyClick(link.name, link.url)}
-                      className="card-kiki flex items-center gap-3 p-4 hover:border-primary/60 hover:shadow-md transition-all group text-left"
+                      className="card-kiki flex items-center gap-3 p-4 hover:border-primary/60 hover:shadow-none transition-all group text-left"
                     >
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
                         {link.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="font-display text-xs font-bold text-foreground uppercase tracking-wide block truncate">{link.name}</span>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <span className="font-display text-xs font-bold text-charcoal uppercase tracking-wide block break-words">{link.name}</span>
+                        <span className="text-[10px] text-charcoal/70 flex items-center gap-1">
                           {alreadyPurchased ? (
                             <>Saved <BookOpen className="w-2.5 h-2.5" /></>
                           ) : (
@@ -207,7 +210,7 @@ export default function BookArmourOfGod() {
                           )}
                         </span>
                       </div>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -222,7 +225,7 @@ export default function BookArmourOfGod() {
           viewport={{ once: true }}
           className="mt-16 space-y-6"
         >
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide text-center">
+          <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide text-center">
             The Armor of God Components Covered
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
@@ -236,16 +239,16 @@ export default function BookArmourOfGod() {
                 className="card-kiki text-center p-5"
               >
                 <h3 className="font-display text-sm font-bold text-primary uppercase tracking-wide mb-1">{item.name}</h3>
-                <p className="font-body text-sm text-muted-foreground">{item.description}</p>
+                <p className="font-body text-sm text-charcoal/70">{item.description}</p>
               </motion.div>
             ))}
           </div>
 
-          <p className="font-body text-sm text-muted-foreground text-center max-w-2xl mx-auto mt-8">
+          <p className="font-body text-sm text-charcoal/70 text-center max-w-2xl mx-auto mt-8">
             This resource is designed to help kids apply these spiritual concepts to their daily lives through prayer and scripture.
           </p>
         </motion.div>
       </div>
-    </div>
+    </PublicPage>
   );
 }

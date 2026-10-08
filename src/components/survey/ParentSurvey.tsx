@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Send, CheckCircle2 } from "lucide-react";
@@ -30,17 +31,17 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   return (
     <div className="flex justify-center gap-2">
       {[1, 2, 3, 4, 5].map((n) => (
-        <button
+        <Button variant="ghost"
           key={n}
           onClick={() => onChange(n)}
           className="touch-target p-1 transition-transform hover:scale-110"
         >
           <Star
             className={`w-8 h-8 transition-colors ${
-              n <= value ? "text-primary fill-primary" : "text-muted-foreground/30"
+              n <= value ? "text-primary fill-primary" : "text-charcoal/40"
             }`}
           />
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -84,18 +85,18 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
     return (
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="card-kiki text-center space-y-5 py-6">
         <CheckCircle2 className="w-14 h-14 text-success mx-auto" />
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           Thank you for your feedback!
         </h3>
-        <p className="font-body text-sm text-muted-foreground max-w-sm mx-auto">
+        <p className="font-body text-sm text-charcoal/70 max-w-sm mx-auto">
           Your feedback helps us continuously improve and keep children safer online.
         </p>
-        <button
+        <Button variant="ghost"
           onClick={onComplete}
-          className="btn-copper px-6 py-3 text-sm uppercase tracking-widest"
+          className="btn-copper adventure-button px-6 py-3 text-sm uppercase tracking-widest"
         >
           Done
-        </button>
+        </Button>
       </motion.div>
     );
   }
@@ -103,41 +104,41 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card-kiki space-y-5">
       <div className="text-center space-y-2">
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           Parent Feedback
         </h3>
-        <p className="font-body text-sm text-muted-foreground">
-          Help us keep improving — your input makes Kiki Warrior better for every family.
+        <p className="font-body text-sm text-charcoal/70">
+          Help us keep improving -- your input makes Kiki Warrior better for every family.
         </p>
       </div>
 
       {/* Yes/No questions */}
       <div className="space-y-3">
         {parentQuestions.map((q) => (
-          <div key={q.key} className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
+          <div key={q.key} className="flex items-center gap-3 rounded-lg bg-peach p-3">
             <span className="text-xl shrink-0">{q.emoji}</span>
-            <p className="font-body text-sm text-foreground flex-1">{q.label}</p>
+            <p className="font-body text-sm text-charcoal flex-1">{q.label}</p>
             <div className="flex gap-2 shrink-0">
-              <button
+              <Button variant="ghost"
                 onClick={() => toggleAnswer(q.key, true)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all ${
                   answers[q.key] === true
                     ? "bg-success text-success-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-success/20"
+                    : "bg-primary/10 text-charcoal/70 hover:bg-success/20"
                 }`}
               >
                 Yes
-              </button>
-              <button
+              </Button>
+              <Button variant="ghost"
                 onClick={() => toggleAnswer(q.key, false)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wide transition-all ${
                   answers[q.key] === false
                     ? "bg-destructive text-destructive-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-destructive/20"
+                    : "bg-primary/10 text-charcoal/70 hover:bg-destructive/20"
                 }`}
               >
                 No
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -145,7 +146,7 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
 
       {/* Star rating */}
       <div className="text-center space-y-2">
-        <p className="font-body text-sm font-medium text-muted-foreground">
+        <p className="font-body text-sm font-medium text-charcoal/70">
           Overall, how would you rate Kiki Warrior?
         </p>
         <StarRating value={rating} onChange={setRating} />
@@ -153,7 +154,7 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
 
       {/* Free-text */}
       <div>
-        <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+        <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">
           Anything else you'd like to share?
         </label>
         <textarea
@@ -162,23 +163,23 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
           placeholder="Your thoughts help us improve..."
           rows={3}
           maxLength={1000}
-          className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors resize-none"
+          className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none transition-colors resize-none"
         />
       </div>
 
-      <button
+      <Button variant="ghost"
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full touch-target btn-copper py-3 text-sm uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
       >
         <Send className="w-4 h-4" />
         {submitting ? "Submitting..." : "Submit Feedback"}
-      </button>
+      </Button>
 
       <div className="text-center">
-        <button onClick={onSkip} className="text-xs font-body text-muted-foreground hover:text-foreground transition-colors">
+        <Button variant="ghost" onClick={onSkip} className="text-xs font-body text-charcoal/70 hover:text-charcoal transition-colors">
           Skip survey
-        </button>
+        </Button>
       </div>
     </motion.div>
   );

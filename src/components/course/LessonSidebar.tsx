@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { CourseIcon } from "./CourseIcons";
 import type { AgeStream } from "@/data/courseData";
@@ -20,11 +21,11 @@ export function LessonSidebar({
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="px-4 pt-4 pb-2 border-b border-border/40">
-        <h3 className="font-display text-sm font-bold text-foreground uppercase tracking-wide">
+      <div className="px-4 pt-4 pb-2 border-b border-primary/15">
+        <h3 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">
           Lessons
         </h3>
-        <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+        <p className="text-[11px] text-charcoal/70 font-body mt-0.5">
           Click a lesson to navigate
         </p>
       </div>
@@ -38,7 +39,7 @@ export function LessonSidebar({
                 <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
                   <CourseIcon name={mod.icon || "shield"} size={14} className="stroke-primary-foreground" />
                 </div>
-                <span className="font-display text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">
+                <span className="font-display text-[10px] font-semibold text-charcoal/70 uppercase tracking-wider break-words">
                   {mod.title}
                 </span>
               </div>
@@ -50,13 +51,13 @@ export function LessonSidebar({
                 const completed = isLessonComplete(lesson.id);
 
                 return (
-                  <button
+                  <Button variant="ghost"
                     key={lesson.id}
                     onClick={() => onSelectLesson(mod.id, lessonIdx)}
                     className={`w-full text-left rounded-lg p-3 transition-all group ${
                       isCurrent
                         ? "bg-primary/15 border border-primary/30"
-                        : "hover:bg-muted/50 border border-transparent"
+                        : "hover:bg-primary/10 border border-transparent"
                     }`}
                   >
                     <div className="flex items-start gap-2.5">
@@ -66,20 +67,20 @@ export function LessonSidebar({
                             ? "bg-primary text-primary-foreground"
                             : completed
                             ? "bg-success/20 text-success"
-                            : "bg-muted text-muted-foreground"
+                            : "bg-primary/10 text-charcoal/70"
                         }`}
                       >
                         {completed ? <CheckCircle className="w-3.5 h-3.5" /> : globalIndex}
                       </span>
                       <div className="flex-1 min-w-0">
                         <p
-                          className={`font-display text-xs font-semibold uppercase tracking-wide truncate ${
-                            isCurrent ? "text-primary" : "text-foreground"
+                          className={`font-display text-xs font-semibold uppercase tracking-wide break-words ${
+                            isCurrent ? "text-primary" : "text-charcoal"
                           }`}
                         >
                           {lesson.title}
                         </p>
-                        <span className="text-[10px] text-muted-foreground/60 font-body">
+                        <span className="text-[10px] text-charcoal/60 font-body">
                           🎬 {lesson.videoDurationMinutes} min · ⏱ ~{lesson.estimatedMinutes} min
                         </span>
                         {isCurrent && (
@@ -89,7 +90,7 @@ export function LessonSidebar({
                         )}
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

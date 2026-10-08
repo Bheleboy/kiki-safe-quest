@@ -1,39 +1,30 @@
+import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Link } from "react-router-dom";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { motion } from "framer-motion";
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen gradient-dark">
+    <PublicPage>
       {/* Header */}
-      <header className="border-b border-border/40 py-4">
-        <div className="max-w-4xl mx-auto px-4 flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full gradient-copper">
-              <ShieldIcon size={16} className="stroke-primary-foreground" />
-            </div>
-            <span className="font-display text-sm text-foreground uppercase tracking-wider font-bold">
-              Kiki Warrior
-            </span>
-          </Link>
-        </div>
-      </header>
+      
 
       <motion.main
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto px-4 py-12"
       >
-        <h1 className="font-display text-3xl font-bold text-foreground uppercase tracking-wide mb-2">
+        <Eyebrow>Trust & privacy</Eyebrow>
+          <h1 className="font-display text-3xl font-bold text-charcoal uppercase tracking-wide mb-2">
           Privacy Policy
         </h1>
-        <p className="font-body text-sm text-muted-foreground mb-10">
+        <p className="font-body text-sm text-charcoal/70 mb-10">
           Last updated: March 2026
         </p>
 
-        <div className="space-y-8 font-body text-sm text-foreground/90 leading-relaxed">
+        <div className="space-y-8 font-body text-sm text-charcoal/70 leading-relaxed">
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               1. Introduction
             </h2>
             <p>
@@ -46,7 +37,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               2. Information We Collect
             </h2>
             <p>We collect the following types of information:</p>
@@ -59,7 +50,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               3. How We Use Your Information
             </h2>
             <ul className="list-disc pl-6 space-y-1.5">
@@ -72,7 +63,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               4. Legal Basis for Processing
             </h2>
             <p>We process personal data based on:</p>
@@ -84,7 +75,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               5. Children's Privacy
             </h2>
             <p>
@@ -97,7 +88,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               6. Data Storage & Security
             </h2>
             <p>
@@ -109,7 +100,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               7. Data Sharing
             </h2>
             <p>
@@ -121,7 +112,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               8. Your Rights
             </h2>
             <p>Under POPIA and GDPR, you have the right to:</p>
@@ -131,24 +122,24 @@ export default function PrivacyPolicy() {
               <li>Request deletion of your data ("right to be forgotten").</li>
               <li>Withdraw consent at any time.</li>
               <li>Object to processing based on legitimate interest.</li>
-              <li>Data portability — receive your data in a structured, machine-readable format.</li>
+              <li>Data portability -- receive your data in a structured, machine-readable format.</li>
               <li>Lodge a complaint with the relevant supervisory authority (Information Regulator in South Africa or your local Data Protection Authority under GDPR).</li>
             </ul>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               9. Data Retention
             </h2>
             <p>
               We retain personal data only for as long as necessary to provide our services or as
-              required by law. When an account is deleted, all associated personal data — including
-              child profiles and progress records — is permanently removed within 30 days.
+              required by law. When an account is deleted, all associated personal data -- including
+              child profiles and progress records -- is permanently removed within 30 days.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               10. Contact Us
             </h2>
             <p>
@@ -161,12 +152,12 @@ export default function PrivacyPolicy() {
           </section>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/40">
+        <div className="mt-12 pt-8 border-t border-primary/15">
           <Link to="/auth?mode=signup" className="font-body text-sm text-primary hover:underline">
             ← Back to Sign Up
           </Link>
         </div>
       </motion.main>
-    </div>
+    </PublicPage>
   );
 }

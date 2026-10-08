@@ -1,3 +1,6 @@
+import { Eyebrow } from "@/components/ui/editorial";
+import { MotionButton } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -118,39 +121,40 @@ export default function ManageChildren() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-dark flex items-center justify-center">
+      <div className="editorial-page min-h-screen bg-cream bg-tech-grid flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen gradient-dark">
-      <header className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
+    <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
+      <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-primary/15 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldIcon size={24} className="stroke-primary" />
-            <span className="font-display font-bold text-sm text-foreground uppercase tracking-wider hidden sm:inline">
-              Kiki Warrior
+            <span className="font-display font-bold text-sm text-charcoal uppercase tracking-wider hidden sm:inline">
+              Kiki<span className="text-primary">Warrior</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate("/parent")} className="text-muted-foreground hover:text-foreground transition-colors p-2" title="Parent Dashboard">
+            <Button variant="ghost" onClick={() => navigate("/parent")} className="text-charcoal/70 hover:text-charcoal transition-colors p-2" title="Parent Dashboard">
               <Users className="w-5 h-5" />
-            </button>
-            <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors p-2">
+            </Button>
+            <Button variant="ghost" onClick={handleLogout} className="text-charcoal/70 hover:text-charcoal transition-colors p-2">
               <LogOut className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display text-3xl font-bold text-foreground uppercase tracking-wide">
+          <Eyebrow>Family hub</Eyebrow>
+          <h1 className="font-display text-3xl font-bold text-charcoal uppercase tracking-wide">
             Welcome, {profile?.first_name || "Parent"}
           </h1>
-          <p className="font-body text-muted-foreground mt-1">
+          <p className="font-body text-charcoal/70 mt-1">
             {children.length === 0
               ? "Add your children to get started with their learning journey."
               : "Choose a learner to start or continue their course."}
@@ -180,36 +184,36 @@ export default function ManageChildren() {
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide truncate">
+                    <h3 className="font-display text-base font-semibold text-charcoal uppercase tracking-wide break-words">
                       {child.first_name}
                     </h3>
                     <span className="font-display text-sm font-bold text-primary shrink-0">
                       {childProgress[child.id] ?? 0}%
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground font-body">
+                  <p className="text-xs text-charcoal/70 font-body">
                     Ages {child.age_band}
                   </p>
-                  <div className="mt-1.5 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="mt-1.5 h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full gradient-copper rounded-full transition-all duration-500"
+                      className="h-full bg-primary rounded-full transition-all duration-500"
                       style={{ width: `${childProgress[child.id] ?? 0}%` }}
                     />
                   </div>
                 </div>
-                <button
+                <Button variant="ghost"
                   onClick={() => removeChild(child.id)}
-                  className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                  className="p-2 text-charcoal/70 hover:text-destructive transition-colors"
                   title="Remove child"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
-                <button
+                </Button>
+                <Button variant="ghost"
                   onClick={() => startCourse(child)}
-                  className="btn-copper px-4 py-2 text-xs uppercase tracking-widest flex items-center gap-1.5"
+                  className="btn-copper adventure-button px-4 py-2 text-xs uppercase tracking-widest flex items-center gap-1.5"
                 >
                   Learn <ArrowRight className="w-3 h-3" />
-                </button>
+                </Button>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -223,11 +227,11 @@ export default function ManageChildren() {
               exit={{ opacity: 0, height: 0 }}
               className="card-kiki space-y-4"
             >
-              <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide">
+              <h3 className="font-display text-base font-semibold text-charcoal uppercase tracking-wide">
                 Add a Child
               </h3>
               <div>
-                <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+                <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">
                   Child's First Name
                 </label>
                 <input
@@ -235,51 +239,51 @@ export default function ManageChildren() {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Enter name"
-                  className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors"
+                  className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors"
                 />
               </div>
               <div>
-                <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+                <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">
                   Age Band
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {(["6-9", "10-13"] as const).map((band) => (
-                    <button
+                    <Button variant="ghost"
                       key={band}
                       type="button"
                       onClick={() => setNewAge(band)}
                       className={`rounded-lg border-2 px-4 py-3 font-display font-semibold text-sm tracking-wide transition-all ${
                         newAge === band
                           ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-muted text-muted-foreground hover:border-primary/50"
+                          : "border-primary/20 bg-primary/10 text-charcoal/70 hover:border-primary/50"
                       }`}
                     >
                       AGES {band}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
               <div className="flex gap-3">
-                <button
+                <Button variant="ghost"
                   onClick={() => setShowAdd(false)}
-                  className="flex-1 rounded-xl border border-border py-3 font-display text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex-1 rounded-xl border border-primary/20 py-3 font-display text-sm uppercase tracking-widest text-charcoal/70 hover:text-charcoal transition-colors"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button variant="ghost"
                   onClick={addChild}
                   disabled={submitting || !newName.trim()}
-                  className="flex-1 btn-copper py-3 text-sm uppercase tracking-widest disabled:opacity-50"
+                  className="flex-1 btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50"
                 >
                   {submitting ? "..." : "Add Child"}
-                </button>
+                </Button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {!showAdd && (
-          <motion.button
+          <MotionButton variant="ghost"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             onClick={() => setShowAdd(true)}
@@ -287,14 +291,14 @@ export default function ManageChildren() {
           >
             <Plus className="w-5 h-5" />
             <span className="font-display text-sm uppercase tracking-widest">Add Child</span>
-          </motion.button>
+          </MotionButton>
         )}
 
         {bookPurchases.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mt-8">
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-primary" />
-              <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">My Books</h2>
+              <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">My Books</h2>
             </div>
             <div className="grid gap-3">
               {Array.from(new Set(bookPurchases.map((p) => p.book_id))).map((bookId) => {
@@ -307,8 +311,8 @@ export default function ManageChildren() {
                         <BookOpen className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-display text-sm font-bold text-foreground uppercase tracking-wide truncate">{title}</h3>
-                        <p className="text-xs text-muted-foreground font-body">
+                        <h3 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide break-words">{title}</h3>
+                        <p className="text-xs text-charcoal/70 font-body">
                           Purchased from {purchases.length} store{purchases.length > 1 ? "s" : ""}
                         </p>
                       </div>
@@ -326,7 +330,7 @@ export default function ManageChildren() {
                           href={p.store_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted border border-border text-xs font-display uppercase tracking-wide text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs font-display uppercase tracking-wide text-charcoal/70 hover:text-charcoal hover:border-primary/40 transition-colors"
                         >
                           {p.store_name}
                           <ExternalLink className="w-3 h-3" />

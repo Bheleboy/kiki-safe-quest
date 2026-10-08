@@ -1,3 +1,4 @@
+import { MotionButton } from "@/components/ui/editorial";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
@@ -47,7 +48,7 @@ export function ArmourUnlockModal({ pieceId, totalEarned, onClose }: ArmourUnloc
             exit={{ scale: 0.5, y: 50 }}
             transition={{ type: "spring", damping: 15, stiffness: 150 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative bg-card rounded-2xl border border-primary/30 p-8 max-w-sm w-full text-center space-y-5 shadow-2xl"
+            className="relative bg-card rounded-2xl border border-primary/30 p-8 max-w-sm w-full text-center space-y-5 shadow-none"
           >
             {/* Glow background */}
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
@@ -59,7 +60,7 @@ export function ArmourUnlockModal({ pieceId, totalEarned, onClose }: ArmourUnloc
               transition={{ type: "spring", delay: 0.2, damping: 10 }}
               className="relative z-10"
             >
-              <div className="mx-auto w-24 h-24 rounded-full gradient-copper flex items-center justify-center pulse-glow">
+              <div className="mx-auto w-24 h-24 rounded-full bg-primary flex items-center justify-center pulse-glow">
                 <ArmourPieceIcon pieceId={piece.id} earned size={56} className="text-primary-foreground drop-shadow-none" />
               </div>
             </motion.div>
@@ -74,14 +75,14 @@ export function ArmourUnlockModal({ pieceId, totalEarned, onClose }: ArmourUnloc
               <p className="font-display text-sm text-primary uppercase tracking-widest font-medium">
                 Armour Unlocked!
               </p>
-              <h2 className="font-display text-2xl font-bold text-foreground uppercase tracking-wide">
+              <h2 className="font-display text-2xl font-bold text-charcoal uppercase tracking-wide">
                 {piece.name}
               </h2>
-              <p className="font-body text-sm text-muted-foreground">
+              <p className="font-body text-sm text-charcoal/70">
                 {piece.description}
               </p>
-              <p className="font-body text-xs text-muted-foreground italic">
-                — {piece.verse}
+              <p className="font-body text-xs text-charcoal/70 italic">
+                -- {piece.verse}
               </p>
             </motion.div>
 
@@ -102,21 +103,21 @@ export function ArmourUnlockModal({ pieceId, totalEarned, onClose }: ArmourUnloc
                   />
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground font-body mt-2">
+              <p className="text-xs text-charcoal/70 font-body mt-2">
                 {totalEarned}/6 pieces of the Armour of God
               </p>
             </motion.div>
 
             {/* Close button */}
-            <motion.button
+            <MotionButton variant="ghost"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
               onClick={onClose}
-              className="relative z-10 btn-copper px-8 py-3 text-sm uppercase tracking-widest"
+              className="relative z-10 btn-copper adventure-button px-8 py-3 text-sm uppercase tracking-widest"
             >
               Continue
-            </motion.button>
+            </MotionButton>
           </motion.div>
         </motion.div>
       )}

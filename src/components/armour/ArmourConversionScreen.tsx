@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArmourPieceIcon } from "./ArmourPieceIcon";
 import { KikiWarriorAvatar } from "./KikiWarriorAvatar";
@@ -26,7 +27,7 @@ export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConv
         <p className="font-display text-sm text-primary uppercase tracking-widest font-medium">
           Congratulations, {learnerName}!
         </p>
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           Full Armour of God Earned!
         </h3>
       </div>
@@ -37,21 +38,21 @@ export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConv
           {ONLINE_SAFETY_PIECES.map((piece) => (
             <div key={piece.id} className="text-center space-y-1">
               <ArmourPieceIcon pieceId={piece.id} earned size={40} />
-              <p className="font-display text-[10px] uppercase tracking-wide text-foreground font-medium">
+              <p className="font-display text-[10px] uppercase tracking-wide text-charcoal font-medium">
                 {piece.name}
               </p>
             </div>
           ))}
         </div>
-        <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
-          {learnerName} has collected all 6 pieces of the Armour of God — a true Kiki Warrior!
+        <p className="font-body text-sm text-charcoal/70 max-w-md mx-auto">
+          {learnerName} has collected all 6 pieces of the Armour of God -- a true Kiki Warrior!
         </p>
       </div>
 
       {/* CTA */}
-      <button className="w-full btn-copper py-4 text-sm uppercase tracking-widest flex items-center justify-center gap-2">
+      <Button variant="ghost" className="w-full btn-copper adventure-button py-4 text-sm uppercase tracking-widest flex items-center justify-center gap-2">
         Continue the Journey <ArrowRight className="w-4 h-4" />
-      </button>
+      </Button>
     </motion.div>
   );
 }

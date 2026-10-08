@@ -24,7 +24,7 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
             size={28}
           />
         ))}
-        <span className="text-xs font-display font-medium text-muted-foreground ml-1">
+        <span className="text-xs font-display font-medium text-charcoal/70 ml-1">
           {totalEarned}/6
         </span>
       </div>
@@ -35,10 +35,10 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h3 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
+        <h3 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
           Armour of God
         </h3>
-        <p className="text-sm text-muted-foreground font-body mt-1">
+        <p className="text-sm text-charcoal/70 font-body mt-1">
           {totalEarned}/6 pieces collected
         </p>
         <div className="mt-3 max-w-xs mx-auto">
@@ -46,9 +46,9 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
         </div>
       </div>
 
-      {/* All 6 pieces — earnable in the Online Safety Course */}
+      {/* All 6 pieces -- earnable in the Online Safety Course */}
       <div>
-        <p className="text-xs font-display font-medium text-muted-foreground uppercase tracking-wide mb-3">
+        <p className="text-xs font-display font-medium text-charcoal/70 uppercase tracking-wide mb-3">
           Online Safety Course
         </p>
         <div className="grid grid-cols-3 gap-3">
@@ -77,7 +77,7 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
                   <ArmourPieceIcon pieceId={piece.id} earned={earned} size={44} />
                 </div>
                 <p className={`font-display text-xs font-semibold uppercase tracking-wide ${
-                  earned ? "text-foreground" : "text-muted-foreground/50"
+                  earned ? "text-charcoal" : "text-charcoal/60"
                 }`}>
                   {piece.name}
                 </p>

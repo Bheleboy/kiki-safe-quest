@@ -1,3 +1,4 @@
+import { MotionButton } from "@/components/ui/editorial";
 import { motion } from "framer-motion";
 import { ProgressBar } from "./ProgressBar";
 import { CourseIcon } from "./CourseIcons";
@@ -19,7 +20,7 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
   const isComplete = progress === 1;
 
   return (
-    <motion.button
+    <MotionButton variant="ghost"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
@@ -32,12 +33,12 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">
+            <h3 className="font-display text-sm font-semibold text-charcoal uppercase tracking-wide break-words">
               {module.title}
             </h3>
             {isComplete && <CheckCircle className="w-4 h-4 text-success shrink-0" />}
           </div>
-          <p className="text-xs text-muted-foreground font-body mt-1">
+          <p className="text-xs text-charcoal/70 font-body mt-1">
             {module.lessons.length} lesson{module.lessons.length !== 1 ? "s" : ""}
             <span className="mx-1">·</span>
             <span className="text-primary/70">
@@ -45,7 +46,7 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
             </span>
           </p>
 
-          {/* Armour piece indicators — a module can unlock 1-2 pieces */}
+          {/* Armour piece indicators -- a module can unlock 1-2 pieces */}
           {armourPieces.length > 0 && (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
               {armourPieces.map((armourPiece) => {
@@ -54,7 +55,7 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
                   <div key={armourPiece.id} className="flex items-center gap-1.5">
                     <ArmourPieceIcon pieceId={armourPiece.id} earned={earned} size={16} />
                     <span className={`font-display text-[10px] uppercase tracking-wide font-medium ${
-                      earned ? "text-primary" : "text-muted-foreground/60"
+                      earned ? "text-primary" : "text-charcoal/60"
                     }`}>
                       {earned ? `${armourPiece.name} ✓` : `Unlocks ${armourPiece.name}`}
                     </span>
@@ -69,6 +70,6 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
           </div>
         </div>
       </div>
-    </motion.button>
+    </MotionButton>
   );
 }

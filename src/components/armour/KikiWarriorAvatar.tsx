@@ -70,7 +70,7 @@ export function KikiWarriorAvatar({
       : isFullArmour
       ? "Full Armour of God!"
       : safetyComplete
-      ? `${earnedCount}/6 Pieces — Keep Going!`
+      ? `${earnedCount}/6 Pieces -- Keep Going!`
       : `${earnedCount}/6 Pieces Earned`;
 
   return (
@@ -99,7 +99,7 @@ export function KikiWarriorAvatar({
             <img
               src={currentImage}
               alt={`Kiki Warrior with ${earnedCount} armour pieces`}
-              className={`w-full h-full object-contain drop-shadow-lg ${
+              className={`w-full h-full object-contain drop-shadow-none ${
                 isFullArmour ? "drop-shadow-[0_0_15px_hsl(25_85%_55%/0.4)]" : ""
               }`}
             />
@@ -134,7 +134,7 @@ export function KikiWarriorAvatar({
             animate={{ scale: 1 }}
             className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full font-display text-xs font-bold uppercase tracking-wider ${
               isFullArmour
-                ? "gradient-copper text-primary-foreground"
+                ? "bg-primary text-primary-foreground"
                 : "bg-primary/10 text-primary border border-primary/30"
             }`}
           >
@@ -148,7 +148,7 @@ export function KikiWarriorAvatar({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className={`font-display text-xs uppercase tracking-widest text-center font-medium ${
-            isFullArmour ? "text-primary" : "text-muted-foreground"
+            isFullArmour ? "text-primary" : "text-charcoal/70"
           }`}
         >
           {label}

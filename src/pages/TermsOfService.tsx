@@ -1,39 +1,30 @@
+import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Link } from "react-router-dom";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { motion } from "framer-motion";
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen gradient-dark">
+    <PublicPage>
       {/* Header */}
-      <header className="border-b border-border/40 py-4">
-        <div className="max-w-4xl mx-auto px-4 flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full gradient-copper">
-              <ShieldIcon size={16} className="stroke-primary-foreground" />
-            </div>
-            <span className="font-display text-sm text-foreground uppercase tracking-wider font-bold">
-              Kiki Warrior
-            </span>
-          </Link>
-        </div>
-      </header>
+      
 
       <motion.main
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto px-4 py-12"
       >
-        <h1 className="font-display text-3xl font-bold text-foreground uppercase tracking-wide mb-2">
+        <Eyebrow>Our commitment</Eyebrow>
+          <h1 className="font-display text-3xl font-bold text-charcoal uppercase tracking-wide mb-2">
           Terms of Service
         </h1>
-        <p className="font-body text-sm text-muted-foreground mb-10">
+        <p className="font-body text-sm text-charcoal/70 mb-10">
           Last updated: March 2026
         </p>
 
-        <div className="space-y-8 font-body text-sm text-foreground/90 leading-relaxed">
+        <div className="space-y-8 font-body text-sm text-charcoal/70 leading-relaxed">
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               1. Acceptance of Terms
             </h2>
             <p>
@@ -46,7 +37,7 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               2. Eligibility & Parent/Guardian Responsibility
             </h2>
             <p>
@@ -63,7 +54,7 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               3. Account Security
             </h2>
             <p>
@@ -75,7 +66,7 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               4. Use of the Platform
             </h2>
             <p>Kiki Warrior is an educational platform designed to teach internet safety to children. You agree to:</p>
@@ -88,19 +79,19 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               5. Content & Intellectual Property
             </h2>
             <p>
-              All content on the Kiki Warrior platform — including courses, illustrations, characters,
-              text, and interactive elements — is the intellectual property of Kiki Warrior and is
+              All content on the Kiki Warrior platform -- including courses, illustrations, characters,
+              text, and interactive elements -- is the intellectual property of Kiki Warrior and is
               protected by copyright law. You may not reproduce, distribute, or create derivative
               works from our content without prior written consent.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               6. Child Safety Commitment
             </h2>
             <p>
@@ -112,7 +103,7 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               7. Limitation of Liability
             </h2>
             <p>
@@ -125,7 +116,7 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               8. Modifications to Terms
             </h2>
             <p>
@@ -136,19 +127,19 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               9. Termination
             </h2>
             <p>
-              You may delete your account at any time. Upon account deletion, all personal data —
-              including child profiles, progress, and badges — will be permanently removed in
+              You may delete your account at any time. Upon account deletion, all personal data --
+              including child profiles, progress, and badges -- will be permanently removed in
               accordance with our Privacy Policy. We reserve the right to terminate accounts that
               violate these terms.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold text-foreground uppercase tracking-wider">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               10. Contact Us
             </h2>
             <p>
@@ -160,12 +151,12 @@ export default function TermsOfService() {
           </section>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/40">
+        <div className="mt-12 pt-8 border-t border-primary/15">
           <Link to="/auth?mode=signup" className="font-body text-sm text-primary hover:underline">
             ← Back to Sign Up
           </Link>
         </div>
       </motion.main>
-    </div>
+    </PublicPage>
   );
 }

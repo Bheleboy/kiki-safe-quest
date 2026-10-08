@@ -1,3 +1,5 @@
+import { Eyebrow, PublicPage } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -73,32 +75,33 @@ export default function AgeVerification() {
   };
 
   return (
-    <div className="min-h-screen gradient-dark flex items-center justify-center px-4 py-12">
+    <PublicPage><main className="editorial-focus mx-auto flex w-full flex-col items-center justify-center px-4 py-12 sm:py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-copper mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-4">
             <ShieldIcon size={32} className="stroke-primary-foreground" />
           </div>
-          <h1 className="font-display text-3xl font-bold tracking-wide text-foreground uppercase">
+          <Eyebrow>Family safety</Eyebrow>
+          <h1 className="font-display text-3xl font-bold tracking-wide text-charcoal uppercase">
             Age Verification
           </h1>
-          <p className="font-body text-muted-foreground text-sm mt-1">
+          <p className="font-body text-charcoal/70 text-sm mt-1">
             We need to verify you are an adult before continuing
           </p>
         </div>
 
         <div className="card-kiki">
-          <h2 className="font-display text-xl font-semibold text-foreground uppercase tracking-wider mb-6 text-center">
+          <h2 className="font-display text-xl font-semibold text-charcoal uppercase tracking-wider mb-6 text-center">
             Confirm Your Identity
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="font-body text-sm font-medium text-muted-foreground block mb-1.5">
+              <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">
                 Date of Birth
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -109,7 +112,7 @@ export default function AgeVerification() {
                   placeholder="DD"
                   min="1"
                   max="31"
-                  className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors text-center"
+                  className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors text-center"
                 />
                 <input
                   type="number"
@@ -118,7 +121,7 @@ export default function AgeVerification() {
                   placeholder="MM"
                   min="1"
                   max="12"
-                  className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors text-center"
+                  className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors text-center"
                 />
                 <input
                   type="number"
@@ -127,7 +130,7 @@ export default function AgeVerification() {
                   placeholder="YYYY"
                   min="1900"
                   max={new Date().getFullYear()}
-                  className="w-full rounded-lg border border-border bg-muted px-4 py-3 font-body text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors text-center"
+                  className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors text-center"
                 />
               </div>
             </div>
@@ -138,9 +141,9 @@ export default function AgeVerification() {
                   type="checkbox"
                   checked={guardianConsent}
                   onChange={(e) => setGuardianConsent(e.target.checked)}
-                  className="mt-1 w-4 h-4 shrink-0 rounded border-border accent-primary"
+                  className="mt-1 w-4 h-4 shrink-0 rounded border-primary/20 accent-primary"
                 />
-                <span className="font-body text-xs text-muted-foreground leading-relaxed">
+                <span className="font-body text-xs text-charcoal/70 leading-relaxed">
                   I confirm that I am the parent or legal guardian of the minor(s) for whom I am creating sub-accounts. I understand that I am solely responsible for overseeing their use of this platform, including all content accessed and data shared. I accept full responsibility for the safety and conduct of the minors under my care while using this service.
                 </span>
               </label>
@@ -149,9 +152,9 @@ export default function AgeVerification() {
                   type="checkbox"
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-1 w-4 h-4 shrink-0 rounded border-border accent-primary"
+                  className="mt-1 w-4 h-4 shrink-0 rounded border-primary/20 accent-primary"
                 />
-                <span className="font-body text-xs text-muted-foreground leading-relaxed">
+                <span className="font-body text-xs text-charcoal/70 leading-relaxed">
                   I agree to the collection and processing of personal data (including that of the minors in my care) in accordance with the{" "}
                   <Link to="/privacy" target="_blank" className="text-primary hover:underline font-semibold">
                     Privacy Policy
@@ -178,25 +181,25 @@ export default function AgeVerification() {
               </p>
             )}
 
-            <button
+            <Button variant="ghost"
               type="submit"
               disabled={submitting}
-              className="w-full touch-target btn-copper py-3 text-sm uppercase tracking-widest disabled:opacity-50"
+              className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50"
             >
               {submitting ? "..." : "Verify & Continue"}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-6 text-center">
-            <button
+            <Button variant="ghost"
               onClick={() => signOut()}
-              className="text-sm font-body text-muted-foreground hover:text-primary hover:underline"
+              className="text-sm font-body text-charcoal/70 hover:text-primary hover:underline"
             >
               Sign out
-            </button>
+            </Button>
           </div>
         </div>
       </motion.div>
-    </div>
+    </main></PublicPage>
   );
 }

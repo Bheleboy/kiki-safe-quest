@@ -1,3 +1,5 @@
+import { Eyebrow, PublicPage } from "@/components/ui/editorial";
+import { Button } from "@/components/ui/button";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck, PlayCircle, Hourglass } from "lucide-react";
@@ -14,14 +16,15 @@ export default function CoursePreview() {
 
   if (courseId !== "internet-safety") {
     return (
-      <div className="min-h-screen gradient-dark flex items-center justify-center px-4">
+      <PublicPage>
         <div className="text-center space-y-4">
-          <h1 className="font-display text-2xl font-bold text-foreground uppercase">Course Not Found</h1>
-          <Link to="/" className="btn-copper inline-flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-widest">
+          <Eyebrow>Free course</Eyebrow>
+          <h1 className="font-display text-2xl font-bold text-charcoal uppercase">Course Not Found</h1>
+          <Link to="/" className="btn-copper adventure-button inline-flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-widest">
             Back Home
           </Link>
         </div>
-      </div>
+      </PublicPage>
     );
   }
 
@@ -57,24 +60,14 @@ export default function CoursePreview() {
   ];
 
   return (
-    <div className="min-h-screen gradient-dark">
+    <PublicPage>
       {/* Nav */}
-      <nav className="sticky top-0 z-50 glass-overlay border-b border-border/40 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <button onClick={() => navigate("/")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-body text-sm">Back</span>
-          </button>
-          <Link to="/auth?mode=signup" className="btn-copper px-5 py-2 text-xs uppercase tracking-widest font-display">
-            Start Free Course
-          </Link>
-        </div>
-      </nav>
+      
 
       <main className="max-w-4xl mx-auto px-4 py-10 space-y-12">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row gap-8 items-start">
-          <div className="w-20 h-20 rounded-2xl gradient-copper flex items-center justify-center shrink-0">
+          <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center shrink-0">
             <ShieldIcon size={40} className="stroke-primary-foreground" />
           </div>
           <div className="space-y-4">
@@ -82,14 +75,15 @@ export default function CoursePreview() {
               <span className="bg-primary/10 text-primary font-display text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">Featured Course</span>
               <span className="bg-success/10 text-success font-display text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">Free</span>
             </div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider">
+            <Eyebrow>Free course</Eyebrow>
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-charcoal uppercase tracking-wider">
               Internet Safety for Kids
             </h1>
-            <p className="font-body text-lg text-muted-foreground leading-relaxed max-w-2xl">
+            <p className="font-body text-lg text-charcoal/70 leading-relaxed max-w-2xl">
               A comprehensive, fun-filled course teaching children aged 6–13 how to stay safe, smart, and strong online.
               Through animated lessons, interactive quizzes, and the Armour of God reward system, young warriors earn heroic armour pieces as they learn essential digital safety skills.
             </p>
-            <div className="flex flex-wrap gap-6 text-sm font-body text-muted-foreground">
+            <div className="flex flex-wrap gap-6 text-sm font-body text-charcoal/70">
               <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-primary" /> {totalLessons} lessons</span>
               <span className="flex items-center gap-1.5"><PlayCircle className="w-4 h-4 text-secondary" /> {formatTime(totalVideoMinutes)} video</span>
               <span className="flex items-center gap-1.5"><Hourglass className="w-4 h-4 text-accent" /> {formatTime(totalEstimatedMinutes)} total</span>
@@ -102,34 +96,34 @@ export default function CoursePreview() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-kiki border-secondary/30 bg-gradient-to-b from-secondary/5 to-card">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5 text-secondary-foreground" />
+              <Clock className="w-5 h-5 text-trust" />
             </div>
             <div>
-              <h2 className="font-display text-base font-bold text-foreground uppercase tracking-wide">Course Time Breakdown</h2>
-              <p className="font-body text-xs text-muted-foreground">Plan your child's learning journey</p>
+              <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Course Time Breakdown</h2>
+              <p className="font-body text-xs text-charcoal/70">Plan your child's learning journey</p>
             </div>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
+            <div className="bg-primary/10 rounded-lg p-3 text-center">
               <p className="font-display text-2xl font-bold text-primary">{totalLessons}</p>
-              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Lessons</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-charcoal/70">Lessons</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
+            <div className="bg-primary/10 rounded-lg p-3 text-center">
               <p className="font-display text-2xl font-bold text-secondary">{formatTime(totalVideoMinutes)}</p>
-              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Video Watch Time</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-charcoal/70">Video Watch Time</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
+            <div className="bg-primary/10 rounded-lg p-3 text-center">
               <p className="font-display text-2xl font-bold text-accent">{formatTime(totalEstimatedMinutes)}</p>
-              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Total Completion Time</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-charcoal/70">Total Completion Time</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
+            <div className="bg-primary/10 rounded-lg p-3 text-center">
               <p className="font-display text-2xl font-bold text-coral">~{Math.ceil(totalEstimatedMinutes / 10)}</p>
-              <p className="font-body text-[10px] uppercase tracking-wider text-muted-foreground">Sessions (10 min each)</p>
+              <p className="font-body text-[10px] uppercase tracking-wider text-charcoal/70">Sessions (10 min each)</p>
             </div>
           </div>
           
-          <p className="font-body text-xs text-muted-foreground mt-4 text-center">
+          <p className="font-body text-xs text-charcoal/70 mt-4 text-center">
             Total completion time includes video watching, quizzes, and activities. Your child can complete this in short daily sessions or all at once!
           </p>
         </motion.div>
@@ -138,31 +132,31 @@ export default function CoursePreview() {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki border-primary/30 bg-gradient-to-b from-primary/5 to-card space-y-5">
           <div className="text-center space-y-2">
             <span className="font-display text-xs uppercase tracking-[0.3em] text-primary">Reward System</span>
-            <h2 className="font-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-wide">
+            <h2 className="font-display text-xl md:text-2xl font-bold text-charcoal uppercase tracking-wide">
               Earn the Armour of God
             </h2>
-            <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
-              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God — a set of six collectible rewards inspired by Ephesians 6. This free course awards all 6 pieces!
+            <p className="font-body text-sm text-charcoal/70 max-w-lg mx-auto">
+              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God -- a set of six collectible rewards inspired by Ephesians 6. This free course awards all 6 pieces!
             </p>
           </div>
 
           {/* Kiki Warrior preview */}
           <div className="flex flex-col items-center">
             <KikiWarriorAvatar earnedPieces={[]} size="lg" showLabel={false} />
-            <p className="font-body text-xs text-muted-foreground mt-2 italic">Your warrior starts here — earn armour as you learn!</p>
+            <p className="font-body text-xs text-charcoal/70 mt-2 italic">Your warrior starts here -- earn armour as you learn!</p>
           </div>
 
           {/* Free course pieces */}
           <div>
-            <p className="font-display text-[10px] uppercase tracking-widest text-muted-foreground text-center mb-3">This Course Awards</p>
+            <p className="font-display text-[10px] uppercase tracking-widest text-charcoal/70 text-center mb-3">This Course Awards</p>
             <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto">
               {ONLINE_SAFETY_PIECES.map((piece) => (
                 <div key={piece.id} className="text-center space-y-2">
                   <div className="mx-auto">
                     <ArmourPieceIcon pieceId={piece.id} earned size={44} />
                   </div>
-                  <p className="font-display text-[10px] uppercase tracking-wide text-foreground font-semibold">{piece.name}</p>
-                  <p className="font-body text-[9px] text-muted-foreground italic">{piece.verse}</p>
+                  <p className="font-display text-[10px] uppercase tracking-wide text-charcoal font-semibold">{piece.name}</p>
+                  <p className="font-body text-[9px] text-charcoal/70 italic">{piece.verse}</p>
                 </div>
               ))}
             </div>
@@ -171,8 +165,8 @@ export default function CoursePreview() {
 
         {/* Intro Video */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide mb-1">Meet Kiki the Warrior</h2>
-          <div className="w-full rounded-xl overflow-hidden bg-muted aspect-video border border-border/40">
+          <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide mb-1">Meet Kiki the Warrior</h2>
+          <div className="w-full rounded-xl overflow-hidden bg-primary/10 aspect-video border border-primary/15">
             <video
               className="w-full h-full object-cover"
               controls
@@ -184,19 +178,19 @@ export default function CoursePreview() {
               Your browser does not support the video tag.
             </video>
           </div>
-          <p className="text-[11px] font-body text-muted-foreground/70 px-1">
+          <p className="text-[11px] font-body text-charcoal/70 px-1">
             🎬 Kiki Safe Quest · Introduction Video
           </p>
         </motion.div>
 
         {/* What's Included */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-4">
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">What's Included</h2>
+          <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">What's Included</h2>
           <div className="grid md:grid-cols-2 gap-3">
             {highlights.map((h) => (
               <div key={h} className="flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-success shrink-0 mt-0.5" />
-                <span className="font-body text-sm text-foreground">{h}</span>
+                <span className="font-body text-sm text-charcoal">{h}</span>
               </div>
             ))}
           </div>
@@ -206,8 +200,8 @@ export default function CoursePreview() {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki flex items-start gap-4">
           <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
           <div>
-            <h3 className="font-display text-base font-bold text-foreground uppercase tracking-wide mb-1">70% Pass Requirement</h3>
-            <p className="font-body text-sm text-muted-foreground">Your child must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
+            <h3 className="font-display text-base font-bold text-charcoal uppercase tracking-wide mb-1">70% Pass Requirement</h3>
+            <p className="font-body text-sm text-charcoal/70">Your child must achieve a minimum score of 70% on each quiz to unlock the next lesson and progress toward earning their armour pieces.</p>
           </div>
         </motion.div>
 
@@ -219,10 +213,10 @@ export default function CoursePreview() {
           return (
             <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">
-                  {stream!.label} — {stream!.description}
+                <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
+                  {stream!.label} -- {stream!.description}
                 </h2>
-                <div className="flex items-center gap-3 text-xs font-body text-muted-foreground">
+                <div className="flex items-center gap-3 text-xs font-body text-charcoal/70">
                   <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> {formatTime(streamVideoMinutes)} video</span>
                   <span className="flex items-center gap-1"><Hourglass className="w-3.5 h-3.5" /> {formatTime(streamEstimatedMinutes)} total</span>
                 </div>
@@ -238,8 +232,8 @@ export default function CoursePreview() {
                         <CourseIcon name={mod.icon || "shield"} size={20} className="stroke-primary-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wide truncate">{mod.title}</h3>
-                        <p className="text-xs text-muted-foreground font-body">
+                        <h3 className="font-display text-sm font-semibold text-charcoal uppercase tracking-wide break-words">{mod.title}</h3>
+                        <p className="text-xs text-charcoal/70 font-body">
                           {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
                           <span className="mx-1">·</span>
                           <span className="flex items-center gap-1 inline-flex"><PlayCircle className="w-3 h-3" /> {formatTime(modVideoMinutes)}</span>
@@ -262,21 +256,21 @@ export default function CoursePreview() {
               <ArmourPieceIcon key={piece.id} pieceId={piece.id} earned size={36} />
             ))}
           </div>
-          <h2 className="font-display text-xl font-bold text-foreground uppercase tracking-wide">Earn Your Armour</h2>
-          <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
-            Complete each module and pass the quizzes to earn all six pieces — the Belt of Truth, Shield of Faith, Helmet of Salvation, Breastplate of Righteousness, Sword of the Spirit, and Shoes of Peace!
+          <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">Earn Your Armour</h2>
+          <p className="font-body text-sm text-charcoal/70 max-w-md mx-auto">
+            Complete each module and pass the quizzes to earn all six pieces -- the Belt of Truth, Shield of Faith, Helmet of Salvation, Breastplate of Righteousness, Sword of the Spirit, and Shoes of Peace!
           </p>
         </motion.div>
 
         {/* CTA */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center space-y-4 py-8">
-          <h2 className="font-display text-2xl font-bold text-foreground uppercase tracking-wider">Ready to Start?</h2>
-          <p className="font-body text-muted-foreground">Create a free parent account and begin your child's Armour of God journey today.</p>
-          <Link to="/auth?mode=signup" className="touch-target inline-flex items-center gap-2 btn-copper px-10 py-4 text-sm uppercase tracking-widest">
+          <h2 className="font-display text-2xl font-bold text-charcoal uppercase tracking-wider">Ready to Start?</h2>
+          <p className="font-body text-charcoal/70">Create a free parent account and begin your child's Armour of God journey today.</p>
+          <Link to="/auth?mode=signup" className="touch-target inline-flex items-center gap-2 btn-copper adventure-button px-10 py-4 text-sm uppercase tracking-widest">
             Start Free Course <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
       </main>
-    </div>
+    </PublicPage>
   );
 }
