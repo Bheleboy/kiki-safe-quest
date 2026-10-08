@@ -255,7 +255,7 @@ export default function HeroSection() {
         <motion.div
           {...fade(0.3, 0, 30)}
           aria-hidden
-          className={`${wordBase} hidden lg:block absolute bottom-[-1%] left-0 right-0 text-center z-0 text-[#E6DBCC] text-[clamp(7rem,17vw,17rem)]`}
+          className={`${wordBase} hidden lg:block absolute bottom-[2.5%] left-0 right-0 text-center z-[25] hero-warrior-3d text-[clamp(6rem,10vw,9.5rem)] pointer-events-none`}
         >
           WARRIOR
         </motion.div>
@@ -265,7 +265,7 @@ export default function HeroSection() {
           <motion.div
             {...fade(0.3, 0, 30)}
             aria-hidden
-            className={`${wordBase} lg:hidden absolute bottom-[4%] left-1/2 w-screen -ml-[50vw] text-center whitespace-nowrap text-[21vw] text-[#E6DBCC] z-0`}
+            className={`${wordBase} lg:hidden absolute bottom-[4%] left-1/2 w-screen -ml-[50vw] text-center whitespace-nowrap text-[21vw] sm:text-[16vw] hero-warrior-3d z-20 pointer-events-none`}
           >
             WARRIOR
           </motion.div>
