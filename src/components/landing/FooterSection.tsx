@@ -21,7 +21,7 @@ export default function FooterSection() {
               <p className="font-display text-xs uppercase tracking-[0.25em] text-primary">{c.h}</p>
               <ul className="mt-4 space-y-1">
                 {c.links.map(([l, href, anchor]) => (
-                  <li key={l}>{anchor ? (<a href={href} className="inline-flex items-center min-h-11 py-1.5 font-body text-sm text-charcoal/75 hover:text-charcoal">{l}</a>) : (<Link to={href} className="inline-flex items-center min-h-11 py-1.5 font-body text-sm text-charcoal/75 hover:text-charcoal">{l}</Link>)}</li>
+                  <li key={l}>{anchor ? (<a href={href} className="inline-flex items-center min-h-11 min-w-11 py-1.5 font-body text-sm text-charcoal/75 hover:text-charcoal">{l}</a>) : (<Link to={href} className="inline-flex items-center min-h-11 min-w-11 py-1.5 font-body text-sm text-charcoal/75 hover:text-charcoal">{l}</Link>)}</li>
                 ))}
               </ul>
             </div>

@@ -37,10 +37,10 @@ export function AgePaths() {
         <h3 className="relative z-10 font-display font-bold uppercase text-3xl leading-tight max-w-[60%] mt-5">{path.title}</h3>
         <p className={`${body} relative z-10 max-w-[55%] mt-3`}>{path.note}</p>
         <ul className="relative z-10 max-w-[55%] mt-5 space-y-2">
-          {courseData.find((stream) => stream.id === path.id)?.modules.map((module) => <li key={module.id} className="flex gap-2 font-body text-xs text-charcoal/75 leading-relaxed"><CheckCircle2 aria-hidden className="w-4 h-4 text-primary shrink-0 mt-0.5" /><span>{module.title.replace(/[–—]/g, "-")}</span></li>)}
+          {courseData.find((stream) => stream.id === path.id)?.modules.map((module) => <li key={module.id} className="flex gap-2 font-body text-xs text-charcoal/75 leading-relaxed"><CheckCircle2 aria-hidden className="w-4 h-4 text-primary shrink-0 mt-0.5" /><span>{module.title.replace(/[\u2013\u2014]/g, "-")}</span></li>)}
         </ul>
         <div className="relative z-10 mt-auto pt-6 max-w-[55%]"><span className="block font-display text-4xl font-bold">{lessonCount(path.id)}</span><span className="font-body text-xs text-charcoal/60">video quests</span></div>
-        <img src={path.image} alt={path.alt} loading="lazy" className="absolute right-0 bottom-0 h-[85%] max-w-[48%] max-[399px]:max-w-[42%] max-[399px]:opacity-90 object-contain object-bottom motion-safe:transition-transform motion-safe:group-hover:-translate-y-1" />
+        <img src={path.image} alt={path.alt} loading="lazy" className="absolute right-0 bottom-0 h-[85%] max-w-[42%] xl:max-w-[48%] max-[399px]:opacity-90 object-contain object-bottom motion-safe:transition-transform motion-safe:group-hover:-translate-y-1" />
       </Link>)}
     </div>
   </div></RevealSection>;
@@ -55,7 +55,7 @@ export function Missions() {
     </div><ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
       {modules.map((module, i) => <li key={module.id} className="rounded-2xl border border-primary/20 bg-card p-5 flex flex-col min-h-[9.5rem]">
         <div className="flex items-center justify-between gap-2"><span className="font-display text-xs uppercase tracking-widest text-primary">Mission {String(i + 1).padStart(2, "0")}</span><span className="font-body text-[10px] text-charcoal/60">{module.age}</span></div>
-        <h3 className="font-display text-lg uppercase leading-tight text-charcoal mt-4 mb-4">{module.title.replace(/[–—]/g, "-")}</h3><p className="mt-auto font-body text-xs text-charcoal/60">{module.lessons.length} video lessons + quizzes</p>
+        <h3 className="font-display text-lg uppercase leading-tight text-charcoal mt-4 mb-4">{module.title.replace(/[\u2013\u2014]/g, "-")}</h3><p className="mt-auto font-body text-xs text-charcoal/60">{module.lessons.length} video lessons + quizzes</p>
       </li>)}
     </ol><PrimaryPill to="/courses/internet-safety" className="mt-10">View the free course</PrimaryPill></div>
   </RevealSection>;
