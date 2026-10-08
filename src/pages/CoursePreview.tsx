@@ -2,7 +2,7 @@ import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck, PlayCircle, Hourglass } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Clock, Shield, CheckCircle, ShieldCheck, PlayCircle, Hourglass } from "lucide-react";
 import { ShieldIcon, CourseIcon } from "@/components/course/CourseIcons";
 import videoPoster from "@/assets/video-poster-kiki-intro.jpg";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
@@ -17,13 +17,13 @@ export default function CoursePreview() {
   if (courseId !== "internet-safety") {
     return (
       <PublicPage>
-        <div className="text-center space-y-4">
+        <main className="editorial-focus flex flex-col items-center justify-center px-4 text-center space-y-4">
           <Eyebrow>Free course</Eyebrow>
           <h1 className="font-display text-2xl font-bold text-charcoal uppercase">Course Not Found</h1>
-          <Link to="/" className="btn-copper adventure-button inline-flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-widest">
-            Back Home
-          </Link>
-        </div>
+          <Button asChild className="btn-copper adventure-button">
+            <Link to="/">Back Home <span className="flex h-9 w-9 items-center justify-center rounded-full bg-card"><ArrowUpRight /></span></Link>
+          </Button>
+        </main>
       </PublicPage>
     );
   }
@@ -266,9 +266,9 @@ export default function CoursePreview() {
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center space-y-4 py-8">
           <h2 className="font-display text-2xl font-bold text-charcoal uppercase tracking-wider">Ready to Start?</h2>
           <p className="font-body text-charcoal/70">Create a free parent account and begin your child's Armour of God journey today.</p>
-          <Link to="/auth?mode=signup" className="touch-target inline-flex items-center gap-2 btn-copper adventure-button px-10 py-4 text-sm uppercase tracking-widest">
-            Start Free Course <ArrowRight className="w-4 h-4" />
-          </Link>
+          <Button asChild className="btn-copper adventure-button">
+            <Link to="/auth?mode=signup">Start Free Course <span className="flex h-9 w-9 items-center justify-center rounded-full bg-card"><ArrowUpRight /></span></Link>
+          </Button>
         </motion.div>
       </main>
     </PublicPage>

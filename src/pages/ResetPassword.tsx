@@ -1,5 +1,6 @@
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,9 +73,9 @@ export default function ResetPasswordPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md text-center">
           <div className="card-kiki py-8 space-y-4">
             <p className="font-body text-charcoal">This password reset link is invalid or has expired.</p>
-            <Link to="/auth" className="btn-copper adventure-button inline-block px-6 py-3 text-sm uppercase tracking-widest">
-              Back to Sign In
-            </Link>
+            <Button asChild className="btn-copper adventure-button">
+              <Link to="/auth">Back to Sign In <span className="flex h-9 w-9 items-center justify-center rounded-full bg-card"><ArrowUpRight /></span></Link>
+            </Button>
           </div>
         </motion.div>
       </main></PublicPage>
