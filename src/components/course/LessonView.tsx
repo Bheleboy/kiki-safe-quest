@@ -61,7 +61,7 @@ export function LessonView({
           <p className="text-xs text-charcoal/70 font-display font-medium uppercase tracking-wide break-words">
             {module.title}
           </p>
-          <h2 className="font-display text-lg font-bold text-charcoal break-words">{lesson.title}</h2>
+          <h2 className="editorial-lesson-title font-display text-xl sm:text-2xl font-bold uppercase text-charcoal break-words">{lesson.title}</h2>
           <p className="text-xs text-charcoal/70 font-body mt-0.5">
             🎬 {lesson.videoDurationMinutes} min video · ⏱ ~{lesson.estimatedMinutes} min total
           </p>
@@ -85,7 +85,7 @@ export function LessonView({
       {/* Parent Tip */}
       <Button variant="ghost"
         onClick={() => setShowParentTip(!showParentTip)}
-        className="w-full flex items-center gap-2 rounded-lg bg-trust/10 p-3 text-sm font-display font-medium text-trust uppercase tracking-wide hover:bg-trust/15 transition-colors"
+        className="w-full flex items-center gap-2 rounded-xl border border-trust/15 bg-trust/10 p-3 text-sm font-display font-medium text-trust uppercase tracking-wide hover:bg-trust/15 transition-colors"
       >
         Parent Tip
       </Button>
@@ -93,9 +93,9 @@ export function LessonView({
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
-          className="rounded-lg bg-trust/10 p-4"
+          className="rounded-xl border border-trust/15 bg-trust/10 p-4"
         >
-          <p className="text-sm font-body text-trust">{lesson.parentTip}</p>
+          <p className="text-sm font-body text-charcoal/70">{lesson.parentTip}</p>
         </motion.div>
       )}
 

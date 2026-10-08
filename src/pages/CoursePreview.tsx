@@ -93,9 +93,9 @@ export default function CoursePreview() {
         </motion.div>
 
         {/* Course Time Summary */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-kiki border-secondary/30 bg-gradient-to-b from-secondary/5 to-card">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-kiki editorial-public-band border-secondary/30 bg-gradient-to-b from-secondary/5 to-card">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
               <Clock className="w-5 h-5 text-trust" />
             </div>
             <div>
@@ -166,7 +166,7 @@ export default function CoursePreview() {
         {/* Intro Video */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki space-y-3">
           <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide mb-1">Meet Kiki the Warrior</h2>
-          <div className="w-full rounded-xl overflow-hidden bg-primary/10 aspect-video border border-primary/15">
+          <div className="editorial-video w-full rounded-[1.5rem] overflow-hidden bg-primary/10 aspect-video border border-primary/15">
             <video
               className="w-full h-full object-cover"
               controls
@@ -250,7 +250,7 @@ export default function CoursePreview() {
         })}
 
         {/* Armour Reward CTA (replaces certificate preview) */}
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki text-center space-y-4 border-primary/20">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="card-kiki editorial-public-band text-center space-y-4 border-primary/20">
           <div className="flex justify-center gap-3">
             {ONLINE_SAFETY_PIECES.map((piece) => (
               <ArmourPieceIcon key={piece.id} pieceId={piece.id} earned size={36} />

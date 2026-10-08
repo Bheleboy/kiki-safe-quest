@@ -93,7 +93,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
 
   return (
     <div className="space-y-2">
-      <div className="w-full rounded-xl overflow-hidden bg-primary/10 aspect-video relative border border-primary/15">
+      <div className="editorial-video w-full rounded-[1.5rem] overflow-hidden bg-primary/10 aspect-video relative border border-primary/15">
         {isMp4 ? (
           <video
             src={videoUrl}

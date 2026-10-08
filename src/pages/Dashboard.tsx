@@ -49,7 +49,7 @@ export default function DashboardPage() {
   return (
     <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
       <header className="border-b border-primary/15 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ShieldIcon size={28} className="stroke-primary" />
             <span className="font-display font-bold text-lg text-charcoal uppercase tracking-wider">
@@ -62,7 +62,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <Eyebrow>Your adventure</Eyebrow>
           <h1 className="font-display text-3xl font-bold text-charcoal uppercase tracking-wide">
@@ -74,7 +74,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="editorial-stat-grid grid grid-cols-3 gap-4">
           <div className="card-kiki text-center">
             <ProgressBar progress={overallProgress} />
             <p className="font-body text-xs text-charcoal/70 mt-2">Progress</p>

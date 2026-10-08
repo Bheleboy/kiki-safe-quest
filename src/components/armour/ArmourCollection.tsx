@@ -15,7 +15,7 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="editorial-compact-armour flex items-center gap-2">
         {ARMOUR_PIECES.map((piece) => (
           <ArmourPieceIcon
             key={piece.id}
@@ -51,7 +51,7 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
         <p className="text-xs font-display font-medium text-charcoal/70 uppercase tracking-wide mb-3">
           Online Safety Course
         </p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="editorial-armour-grid grid grid-cols-3 gap-3">
           {ARMOUR_PIECES.map((piece, i) => {
             const earned = earnedPieces.includes(piece.id);
             const progress = pieceProgress[piece.id] ?? (earned ? 1 : 0);
@@ -69,11 +69,11 @@ export function ArmourCollection({ earnedPieces, pieceProgress = {}, compact }: 
                 {earned && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-success flex items-center justify-center">
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M2 6l3 3 5-5" stroke="hsl(var(--success-foreground))" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                   </div>
                 )}
-                <div className={`mx-auto ${earned ? "pulse-glow rounded-full p-1" : ""}`}>
+                <div className={`editorial-armour-badge clip-badge mx-auto ${earned ? "pulse-glow rounded-full p-1" : ""}`}>
                   <ArmourPieceIcon pieceId={piece.id} earned={earned} size={44} />
                 </div>
                 <p className={`font-display text-xs font-semibold uppercase tracking-wide ${

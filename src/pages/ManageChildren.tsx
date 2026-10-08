@@ -133,7 +133,7 @@ export default function ManageChildren() {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldIcon size={24} className="stroke-primary" />
-            <span className="font-display font-bold text-sm text-charcoal uppercase tracking-wider hidden sm:inline">
+            <span className="font-display font-bold text-sm text-charcoal uppercase tracking-wider">
               Kiki<span className="text-primary">Warrior</span>
             </span>
           </div>
@@ -170,7 +170,7 @@ export default function ManageChildren() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: i * 0.05 }}
-                className="card-kiki flex items-center gap-4"
+                className="card-kiki adventure-card editorial-family-card flex items-center gap-4"
               >
                 {user && (
                   <div className="shrink-0">
@@ -183,7 +183,7 @@ export default function ManageChildren() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-display text-base font-semibold text-charcoal uppercase tracking-wide break-words">
                       {child.first_name}
                     </h3>
@@ -203,7 +203,7 @@ export default function ManageChildren() {
                 </div>
                 <Button variant="ghost"
                   onClick={() => removeChild(child.id)}
-                  className="p-2 text-charcoal/70 hover:text-destructive transition-colors"
+                  className="p-2 text-destructive hover:text-destructive transition-colors"
                   title="Remove child"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -307,7 +307,7 @@ export default function ManageChildren() {
                 return (
                   <div key={bookId} className="card-kiki space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center text-primary shrink-0">
                         <BookOpen className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">

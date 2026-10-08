@@ -135,7 +135,7 @@ export default function BookArmourOfGod() {
             className="flex justify-center"
           >
             <div className="relative">
-              <div className="w-72 md:w-80 rounded-2xl overflow-hidden shadow-none border border-primary/15">
+              <div className="editorial-book-cover w-72 md:w-80 rounded-2xl overflow-hidden shadow-none border border-primary/15">
                 <img
                   src="/images/kiki-armour-of-god.png"
                   alt="Kiki's Armour of God workbook cover"
@@ -188,16 +188,16 @@ export default function BookArmourOfGod() {
             {/* Buy Links */}
             <div className="space-y-3">
               <h2 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Get Your Copy</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {bookLinks.map((link) => {
                   const alreadyPurchased = purchasedStores.includes(link.name);
                   return (
                     <Button variant="ghost"
                       key={link.name}
                       onClick={() => handleBuyClick(link.name, link.url)}
-                      className="card-kiki flex items-center gap-3 p-4 hover:border-primary/60 hover:shadow-none transition-all group text-left"
+                      className="card-kiki adventure-card flex items-center gap-3 p-4 hover:border-primary/60 hover:shadow-none transition-all group text-left"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
                         {link.icon}
                       </div>
                       <div className="flex-1 min-w-0">

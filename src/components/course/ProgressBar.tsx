@@ -16,7 +16,7 @@ export function ProgressBar({ progress, label }: ProgressBarProps) {
           <span className="text-xs font-display font-medium text-primary">{percent}%</span>
         </div>
       )}
-      <div className="w-full h-2 bg-primary/10 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-primary/15 rounded-full overflow-hidden">
         <motion.div
           className="h-full rounded-full bg-primary"
           initial={{ width: 0 }}

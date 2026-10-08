@@ -22,7 +22,7 @@ export default function TermsOfService() {
           Last updated: March 2026
         </p>
 
-        <div className="space-y-8 font-body text-sm text-charcoal/70 leading-relaxed">
+        <div className="editorial-legal space-y-8 font-body text-sm text-charcoal/70 leading-relaxed">
           <section className="space-y-3">
             <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
               1. Acceptance of Terms

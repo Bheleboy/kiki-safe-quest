@@ -140,10 +140,10 @@ export default function CoursePage() {
     <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
       {/* Top Bar */}
       <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-primary/15 px-4 py-3">
-        <div className={`mx-auto flex items-center gap-3 ${view.type === "lesson" ? "max-w-7xl" : "max-w-2xl"}`}>
+        <div className={`editorial-course-bar mx-auto flex items-center gap-3 ${view.type === "lesson" ? "max-w-7xl" : "max-w-4xl"}`}>
           <div className="flex items-center gap-2 shrink-0">
             <ShieldIcon size={24} className="stroke-primary" />
-            <span className="font-display font-bold text-sm text-charcoal uppercase tracking-wider hidden sm:inline">
+            <span className="font-display font-bold text-sm text-charcoal uppercase tracking-wider">
               Kiki<span className="text-primary">Warrior</span>
             </span>
           </div>
@@ -170,7 +170,7 @@ export default function CoursePage() {
         </div>
       </header>
 
-      <main className={`mx-auto px-4 py-6 ${view.type === "lesson" ? "max-w-7xl" : "max-w-2xl"}`}>
+      <main className={`mx-auto px-4 py-6 ${view.type === "lesson" ? "max-w-7xl" : "max-w-4xl"}`}>
         <AnimatePresence mode="wait">
           {/* HOME */}
           {view.type === "home" && (
@@ -215,7 +215,7 @@ export default function CoursePage() {
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       onClick={() => setView({ type: "stream", streamId: stream.id })}
-                      className="card-kiki text-left relative overflow-hidden group"
+                      className="card-kiki adventure-card text-left relative overflow-hidden group"
                     >
                       <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-2">
@@ -418,7 +418,7 @@ export default function CoursePage() {
                           <p className="font-display text-[10px] uppercase tracking-wide text-charcoal/70 font-medium">
                             {armourPiece.name}
                           </p>
-                          <div className="h-1 w-full bg-primary/10 rounded-full overflow-hidden">
+                          <div className="h-1 w-full bg-primary/15 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-primary rounded-full transition-all"
                               style={{

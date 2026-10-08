@@ -181,13 +181,7 @@ export default function ParentDashboard() {
             <ArrowLeft className="w-5 h-5 text-charcoal" />
           </Button>
           <div className="flex-1">
-            <Eyebrow>For parents</Eyebrow>
-          <h1 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider">
-              Parent Dashboard
-            </h1>
-            <p className="text-xs text-charcoal/70 font-body">
-              {children.length > 0 ? `Tracking ${children.length} learner${children.length > 1 ? "s" : ""}` : "No children added yet"}
-            </p>
+            <span className="font-display font-bold text-lg uppercase text-charcoal">Kiki<span className="text-primary">Warrior</span></span>
           </div>
           {profile?.is_admin && (
             <a
@@ -209,6 +203,14 @@ export default function ParentDashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <div>            <Eyebrow>For parents</Eyebrow>
+          <h1 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider">
+              Parent Dashboard
+            </h1>
+            <p className="text-xs text-charcoal/70 font-body">
+              {children.length > 0 ? `Tracking ${children.length} learner${children.length > 1 ? "s" : ""}` : "No children added yet"}
+            </p>
+</div>
         {notifications.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
             <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide flex items-center gap-2">
@@ -242,7 +244,7 @@ export default function ParentDashboard() {
                 onClick={() => { setSelectedChildId(child.id); setShowSurveyReview(false); setShowParentSurvey(false); }}
                 className={`px-4 py-2 rounded-lg font-display text-sm font-bold uppercase tracking-wide transition-all whitespace-nowrap ${
                   (selectedChild?.id === child.id)
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary text-charcoal"
                     : "bg-primary/10 text-charcoal/70 hover:bg-primary/10/80"
                 }`}
               >
@@ -281,10 +283,10 @@ export default function ParentDashboard() {
             <div className="grid gap-3 sm:grid-cols-2">
               <Button variant="ghost"
                 onClick={() => { setShowSurveyReview(true); setShowParentSurvey(false); }}
-                className="card-kiki text-left hover:border-primary/30 transition-colors group"
+                className="card-kiki adventure-card text-left hover:border-primary/30 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-trust/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                     <ClipboardList className="w-5 h-5 text-primary" />
                   </div>
                   <div>
@@ -296,10 +298,10 @@ export default function ParentDashboard() {
 
               <Button variant="ghost"
                 onClick={() => { setShowParentSurvey(true); setShowSurveyReview(false); }}
-                className="card-kiki text-left hover:border-primary/30 transition-colors group"
+                className="card-kiki adventure-card text-left hover:border-primary/30 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-trust/10 flex items-center justify-center shrink-0 group-hover:bg-trust/10 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-trust/10 flex items-center justify-center shrink-0 group-hover:bg-trust/10 transition-colors">
                     <Star className="w-5 h-5 text-secondary" />
                   </div>
                   <div>

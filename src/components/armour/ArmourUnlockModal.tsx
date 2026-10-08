@@ -48,7 +48,7 @@ export function ArmourUnlockModal({ pieceId, totalEarned, onClose }: ArmourUnloc
             exit={{ scale: 0.5, y: 50 }}
             transition={{ type: "spring", damping: 15, stiffness: 150 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative bg-card rounded-2xl border border-primary/30 p-8 max-w-sm w-full text-center space-y-5 shadow-none"
+            className="editorial-dialog relative bg-card rounded-[2rem] border border-primary/30 p-8 max-w-sm w-full text-center space-y-5 shadow-none"
           >
             {/* Glow background */}
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
@@ -60,7 +60,7 @@ export function ArmourUnlockModal({ pieceId, totalEarned, onClose }: ArmourUnloc
               transition={{ type: "spring", delay: 0.2, damping: 10 }}
               className="relative z-10"
             >
-              <div className="mx-auto w-24 h-24 rounded-full bg-primary flex items-center justify-center pulse-glow">
+              <div className="clip-badge mx-auto w-24 h-24 bg-primary flex items-center justify-center pulse-glow">
                 <ArmourPieceIcon pieceId={piece.id} earned size={56} className="text-primary-foreground drop-shadow-none" />
               </div>
             </motion.div>

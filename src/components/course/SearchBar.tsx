@@ -29,7 +29,7 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
     : [];
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="editorial-search relative w-full max-w-md mx-auto">
       <div className="flex items-center gap-2 rounded-lg bg-primary/10 border border-primary/20 px-4 py-2 focus-within:border-primary/50 transition-colors">
         <Search className="w-4 h-4 text-charcoal/70 shrink-0" />
         <input

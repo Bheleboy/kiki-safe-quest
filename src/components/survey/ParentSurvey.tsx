@@ -115,7 +115,7 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
       {/* Yes/No questions */}
       <div className="space-y-3">
         {parentQuestions.map((q) => (
-          <div key={q.key} className="flex items-center gap-3 rounded-lg bg-peach p-3">
+          <div key={q.key} className="editorial-survey-row flex items-center gap-3 rounded-xl bg-peach p-3">
             <span className="text-xl shrink-0">{q.emoji}</span>
             <p className="font-body text-sm text-charcoal flex-1">{q.label}</p>
             <div className="flex gap-2 shrink-0">

@@ -184,16 +184,16 @@ export function QuizBlock({ questions, onComplete, alreadyCompleted }: QuizBlock
               transition={{ delay: i * 0.1 }}
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
-              className={`touch-target w-full text-left rounded-lg p-4 font-body font-medium text-sm transition-all border ${
+              className={`editorial-quiz-option touch-target w-full text-left rounded-lg p-4 font-body font-medium text-sm transition-all border ${
                 selected === null
-                  ? "border-primary/20 bg-primary/10 hover:border-primary/50 active:scale-[0.98]"
+                  ? "border-primary/20 bg-card hover:border-primary/50 active:scale-[0.98]"
                   : selected === i
                   ? isCorrect
                     ? "border-success bg-success/10 text-success"
                     : "border-destructive bg-destructive/10 text-destructive"
                   : i === question.correctIndex && showResult
                   ? "border-success bg-success/10"
-                  : "border-primary/20 bg-primary/10 opacity-40"
+                  : "border-primary/20 bg-card opacity-40"
               }`}
             >
               {opt.label}

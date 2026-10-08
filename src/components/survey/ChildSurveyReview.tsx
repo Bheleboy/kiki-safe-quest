@@ -115,7 +115,7 @@ export function ChildSurveyReview({ userId, childId, childName, onDone }: ChildS
           animate={{ opacity: 1, y: 0 }}
           className="card-kiki space-y-3"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">
               {survey.age_band === "6-9" ? "Ages 6–9" : "Ages 10–13"} Course
             </span>

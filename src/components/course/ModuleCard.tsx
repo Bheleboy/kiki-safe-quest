@@ -25,11 +25,11 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
       onClick={onClick}
-      className="w-full card-kiki text-left hover:border-primary/40 active:scale-[0.99] transition-all group"
+      className="w-full card-kiki adventure-card text-left hover:border-primary/40 active:scale-[0.99] transition-all group"
     >
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center shrink-0">
-          <CourseIcon name={module.icon || "shield"} size={24} className="stroke-primary-foreground" />
+        <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+          <CourseIcon name={module.icon || "shield"} size={24} className="stroke-primary" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
