@@ -109,17 +109,7 @@ Deno.serve(async (req) => {
       await logEvent({ email_hash: emailHash, ip, user_agent: ua, event_type: 'account_locked' })
       const { data: prof } = await admin.from('profiles').select('id, email').ilike('email', email).maybeSingle()
       if (prof?.email) {
-        await sendSecurityEmail({
-          to: prof.email,
-          subject: 'Your Kiki Warrior account was paused',
-          heading: 'Account paused',
-          paragraphs: [
-            'Your Kiki Warrior account was paused after several failed sign-in attempts.',
-            `When: ${nowText()}. Approximate device: ${ua}.`,
-            'If this was you, wait a little and try again. If it was not you, we recommend changing your password.',
-          ],
-          label: 'security_account_locked',
-        })
+        await sendSecurityEmail({ to: prof.email, template: 'security-account-locked', device: ua })
       }
     }
     if (ipLocked) await logEvent({ ip, user_agent: ua, event_type: 'ip_locked' })

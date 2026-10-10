@@ -99,17 +99,7 @@ Deno.serve(async (req) => {
     await admin.from('parent_pins').update({ failed_attempts: fails, lock_level: lockLevel, locked_until: lockedUntil, updated_at: new Date().toISOString() }).eq('user_id', userId)
     await logEvent({ user_id: userId, ip, user_agent: ua, event_type: lockedUntil ? 'pin_locked' : 'pin_wrong' })
     if (lockedUntil && email) {
-      await sendSecurityEmail({
-        to: email,
-        subject: 'Your Kiki Warrior parent PIN was locked',
-        heading: 'Parent PIN locked',
-        paragraphs: [
-          'Someone entered the wrong parent PIN several times, so parent areas are locked for a while.',
-          `When: ${nowText()}. Device: ${ua}.`,
-          'If this was not you or your family, sign in and change your password.',
-        ],
-        label: 'security_pin_locked',
-      })
+      await sendSecurityEmail({ to: email, template: 'security-pin-locked', device: ua })
       return json({ error: 'locked', message: 'Too many wrong PINs. Parent areas are locked for a while.' }, 429)
     }
     return json({ error: 'wrong_pin', message: `Wrong PIN. ${MAX_FAILS - fails} tries left.` }, 400)

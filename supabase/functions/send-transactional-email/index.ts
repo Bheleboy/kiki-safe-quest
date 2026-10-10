@@ -91,6 +91,21 @@ Deno.serve(async (req) => {
     )
   }
 
+  // Security notices may only be triggered by trusted server code (service role).
+  if (templateName.startsWith('security-')) {
+    let role = ''
+    try {
+      const tok = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '')
+      const b = tok.split('.')[1].replaceAll('-', '+').replaceAll('_', '/')
+      role = JSON.parse(atob(b.padEnd(Math.ceil(b.length / 4) * 4, '='))).role || ''
+    } catch { /* ignore */ }
+    if (role !== 'service_role') {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+  }
+
   // 1. Look up template from registry (early — needed to resolve recipient)
   const template = TEMPLATES[templateName]
 
