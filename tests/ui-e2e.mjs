@@ -38,7 +38,18 @@ try {
   }
   if (phase === "ui2") {
     if (codeScreen) {
-      await page.getByLabel("6-digit sign-in code").fill(arg1);
+      await shot(page, "code-screen");
+      // Wait for the tester to publish the emailed code to code.txt on the e2e-results branch.
+      let code = "";
+      for (let i = 0; i < 40 && !code; i++) {
+        await new Promise((r) => setTimeout(r, 6000));
+        try {
+          const r = await fetch(`https://raw.githubusercontent.com/Bheleboy/kiki-safe-quest/e2e-results/code.txt?${Date.now()}`, { cache: "no-store" });
+          if (r.ok) { const [ts, c] = (await r.text()).trim().split(":"); if (Number(ts) > Date.parse(out.at)) code = c; }
+        } catch {}
+      }
+      check("code received from tester", !!code);
+      await page.getByLabel("6-digit sign-in code").fill(code);
       await page.click('button[type="submit"]');
       await page.waitForURL((u) => !u.pathname.startsWith("/auth"), { timeout: 40000 }).catch(() => {});
       await page.waitForTimeout(3000);
