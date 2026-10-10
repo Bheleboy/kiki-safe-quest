@@ -1,0 +1,14 @@
+{
+  "phase": "ui1",
+  "at": "2026-10-10T15:42:16.304Z",
+  "checks": [
+    {
+      "name": "new browser is asked for an emailed code",
+      "pass": false
+    }
+  ],
+  "shots": [
+    "shots/ui1-code-screen.png"
+  ],
+  "summary": "0/1 passed"
+}
