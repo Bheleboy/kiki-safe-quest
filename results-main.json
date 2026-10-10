@@ -1,0 +1,102 @@
+{
+  "phase": "main",
+  "at": "2026-10-10T14:53:17.612Z",
+  "checks": [
+    {
+      "name": "direct auth login returns a token (expected)",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "unregistered session reads no profile data",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": []
+      }
+    },
+    {
+      "name": "unregistered session reads no child data",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "n": 0
+      }
+    },
+    {
+      "name": "first device sign-in returns tokens",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "keys": [
+          "access_token",
+          "refresh_token"
+        ]
+      }
+    },
+    {
+      "name": "registered session passes session-check",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "valid": true
+        }
+      }
+    },
+    {
+      "name": "same session from another device fails session-check",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "valid": false,
+          "reason": "device_mismatch"
+        }
+      }
+    },
+    {
+      "name": "registered session can read own profile",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "n": 1
+      }
+    },
+    {
+      "name": "new device gets step-up and no tokens",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "step_up": true,
+          "challenge_id": "41be1a56-e917-4a11-9a55-061840d0ab65",
+          "masked_email": "[hidden]"
+        }
+      }
+    },
+    {
+      "name": "6th wrong attempt is locked with wait time",
+      "pass": true,
+      "detail": {
+        "status": 429,
+        "body": {
+          "error": "locked",
+          "retry_after_seconds": 899
+        }
+      }
+    },
+    {
+      "name": "unknown account gets the generic error",
+      "pass": true,
+      "detail": {
+        "error": "invalid_credentials",
+        "message": "Invalid email or password."
+      }
+    }
+  ],
+  "challenge_id": "41be1a56-e917-4a11-9a55-061840d0ab65",
+  "summary": "10/10 passed"
+}
