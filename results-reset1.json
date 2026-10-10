@@ -1,0 +1,29 @@
+{
+  "phase": "reset1",
+  "at": "2026-10-10T15:37:20.341Z",
+  "checks": [
+    {
+      "name": "reset request accepted (generic reply)",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "message": "If an account exists, we have sent a link."
+        }
+      }
+    },
+    {
+      "name": "unknown email gets the same reply",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "message": "If an account exists, we have sent a link."
+        }
+      }
+    }
+  ],
+  "summary": "2/2 passed"
+}
