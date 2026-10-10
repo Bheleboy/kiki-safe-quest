@@ -32,7 +32,8 @@ export function InactivityGuard() {
   const lastActive = useRef(Date.now());
   const [warnLeft, setWarnLeft] = useState<number | null>(null);
   const warnLeftRef = useRef<number | null>(null);
-  warnLeftRef.current = warnLeft;  const signOutRef = useRef(signOutWithMessage);
+  warnLeftRef.current = warnLeft;
+  const signOutRef = useRef(signOutWithMessage);
   signOutRef.current = signOutWithMessage;
 
   useEffect(() => {
