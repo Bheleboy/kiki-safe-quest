@@ -19,6 +19,25 @@ async function sha256(s: string) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+function friendlyDevice(ua: string | null | undefined): string {
+  if (!ua) return "Unknown device";
+  const s = ua.toLowerCase();
+  const browser = s.includes("edg/") ? "Edge"
+    : s.includes("chrome/") && !s.includes("chromium") ? "Chrome"
+    : s.includes("safari/") && !s.includes("chrome") ? "Safari"
+    : s.includes("firefox/") ? "Firefox"
+    : s.includes("chromium") ? "Chromium"
+    : "Browser";
+  const os = s.includes("iphone") ? "iPhone"
+    : s.includes("ipad") ? "iPad"
+    : s.includes("android") ? "Android"
+    : s.includes("mac os") || s.includes("macintosh") ? "Mac"
+    : s.includes("windows") ? "Windows"
+    : s.includes("linux") ? "Linux"
+    : null;
+  return os ? `${browser} on ${os}` : "Unknown device";
+}
+
 const COUNTED = [
   "login_failed", "account_locked", "ip_locked", "stepup_sent", "stepup_device_mismatch", "user_reported_signin", "pin_locked",
 ];
