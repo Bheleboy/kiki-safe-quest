@@ -91,15 +91,32 @@ Deno.serve(async (req) => {
     )
   }
 
-  // Security notices may only be triggered by trusted server code (service role).
+  // Security notices may only be triggered by trusted server code.
+  // Internal callers send x-internal-key = this project's service key (constant-time compare).
+  // A gateway-verified service_role JWT is also accepted.
   if (templateName.startsWith('security-')) {
-    let role = ''
-    try {
-      const tok = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '')
-      const b = tok.split('.')[1].replaceAll('-', '+').replaceAll('_', '/')
-      role = JSON.parse(atob(b.padEnd(Math.ceil(b.length / 4) * 4, '='))).role || ''
-    } catch { /* ignore */ }
-    if (role !== 'service_role') {
+    const provided = req.headers.get('x-internal-key') || ''
+    const expected = supabaseServiceKey
+    let ok = false
+    if (provided && expected) {
+      const a = new TextEncoder().encode(provided)
+      const b = new TextEncoder().encode(expected)
+      let diff = a.length ^ b.length
+      for (let i = 0; i < b.length; i++) diff |= (a[i % (a.length || 1)] ?? 0) ^ b[i]
+      ok = diff === 0
+    }
+    if (!ok) {
+      try {
+        const tok = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '')
+        const seg = tok.split('.')[1]
+        if (seg) {
+          const b64 = seg.replaceAll('-', '+').replaceAll('_', '/')
+          ok = JSON.parse(atob(b64.padEnd(Math.ceil(b64.length / 4) * 4, '='))).role === 'service_role'
+        }
+      } catch { /* ignore */ }
+    }
+    if (!ok) {
+      console.error('Rejected security template call without internal credentials', { templateName })
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
