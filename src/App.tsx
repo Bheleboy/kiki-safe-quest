@@ -81,7 +81,7 @@ const App = () => (
               <Route path="/security/revoke" element={<SecurityRevoke />} />
 
               {/* Protected */}
-              <Route path="/family" element={<ProtectedRoute><ParentGate><ManageChildren /></ParentGate></ProtectedRoute>} />
+              <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
               <Route path="/parent" element={<ProtectedRoute><ParentGate><ParentDashboard /></ParentGate></ProtectedRoute>} />
