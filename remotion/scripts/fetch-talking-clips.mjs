@@ -27,7 +27,7 @@ if (!KEY) {
 
 async function api(url) {
   const res = await fetch(url, {
-    headers: { "X-Api-Key": KEY, Accept: "application/json" },
+    headers: { "x-api-key": KEY, Accept: "application/json" },
     signal: AbortSignal.timeout(30000),
   });
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
@@ -38,14 +38,21 @@ async function listVideos() {
   const all = [];
   let token = null;
   for (let page = 0; page < 30; page++) {
-    let url = "https://api.heygen.com/v1/video.list?limit=100";
+    // HeyGen v3 (v1 video.list retired 31 Oct 2026)
+    let url = "https://api.heygen.com/v3/videos?limit=100&title=KW";
     if (token) url += `&token=${encodeURIComponent(token)}`;
     const json = await api(url);
-    const vids = json?.data?.videos ?? [];
+    const vids = (json?.data ?? []).map((v) => ({
+      video_id: v.id,
+      video_title: v.title,
+      status: v.status,
+      created_at: v.created_at,
+      video_url: v.video_url,
+    }));
     all.push(...vids);
     console.log(`page ${page + 1}: ${vids.length} videos`);
-    const next = json?.data?.token;
-    if (!next || next === token || vids.length === 0) break;
+    const next = json?.next_token;
+    if (!json?.has_more || !next || next === token || vids.length === 0) break;
     token = next;
   }
   return all;
@@ -87,8 +94,9 @@ async function main() {
       if (!match) { console.log(`missing: ${slug}`); continue; }
       console.log(`found: ${slug} (video id ${match.video_id}, created_at ${match.created_at})`);
 
-      const status = await api(`https://api.heygen.com/v1/video_status.get?video_id=${encodeURIComponent(match.video_id)}`);
-      const videoUrl = status?.data?.video_url;
+      // Fetch a fresh presigned URL (v3 replacement for v1 video_status.get)
+      const status = await api(`https://api.heygen.com/v3/videos/${encodeURIComponent(match.video_id)}`);
+      const videoUrl = status?.data?.video_url ?? match.video_url;
       if (!videoUrl) throw new Error("no video_url");
       const mp4 = path.join(TMP_DIR, `${slug}.mp4`);
       await download(videoUrl, mp4);

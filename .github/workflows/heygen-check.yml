@@ -1,0 +1,25 @@
+name: HeyGen API check (fetch only, no render)
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "Lesson ids to fetch"
+        default: "ages-10-13_5-ways-to-stay-private"
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: Fetch talking clip via HeyGen v3
+        working-directory: remotion
+        env:
+          HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
+        run: |
+          node scripts/fetch-talking-clips.mjs ${{ github.event.inputs.ids }}
+          cat src/talking-manifest.json
+          ls -la public/talking | head
+          test "$(node -e 'console.log(require("./src/talking-manifest.json").length)')" -gt 0
