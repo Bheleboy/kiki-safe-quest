@@ -5,3 +5,5 @@
 - Serve brand font weights locally through global font-face declarations to keep typography reliable without remote stylesheet dependencies.
 - Password sign-in goes through the `secure-login` edge function and every data table carries a RESTRICTIVE `require_registered_session` policy; sessions must be registered in `user_sessions` (device-bound) or they cannot read/write data, so direct auth-API sessions are useless.
 - Security edge functions share helpers in `supabase/functions/_shared/security.ts` and send branded notices through the existing `auth_emails` queue to avoid a second email pipeline.
+- Signup, password reset and password change go through edge functions (`secure-signup`, `secure-reset-request` + `complete-password-reset`, `change-password`) that enforce the shared password policy; never call `supabase.auth.signUp`/`updateUser({password})` from the client.
+- Parent-only routes are wrapped in `ParentGate` (server-verified PIN, client-side unlock window) and `InactivityGuard` handles idle sign-out per route group; sign-out always revokes the registered session server-side first.

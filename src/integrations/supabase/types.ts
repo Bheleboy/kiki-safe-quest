@@ -409,6 +409,33 @@ export type Database = {
           },
         ]
       }
+      parent_pins: {
+        Row: {
+          failed_attempts: number
+          lock_level: number
+          locked_until: string | null
+          pin_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          failed_attempts?: number
+          lock_level?: number
+          locked_until?: string | null
+          pin_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          failed_attempts?: number
+          lock_level?: number
+          locked_until?: string | null
+          pin_hash?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       parent_surveys: {
         Row: {
           approved: boolean
@@ -560,6 +587,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reset_requests: {
+        Row: {
+          created_at: string
+          device_hash: string
+          expires_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_hash: string
+          expires_at: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_hash?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       security_events: {
         Row: {

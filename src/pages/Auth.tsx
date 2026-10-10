@@ -16,7 +16,7 @@ type Mode = "login" | "signup" | "forgot";
 const signupSchema = z.object({
   firstName: z.string().trim().min(1, "Name is required").max(50),
   email: z.string().trim().email("Invalid email").max(255),
-  password: z.string().min(6, "Password must be at least 6 characters").max(128),
+  password: z.string().min(10, "Password must be at least 10 characters").max(128),
 });
 
 const loginSchema = z.object({
@@ -84,7 +84,11 @@ export default function AuthPage() {
     try {
       if (mode === "signup") {
         const parsed = signupSchema.parse({ firstName, email, password });
-        const { error: err } = await signUp(parsed.email, parsed.password, parsed.firstName, "parent");
+        if (parsed.password.trim().toLowerCase() === parsed.email.toLowerCase()) { setError("Password must not be the same as your email."); return; }
+        const res = await signUp(parsed.email, parsed.password, parsed.firstName, "parent", turnstileToken);
+        setTurnstileToken(undefined);
+        const err = res.error;
+        if (res.captchaRequired) setCaptchaNeeded(true);
         if (err) { setError(err.message); }
         else { setMessage("Check your email for a verification link!"); }
       } else if (mode === "login") {
@@ -99,7 +103,7 @@ export default function AuthPage() {
         z.string().email().parse(email.trim());
         const { error: err } = await resetPassword(email.trim());
         if (err) { setError(err.message); }
-        else { setMessage("Check your email for a password reset link."); }
+        else { setMessage("If an account exists, we have sent a link. Open it on this device and browser."); }
       }
     } catch (err: any) {
       if (err instanceof z.ZodError) {
@@ -245,13 +249,18 @@ export default function AuthPage() {
                   placeholder="••••••••"
                   className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors"
                 />
+                {mode === "signup" && (
+                  <p className="mt-1.5 font-body text-xs text-charcoal/70 leading-relaxed">
+                    At least 10 characters. Avoid common or reused passwords.
+                  </p>
+                )}
               </div>
             )}
 
             {securityMessage && !error && (
               <p className="text-sm font-body text-charcoal bg-primary/10 rounded-lg px-4 py-2">{securityMessage}</p>
             )}
-            {mode === "login" && captchaNeeded && turnstileSiteKey && (
+            {mode !== "forgot" && (captchaNeeded || (mode === "signup" && !!turnstileSiteKey)) && turnstileSiteKey && (
               <Turnstile siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
             )}
             {error && (

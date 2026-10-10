@@ -1,6 +1,6 @@
 import {
   admin, anonClient, clientIp, cors, createChallenge, decodeJwt, deviceHashFrom, isTrusted, json, logEvent,
-  maskEmail, nowText, registerSession, revokeSession, sendSecurityEmail, sha256, trustDevice, trustedCount, userAgent,
+  maskEmail, nowText, registerSession, sendNewSigninEmail, revokeSession, sendSecurityEmail, sha256, trustDevice, trustedCount, userAgent,
 } from '../_shared/security.ts'
 
 const WINDOW_MS = 15 * 60_000
@@ -152,5 +152,6 @@ Deno.serve(async (req) => {
 
   await registerSession({ sessionId, userId: user.id, email: user.email ?? email, deviceHash, ip, ua })
   await logEvent({ user_id: user.id, ip, user_agent: ua, event_type: 'login_success' })
+  if (count === 0) await sendNewSigninEmail(user.id, user.email ?? email, ua)
   return json({ access_token: session.access_token, refresh_token: session.refresh_token })
 })

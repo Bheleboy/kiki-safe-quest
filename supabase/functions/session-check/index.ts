@@ -1,6 +1,6 @@
 import {
   admin, anonClient, clientIp, cors, createChallenge, deviceHashFrom, isTrusted, json, logEvent, maskEmail,
-  registerSession, trustDevice, trustedCount, userAgent,
+  registerSession, revokeSession, sendNewSigninEmail, trustDevice, trustedCount, userAgent,
 } from '../_shared/security.ts'
 
 Deno.serve(async (req) => {
@@ -26,6 +26,16 @@ Deno.serve(async (req) => {
 
   const { data: row } = await admin.from('user_sessions').select('*').eq('session_id', sessionId).maybeSingle()
 
+  if (body?.action === 'revoke_self') {
+    if (row && row.user_id === userId) {
+      await revokeSession(sessionId, typeof body?.reason === 'string' ? body.reason.slice(0, 40) : 'sign_out')
+    } else {
+      await admin.rpc('revoke_auth_session', { _session_id: sessionId })
+    }
+    await logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'session_revoked_self', details: { reason: body?.reason ?? 'sign_out' } })
+    return json({ ok: true })
+  }
+
   if (body?.action === 'register') {
     if (row) {
       if (row.revoked_at || row.device_hash !== deviceHash || row.user_id !== userId) return json({ valid: false, reason: 'revoked' })
@@ -44,6 +54,7 @@ Deno.serve(async (req) => {
       await trustDevice(userId, deviceHash, ua)
       await registerSession({ sessionId, userId, email: email || null, deviceHash, ip, ua })
       await logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'login_success_oauth' })
+      if (count === 0 && email) await sendNewSigninEmail(userId, email, ua)
       return json({ valid: true, registered: true })
     }
     if (!email) return json({ valid: false, reason: 'no_email' })

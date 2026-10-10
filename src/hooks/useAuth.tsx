@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getProductionOrigin } from "@/lib/domain";
 import { getDeviceSecret, loadChallenge, saveChallenge, type PendingChallenge } from "@/lib/device";
 import type { User, Session } from "@supabase/supabase-js";
 import type { Tables } from "@/integrations/supabase/types";
@@ -26,7 +25,9 @@ interface AuthContextType {
   pendingChallenge: PendingChallenge | null;
   securityMessage: string;
   clearSecurityMessage: () => void;
-  signUp: (email: string, password: string, firstName: string, ageBand: string) => Promise<SimpleResult>;
+  signUp: (email: string, password: string, firstName: string, ageBand: string, turnstileToken?: string) => Promise<SignInResult>;
+  signOutWithMessage: (message: string, reason?: string) => Promise<void>;
+  setSecurityNotice: (message: string) => void;
   signIn: (email: string, password: string, turnstileToken?: string) => Promise<SignInResult>;
   verifyChallenge: (code: string) => Promise<SimpleResult>;
   resendChallenge: () => Promise<SimpleResult>;
@@ -44,7 +45,7 @@ const ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 const SIGNED_OUT_MSG = "You have been signed out for your security. Please sign in again.";
 const CHECK_INTERVAL_MS = 3 * 60 * 1000;
 
-async function callFn(name: string, body: Record<string, unknown>, accessToken?: string) {
+export async function callFn(name: string, body: Record<string, unknown>, accessToken?: string) {
   const res = await fetch(`${FN_BASE}/${name}`, {
     method: "POST",
     headers: {
@@ -205,16 +206,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [checkSession, forceSignOut]);
 
-  const signUp = async (email: string, password: string, firstName: string, ageBand: string) => {
+  const signUp = async (email: string, password: string, firstName: string, ageBand: string, turnstileToken?: string): Promise<SignInResult> => {
     const now = Date.now();
     if (now - lastAuthAttempt.current < 2000) return { error: { message: "Please wait before trying again." } };
     lastAuthAttempt.current = now;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { first_name: firstName, age_band: ageBand }, emailRedirectTo: getProductionOrigin() },
-    });
-    return { error: error ? { message: error.message } : null };
+    try {
+      const r = await callFn("secure-signup", { email, password, first_name: firstName, age_band: ageBand, turnstile_token: turnstileToken });
+      const d = r.data ?? {};
+      if (d.error === "captcha_required") return { error: { message: "Please complete the security check and try again." }, captchaRequired: true };
+      if (d.error === "locked") return { error: { message: d.message || "Too many attempts. Please try again later." }, locked: true };
+      if (!r.ok) return { error: { message: d.message || "Could not create the account. Please try again." } };
+      return { error: null };
+    } catch {
+      return { error: { message: "Could not reach the server. Please try again." } };
+    }
   };
 
   const applyTokens = async (data: any): Promise<SimpleResult> => {
@@ -297,19 +302,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const revokeSelf = async (reason: string) => {
+    const s = sessionRef.current;
+    if (!s) return;
+    try { await callFn("session-check", { action: "revoke_self", reason }, s.access_token); } catch { /* ignore */ }
+  };
+
   const signOut = async () => {
     manualSignOut.current = true;
-    await supabase.auth.signOut();
+    await revokeSelf("sign_out");
+    try { await supabase.auth.signOut({ scope: "local" }); } catch { /* ignore */ }
     manualSignOut.current = false;
     hadUser.current = false;
+    sessionRef.current = null;
     setUser(null);
     setProfile(null);
     setSession(null);
   };
 
+  const signOutWithMessage = async (message: string, reason = "inactivity") => {
+    await revokeSelf(reason);
+    await forceSignOut(message);
+  };
+
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${getProductionOrigin()}/reset-password` });
-    return { error: error ? { message: error.message } : null };
+    try {
+      const r = await callFn("secure-reset-request", { email });
+      if (!r.ok && r.status !== 200) return { error: { message: "Could not send the link. Please try again." } };
+      return { error: null };
+    } catch {
+      return { error: { message: "Could not reach the server. Please try again." } };
+    }
   };
 
   const updatePassword = async (password: string) => {
@@ -321,6 +344,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{
       user, profile, session, loading, pendingChallenge, securityMessage,
       clearSecurityMessage: () => setSecurityMessage(""),
+      signOutWithMessage, setSecurityNotice: setSecurityMessage,
       signUp, signIn, verifyChallenge, resendChallenge, cancelChallenge,
       signOut, resetPassword, updatePassword, fetchProfile,
     }}>

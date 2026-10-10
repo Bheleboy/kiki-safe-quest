@@ -15,6 +15,7 @@ import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { ChildSurveyReview } from "@/components/survey/ChildSurveyReview";
 import { ParentSurvey } from "@/components/survey/ParentSurvey";
 import { useNavigate } from "react-router-dom";
+import { ChangePasswordCard } from "@/components/security/ChangePasswordCard";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -332,6 +333,7 @@ export default function ParentDashboard() {
             )}
           </motion.div>
         )}
+        <ChangePasswordCard />
       </main>
     </div>
   );

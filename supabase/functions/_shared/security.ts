@@ -254,3 +254,125 @@ export async function sendCodeEmail(email: string, code: string) {
     label: 'security_stepup_code',
   })
 }
+
+// ---------- Part 2 helpers ----------
+export const SITE_URL = 'https://kikiwarrior.com'
+
+/** Simple fixed-window counter on login_throttle. Counts every call. */
+export async function hitLimit(key: string, limit: number, windowMs: number): Promise<{ blocked: boolean; retryAfterSeconds: number }> {
+  const { data } = await admin.from('login_throttle').select('fail_count, window_start').eq('key', key).maybeSingle()
+  const now = Date.now()
+  let count = data?.fail_count ?? 0
+  let start = data ? new Date(data.window_start).getTime() : now
+  if (now - start > windowMs) { count = 0; start = now }
+  if (count >= limit) return { blocked: true, retryAfterSeconds: Math.ceil((start + windowMs - now) / 1000) }
+  await admin.from('login_throttle').upsert({
+    key, fail_count: count + 1, window_start: new Date(start).toISOString(), updated_at: new Date().toISOString(),
+  })
+  return { blocked: false, retryAfterSeconds: 0 }
+}
+
+export async function createRevokeLink(userId: string): Promise<string> {
+  const raw = randomToken(32)
+  await admin.from('security_tokens').insert({
+    user_id: userId,
+    token_hash: await sha256(raw),
+    purpose: 'revoke_all',
+    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60_000).toISOString(),
+  })
+  return `${SITE_URL}/security/revoke?token=${raw}`
+}
+
+export async function sendNewSigninEmail(userId: string, email: string, ua: string) {
+  const url = await createRevokeLink(userId)
+  await sendSecurityEmail({
+    to: email,
+    subject: 'New sign-in to your Kiki Warrior account',
+    heading: 'New sign-in',
+    paragraphs: [
+      'There was a new sign-in to your Kiki Warrior account.',
+      `When: ${nowText()}. Device: ${ua}.`,
+      'If this was you, there is nothing to do. If it was not you, tap the button below to sign out everywhere.',
+    ],
+    button: { label: "This wasn't me", url },
+    label: 'security_new_signin',
+  })
+}
+
+export async function revokeAllSessions(userId: string, reason: string) {
+  const { data } = await admin.from('user_sessions').select('session_id').eq('user_id', userId).is('revoked_at', null)
+  for (const s of data ?? []) await revokeSession(s.session_id, reason)
+}
+
+/** Validates a bearer JWT. Returns claims or null. */
+export async function getClaimsFrom(req: Request): Promise<Record<string, any> | null> {
+  const auth = req.headers.get('Authorization') ?? ''
+  if (!auth.startsWith('Bearer ')) return null
+  const { data, error } = await anonClient().auth.getClaims(auth.slice(7))
+  const c = data?.claims as Record<string, any> | undefined
+  if (error || !c?.sub) return null
+  return c
+}
+
+export async function isRegisteredSession(claims: Record<string, any>): Promise<boolean> {
+  if (!claims.session_id) return false
+  const { data } = await admin.from('user_sessions').select('user_id, revoked_at').eq('session_id', claims.session_id).maybeSingle()
+  return !!data && !data.revoked_at && data.user_id === claims.sub
+}
+
+/** Re-checks a password without leaving a usable session behind. */
+export async function checkPassword(email: string, password: string): Promise<boolean> {
+  const { data, error } = await anonClient().auth.signInWithPassword({ email, password })
+  if (error || !data.session) return false
+  const sid = decodeJwt(data.session.access_token)?.session_id
+  if (sid) await admin.rpc('revoke_auth_session', { _session_id: sid })
+  return true
+}
+
+async function sha1Hex(s: string) {
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(s))
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+}
+
+/** Returns an error message, or null when the password is acceptable. */
+export async function passwordPolicy(password: string, email: string, ctx: { ip?: string; ua?: string } = {}): Promise<string | null> {
+  if (typeof password !== 'string' || password.length < 10) return 'Password must be at least 10 characters.'
+  if (password.length > 128) return 'Password must be 128 characters or fewer.'
+  if (email && password.trim().toLowerCase() === email.trim().toLowerCase()) return 'Password must not be the same as your email.'
+  try {
+    const h = await sha1Hex(password)
+    const ctrl = new AbortController()
+    const t = setTimeout(() => ctrl.abort(), 4000)
+    const r = await fetch(`https://api.pwnedpasswords.com/range/${h.slice(0, 5)}`, {
+      headers: { 'Add-Padding': 'true', 'User-Agent': 'KikiWarrior-Security' },
+      signal: ctrl.signal,
+    })
+    clearTimeout(t)
+    if (!r.ok) throw new Error(`hibp ${r.status}`)
+    const body = await r.text()
+    const suffix = h.slice(5)
+    for (const line of body.split('\n')) {
+      const [suf, cnt] = line.trim().split(':')
+      if (suf === suffix && Number(cnt) > 0) return 'This password has appeared in a data breach. Please choose a different one.'
+    }
+  } catch (e) {
+    await logEvent({ ip: ctx.ip, user_agent: ctx.ua, event_type: 'hibp_unavailable', details: { error: String(e) } })
+  }
+  return null
+}
+
+export async function verifyTurnstileToken(token: unknown, ip: string): Promise<boolean> {
+  const secret = Deno.env.get('TURNSTILE_SECRET_KEY')
+  if (!secret) return true
+  if (typeof token !== 'string' || !token) return false
+  const form = new FormData()
+  form.append('secret', secret)
+  form.append('response', token)
+  if (ip !== 'unknown') form.append('remoteip', ip)
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form })
+    return (await r.json()).success === true
+  } catch {
+    return false
+  }
+}
