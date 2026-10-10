@@ -12,10 +12,11 @@ const PARENT_TIMEOUT = 30 * 60_000;
 const CHILD_TIMEOUT = 2 * 60 * 60_000;
 const WARNING_MS = 60_000;
 
-let videosPlaying = 0;
+function anyVideoPlaying() {
+  return Array.from(document.querySelectorAll("video")).some((v) => !v.paused && !v.ended);
+}
 /** Called by video players so lessons never time out mid-video. */
-export function markVideoPlaying(playing: boolean) {
-  videosPlaying = Math.max(0, videosPlaying + (playing ? 1 : -1));
+export function markVideoPlaying(_playing: boolean) {
   window.dispatchEvent(new Event("kw-activity"));
 }
 export function markActivity() {
@@ -39,7 +40,7 @@ export function InactivityGuard() {
     const events = ["pointerdown", "pointermove", "keydown", "touchstart", "scroll", "wheel", "kw-activity"];
     events.forEach((e) => window.addEventListener(e, bump, { passive: true, capture: true }));
     const iv = window.setInterval(() => {
-      if (videosPlaying > 0) { lastActive.current = Date.now(); setWarnLeft(null); return; }
+      if (anyVideoPlaying()) { lastActive.current = Date.now(); setWarnLeft(null); return; }
       const idle = Date.now() - lastActive.current;
       if (idle >= timeout) {
         setWarnLeft(null);
