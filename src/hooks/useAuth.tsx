@@ -149,6 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Token refreshes keep the same session: no need to re-check.
       if (lastSessionId === s.access_token.split(".")[1] && event === "TOKEN_REFRESHED") return;
       if (hadUser.current && event === "TOKEN_REFRESHED") return;
+      // Password recovery sessions are only used to set a new password on /reset-password.
+      if (event === "PASSWORD_RECOVERY" || window.location.pathname === "/reset-password") {
+        setLoading(false);
+        return;
+      }
       lastSessionId = s.access_token.split(".")[1];
       setTimeout(async () => {
         if (!mounted) return;
