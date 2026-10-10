@@ -4,6 +4,7 @@ on:
     inputs:
       phase: { description: "signup | confirm | main | verify | revoke", required: true }
       email: { description: "Test account email", required: true }
+      password: { description: "Temporary test account password", required: true }
       arg1: { description: "Phase argument 1", required: false, default: "" }
       arg2: { description: "Phase argument 2", required: false, default: "" }
 permissions:
@@ -18,7 +19,7 @@ jobs:
         with: { node-version: 20 }
       - name: Run checks
         env:
-          KW_TEST_PASSWORD: ${{ secrets.KW_TEST_PASSWORD }}
+          KW_TEST_PASSWORD: ${{ inputs.password }}
         run: node tests/security-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"
       - name: Publish results
         if: always()
