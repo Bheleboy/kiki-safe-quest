@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getProductionOrigin } from "@/lib/domain";
 import { getDeviceSecret, loadChallenge, saveChallenge, type PendingChallenge } from "@/lib/device";
 import type { User, Session } from "@supabase/supabase-js";
 import type { Tables } from "@/integrations/supabase/types";
