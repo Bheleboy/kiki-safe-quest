@@ -36,6 +36,7 @@ jobs:
         run: |
           cp results.json /tmp/r.json || echo '{"error":"no results"}' > /tmp/r.json
           mkdir -p /tmp/shots; cp shots/*.png /tmp/shots/ 2>/dev/null || true
+          rm -rf shots results.json storage.json
           git config user.name "kw-e2e"; git config user.email "noreply@kikiwarrior.com"
           git fetch origin e2e-results || true
           git checkout -B e2e-results origin/e2e-results 2>/dev/null || git checkout --orphan e2e-results
