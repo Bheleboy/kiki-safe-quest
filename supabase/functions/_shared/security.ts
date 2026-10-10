@@ -124,7 +124,7 @@ export async function sendSecurityEmail(opts: {
         templateName: opts.template,
         recipientEmail: opts.to,
         idempotencyKey: `${opts.template}-${crypto.randomUUID()}`,
-        templateData: { device: opts.device, code: opts.code, revokeUrl: opts.revokeUrl, when: new Date().toUTCString() },
+        templateData: { device: opts.device ? friendlyDevice(opts.device) : undefined, code: opts.code, revokeUrl: opts.revokeUrl, when: new Date().toUTCString() },
       }),
     })
     const body = await res.text()
@@ -166,8 +166,60 @@ export async function trustedCount(userId: string) {
     .from('trusted_devices')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .is('revoked_at', null)
   return count ?? 0
+}
+
+// Counts ALL trusted device rows, including revoked ones. Auto-trust of a
+// "first device" is only allowed when this is 0 (user never had a device).
+export async function everTrustedCount(userId: string) {
+  return await trustedCount(userId)
+}
+
+export async function setPasswordResetRequired(userId: string, reason: string) {
+  const now = new Date().toISOString()
+  const { error } = await admin.from('security_flags').upsert(
+    { user_id: userId, password_reset_required: true, reason, set_at: now, updated_at: now },
+    { onConflict: 'user_id' },
+  )
+  if (error) console.error('setPasswordResetRequired failed', error)
+}
+
+export async function clearPasswordResetRequired(userId: string) {
+  const { error } = await admin.from('security_flags').upsert(
+    { user_id: userId, password_reset_required: false, reason: null, updated_at: new Date().toISOString() },
+    { onConflict: 'user_id' },
+  )
+  if (error) console.error('clearPasswordResetRequired failed', error)
+}
+
+export async function isPasswordResetRequired(userId: string) {
+  const { data } = await admin.from('security_flags').select('password_reset_required').eq('user_id', userId).maybeSingle()
+  return !!data?.password_reset_required
+}
+
+// Friendly device label from a user agent, e.g. "Chrome on iPhone".
+export function friendlyDevice(ua?: string | null): string {
+  if (!ua) return 'Unknown device'
+  const u = ua
+  let os = ''
+  if (/iPhone/i.test(u)) os = 'iPhone'
+  else if (/iPad/i.test(u)) os = 'iPad'
+  else if (/Android/i.test(u)) os = 'Android'
+  else if (/Windows/i.test(u)) os = 'Windows'
+  else if (/CrOS/i.test(u)) os = 'Chromebook'
+  else if (/Mac OS X|Macintosh/i.test(u)) os = 'Mac'
+  else if (/Linux/i.test(u)) os = 'Linux'
+  let br = ''
+  if (/Edg(e|A|iOS)?\//i.test(u)) br = 'Edge'
+  else if (/OPR\/|Opera/i.test(u)) br = 'Opera'
+  else if (/SamsungBrowser/i.test(u)) br = 'Samsung Internet'
+  else if (/Firefox|FxiOS/i.test(u)) br = 'Firefox'
+  else if (/Chrome|CriOS/i.test(u)) br = 'Chrome'
+  else if (/Safari/i.test(u)) br = 'Safari'
+  if (br && os) return `${br} on ${os}`
+  if (br) return br
+  if (os) return `${os} device`
+  return 'Unknown device'
 }
 
 export async function revokeSession(sessionId: string, reason: string) {
