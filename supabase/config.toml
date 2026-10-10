@@ -3,3 +3,5 @@ project_id = "cadawrwcoqipuyzypgfx"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.admin-parent-reviews]
+    verify_jwt = false
