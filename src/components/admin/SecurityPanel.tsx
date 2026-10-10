@@ -62,7 +62,25 @@ const TILES: { key: string; label: string }[] = [
 ];
 
 const fmt = (d: string) => new Date(d).toLocaleString();
-const shortUa = (ua: string | null) => (ua ? (ua.length > 60 ? `${ua.slice(0, 60)}...` : ua) : "Unknown");
+const friendlyDevice = (ua: string | null): string => {
+  if (!ua) return "Unknown device";
+  const s = ua.toLowerCase();
+  const browser = s.includes("edg/") ? "Edge"
+    : s.includes("chrome/") && !s.includes("chromium") ? "Chrome"
+    : s.includes("safari/") && !s.includes("chrome") ? "Safari"
+    : s.includes("firefox/") ? "Firefox"
+    : s.includes("chromium") ? "Chromium"
+    : "Browser";
+  const os = s.includes("iphone") ? "iPhone"
+    : s.includes("ipad") ? "iPad"
+    : s.includes("android") ? "Android"
+    : s.includes("mac os") || s.includes("macintosh") ? "Mac"
+    : s.includes("windows") ? "Windows"
+    : s.includes("linux") ? "Linux"
+    : null;
+  return os ? `${browser} on ${os}` : "Unknown device";
+};
+const shortUa = (ua: string | null) => friendlyDevice(ua);
 const pill = "min-h-11 rounded-full px-5 font-display text-xs uppercase tracking-wider disabled:opacity-50";
 
 export function SecurityPanel() {
