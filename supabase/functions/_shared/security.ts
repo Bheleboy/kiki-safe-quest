@@ -352,3 +352,28 @@ export async function verifyTurnstileToken(token: unknown, ip: string): Promise<
     return false
   }
 }
+
+export function friendlyDevice(ua: string | null | undefined): string {
+  if (!ua) return 'Unknown device'
+  const s = ua.toLowerCase()
+  const browser = s.includes('edg/') ? 'Edge'
+    : s.includes('chrome/') && !s.includes('chromium') ? 'Chrome'
+    : s.includes('safari/') && !s.includes('chrome') ? 'Safari'
+    : s.includes('firefox/') ? 'Firefox'
+    : s.includes('chromium') ? 'Chromium'
+    : 'Browser'
+  const os = s.includes('iphone') ? 'iPhone'
+    : s.includes('ipad') ? 'iPad'
+    : s.includes('android') ? 'Android'
+    : s.includes('mac os') || s.includes('macintosh') ? 'Mac'
+    : s.includes('windows') ? 'Windows'
+    : s.includes('linux') ? 'Linux'
+    : null
+  return os ? `${browser} on ${os}` : 'Unknown device'
+}
+
+export async function setPasswordResetRequired(userId: string, reason: string) {
+  const { error } = await admin.from('profiles').update({ password_reset_required: true }).eq('id', userId)
+  if (error) console.error('setPasswordResetRequired failed', error)
+  await logEvent({ user_id: userId, event_type: 'password_reset_required', details: { reason } })
+}

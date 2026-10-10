@@ -19,6 +19,25 @@ async function sha256(s: string) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+function friendlyDevice(ua: string | null | undefined): string {
+  if (!ua) return "Unknown device";
+  const s = ua.toLowerCase();
+  const browser = s.includes("edg/") ? "Edge"
+    : s.includes("chrome/") && !s.includes("chromium") ? "Chrome"
+    : s.includes("safari/") && !s.includes("chrome") ? "Safari"
+    : s.includes("firefox/") ? "Firefox"
+    : s.includes("chromium") ? "Chromium"
+    : "Browser";
+  const os = s.includes("iphone") ? "iPhone"
+    : s.includes("ipad") ? "iPad"
+    : s.includes("android") ? "Android"
+    : s.includes("mac os") || s.includes("macintosh") ? "Mac"
+    : s.includes("windows") ? "Windows"
+    : s.includes("linux") ? "Linux"
+    : null;
+  return os ? `${browser} on ${os}` : "Unknown device";
+}
+
 const COUNTED = [
   "login_failed", "account_locked", "ip_locked", "stepup_sent", "stepup_device_mismatch", "user_reported_signin", "pin_locked",
 ];
@@ -120,6 +139,7 @@ Deno.serve(async (req) => {
         created_at: e.created_at,
         ip: e.ip,
         user_agent: e.user_agent,
+        device_name: friendlyDevice(e.user_agent),
         email: (e.user_id && byId.get(e.user_id)) || (e.email_hash && byHash.get(e.email_hash)) || null,
       }));
 
@@ -145,7 +165,9 @@ Deno.serve(async (req) => {
         db.from("user_sessions").select("session_id, user_agent, ip, created_at, last_seen_at").eq("user_id", p.id).is("revoked_at", null).order("last_seen_at", { ascending: false }),
         db.from("trusted_devices").select("id, user_agent, created_at, last_seen_at").eq("user_id", p.id).is("revoked_at", null).order("last_seen_at", { ascending: false }),
       ]);
-      return json({ found: true, email: p.email, sessions: sessions ?? [], devices: devices ?? [] });
+      const withNames = <T extends { user_agent: string | null }>(rows: T[]) =>
+        rows.map((r) => ({ ...r, device_name: friendlyDevice(r.user_agent) }));
+      return json({ found: true, email: p.email, sessions: withNames(sessions ?? []), devices: withNames(devices ?? []) });
     }
 
     if (body.action === "revoke_user") {
@@ -158,7 +180,9 @@ Deno.serve(async (req) => {
         await db.rpc("revoke_auth_session", { _session_id: s.session_id });
       }
       await db.from("trusted_devices").update({ revoked_at: nowIso }).eq("user_id", p.id).is("revoked_at", null);
-      await log("admin_revoked", { sessions: sessions?.length ?? 0 }, p.id);
+      const { error: resetErr } = await db.from("profiles").update({ password_reset_required: true }).eq("id", p.id);
+      if (resetErr) console.error("admin-security: password_reset_required update failed", resetErr);
+      await log("admin_revoked", { sessions: sessions?.length ?? 0, password_reset_required: true }, p.id);
       return json({ ok: true, revoked: sessions?.length ?? 0 });
     }
 

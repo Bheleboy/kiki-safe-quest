@@ -648,6 +648,30 @@ export type Database = {
         }
         Relationships: []
       }
+      security_flags: {
+        Row: {
+          password_reset_required: boolean
+          reason: string | null
+          set_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          password_reset_required?: boolean
+          reason?: string | null
+          set_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          password_reset_required?: boolean
+          reason?: string | null
+          set_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       security_tokens: {
         Row: {
           created_at: string
