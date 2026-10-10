@@ -8,6 +8,8 @@ import { useNavigate, useSearchParams, useLocation, Link } from "react-router-do
 import { isAllowedAuthDomain, getProductionOrigin } from "@/lib/domain";
 import { lovable } from "@/integrations/lovable/index";
 import { z } from "zod";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Turnstile } from "@/components/Turnstile";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -33,7 +35,26 @@ export default function AuthPage() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
-  const { signUp, signIn, resetPassword, user } = useAuth();
+  const { signUp, signIn, resetPassword, user, pendingChallenge, verifyChallenge, resendChallenge, cancelChallenge, securityMessage, clearSecurityMessage } = useAuth();
+  const [captchaNeeded, setCaptchaNeeded] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | undefined>();
+  const [code, setCode] = useState("");
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+
+  const handleVerify = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (code.length !== 6) { setError("Enter the 6-digit code."); return; }
+    setError(""); setMessage(""); setSubmitting(true);
+    const { error: err } = await verifyChallenge(code);
+    setSubmitting(false);
+    if (err) { setError(err.message); setCode(""); }
+  };
+
+  const handleResend = async () => {
+    setError(""); setMessage("");
+    const { error: err } = await resendChallenge();
+    if (err) setError(err.message); else setMessage("A new code is on its way.");
+  };
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = (location.state as any)?.returnTo || "/family";
@@ -68,9 +89,12 @@ export default function AuthPage() {
         else { setMessage("Check your email for a verification link!"); }
       } else if (mode === "login") {
         loginSchema.parse({ email, password });
-        const { error: err } = await signIn(email.trim(), password);
-        if (err) { setError(err.message); }
-        else { navigate(returnTo); }
+        clearSecurityMessage();
+        const res = await signIn(email.trim(), password, turnstileToken);
+        setTurnstileToken(undefined);
+        if (res.captchaRequired) setCaptchaNeeded(true);
+        if (res.stepUp) { setCode(""); setPassword(""); }
+        else if (res.error) { setError(res.error.message); }
       } else {
         z.string().email().parse(email.trim());
         const { error: err } = await resetPassword(email.trim());
@@ -112,6 +136,41 @@ export default function AuthPage() {
         </div>
 
         {/* Card */}
+        {pendingChallenge ? (
+        <div className="card-kiki">
+          <h2 className="font-display text-xl font-semibold text-charcoal uppercase tracking-wider mb-4 text-center">
+            Check your email
+          </h2>
+          <p className="font-body text-sm text-charcoal/70 leading-relaxed text-center mb-6">
+            We emailed a code to {pendingChallenge.masked_email || "your email"}. Enter it on this device.
+          </p>
+          <form onSubmit={handleVerify} className="space-y-4">
+            <div className="flex justify-center">
+              <InputOTP maxLength={6} value={code} onChange={setCode} inputMode="numeric" autoFocus aria-label="6-digit sign-in code">
+                <InputOTPGroup>
+                  {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            {error && <p className="text-sm font-body text-destructive bg-destructive/10 rounded-lg px-4 py-2">{error}</p>}
+            {message && <p className="text-sm font-body text-success bg-success/10 rounded-lg px-4 py-2">{message}</p>}
+            <Button variant="ghost" type="submit" disabled={submitting || code.length !== 6}
+              className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50">
+              {submitting ? "..." : "Verify and sign in"}
+            </Button>
+          </form>
+          <div className="mt-6 space-y-2 text-center">
+            <Button variant="ghost" onClick={handleResend} className="text-sm font-body text-primary hover:underline">
+              Send a new code
+            </Button>
+            <div>
+              <Button variant="ghost" onClick={() => { cancelChallenge(); setError(""); setMessage(""); setCode(""); setMode("login"); }} className="text-sm font-body text-charcoal/70 hover:underline">
+                Back to Sign In
+              </Button>
+            </div>
+          </div>
+        </div>
+        ) : (
         <div className="card-kiki">
           <h2 className="font-display text-xl font-semibold text-charcoal uppercase tracking-wider mb-6 text-center">
             {mode === "login" ? "Welcome Back" : mode === "signup" ? "Parent Account" : "Reset Password"}
@@ -189,6 +248,12 @@ export default function AuthPage() {
               </div>
             )}
 
+            {securityMessage && !error && (
+              <p className="text-sm font-body text-charcoal bg-primary/10 rounded-lg px-4 py-2">{securityMessage}</p>
+            )}
+            {mode === "login" && captchaNeeded && turnstileSiteKey && (
+              <Turnstile siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+            )}
             {error && (
               <p className="text-sm font-body text-destructive bg-destructive/10 rounded-lg px-4 py-2">
                 {error}
@@ -244,6 +309,7 @@ export default function AuthPage() {
             )}
           </div>
         </div>
+        )}
       </motion.div>
     </main></PublicPage>
   );

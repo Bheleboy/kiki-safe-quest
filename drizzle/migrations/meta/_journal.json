@@ -15,6 +15,13 @@
       "when": 1791641349636,
       "tag": "0001_drop_admin_parent_survey_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791642544426,
+      "tag": "0002_security_sessions",
+      "breakpoints": true
     }
   ]
 }
