@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { sitecheckerSupabase } from "@/integrations/sitechecker/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { Users, Baby, BookOpen, TrendingUp, Search, LogOut } from "lucide-react";
+import { Users, Baby, BookOpen, TrendingUp, Search, LogOut, Star } from "lucide-react";
 
 const KIKI_CLIENT_ID = "7a197200-b63e-4a04-80b7-6c3bdcfd93d7";
 
@@ -340,6 +341,13 @@ function AdminDashboardView() {
           </>
         )}
 
+        <section>
+          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
+            <Star size={20} className="text-primary" /> Parent reviews
+          </h2>
+          <ParentReviewsPanel />
+        </section>
+
         {/* Section 5: Google Search Console */}
         <section>
           <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
@@ -531,6 +539,65 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
       <p className="text-xs text-muted-foreground uppercase tracking-wider font-display">{label}</p>
       <p className="text-2xl font-bold mt-1">{value}</p>
       {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+    </div>
+  );
+}
+
+type ReviewRow = { id: string; display_name: string | null; overall_rating: number | null; feedback: string | null; created_at: string; approved: boolean };
+
+function ParentReviewsPanel() {
+  const [rows, setRows] = useState<ReviewRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    supabase
+      .from("parent_surveys")
+      .select("id, display_name, overall_rating, feedback, created_at, approved")
+      .eq("share_publicly", true)
+      .order("created_at", { ascending: false })
+      .then(({ data, error: err }) => {
+        if (!mounted) return;
+        if (err) setError("Could not load reviews. Sign in to the main site with your admin account.");
+        setRows(((data ?? []) as ReviewRow[]).sort((a, b) => Number(a.approved) - Number(b.approved)));
+        setLoading(false);
+      });
+    return () => { mounted = false; };
+  }, []);
+
+  async function setApproved(id: string, approved: boolean) {
+    setBusy(id);
+    const approved_at = approved ? new Date().toISOString() : null;
+    const { error: err } = await supabase.from("parent_surveys").update({ approved, approved_at }).eq("id", id);
+    setBusy(null);
+    if (err) { setError("Update failed. Check you are signed in as an admin."); return; }
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, approved } : r)).sort((a, b) => Number(a.approved) - Number(b.approved)));
+  }
+
+  if (loading) return <p className="font-body text-sm text-charcoal/70">Loading reviews...</p>;
+  return (
+    <div className="space-y-3">
+      {error && <p className="font-body text-sm text-destructive">{error}</p>}
+      {rows.length === 0 && !error && <p className="font-body text-sm text-charcoal/70">No parents have asked to share a review yet.</p>}
+      {rows.map((r) => (
+        <article key={r.id} className="rounded-2xl bg-card border border-primary/15 p-5 flex flex-col sm:flex-row sm:items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-display uppercase text-sm text-charcoal">{r.display_name || "No name"}</span>
+              <span className="flex gap-0.5" aria-label={`${r.overall_rating ?? 0} out of 5`}>{[1, 2, 3, 4, 5].map((n) => <Star key={n} size={14} className={n <= (r.overall_rating ?? 0) ? "text-primary fill-primary" : "text-charcoal/20"} />)}</span>
+              <span className={`rounded-full px-3 py-1 font-display text-[11px] uppercase tracking-widest ${r.approved ? "bg-success/15 text-charcoal" : "bg-primary/15 text-charcoal"}`}>{r.approved ? "Live" : "Pending"}</span>
+              <span className="font-body text-xs text-charcoal/60">{new Date(r.created_at).toLocaleDateString()}</span>
+            </div>
+            <p className="font-body text-sm text-charcoal/70 mt-2 break-words">{r.feedback || "(no written feedback)"}</p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button type="button" disabled={busy === r.id || r.approved} onClick={() => setApproved(r.id, true)} className="min-h-11 rounded-full bg-primary px-5 font-display text-xs uppercase tracking-wider text-charcoal disabled:opacity-50">Approve</button>
+            <button type="button" disabled={busy === r.id || !r.approved} onClick={() => setApproved(r.id, false)} className="min-h-11 rounded-full border-2 border-primary/35 px-5 font-display text-xs uppercase tracking-wider text-charcoal disabled:opacity-50">Hide</button>
+          </div>
+        </article>
+      ))}
     </div>
   );
 }
