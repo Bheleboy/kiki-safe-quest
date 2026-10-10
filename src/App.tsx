@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import VideoDemo from "./pages/VideoDemo";
 import CookieConsent from "./components/CookieConsent";
 import SecurityRevoke from "./pages/SecurityRevoke";
+import Unsubscribe from "./pages/Unsubscribe";
 import { ParentGate } from "./components/security/ParentGate";
 import { InactivityGuard } from "./components/security/InactivityGuard";
 
@@ -79,6 +80,7 @@ const App = () => (
               <Route path="/verify-age" element={<AgeVerification />} />
               <Route path="/video-demo" element={<VideoDemo />} />
               <Route path="/security/revoke" element={<SecurityRevoke />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
 
               {/* Protected */}
               <Route path="/family" element={<ProtectedRoute><ParentGate><ManageChildren /></ParentGate></ProtectedRoute>} />

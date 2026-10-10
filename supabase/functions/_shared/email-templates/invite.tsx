@@ -36,7 +36,7 @@ export const InviteEmail = ({
           <Link href={siteUrl} style={link}>
             <strong>Kiki Warrior</strong>
           </Link>
-          — internet safety for families. Click below to accept and create your account.
+          , internet safety for families. Click below to accept and create your account.
         </Text>
         <Button style={button} href={confirmationUrl}>
           Accept Invitation

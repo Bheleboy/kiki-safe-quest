@@ -87,49 +87,32 @@ export function maskEmail(email: string): string {
   return `${u.slice(0, 1)}${'*'.repeat(Math.max(1, Math.min(u.length - 1, 5)))}@${d}`
 }
 
-// ---------- Email (uses the existing branded email queue) ----------
-const SENDER_DOMAIN = 'notify.kikiwarrior.com'
-const FROM = 'Kiki Warrior <noreply@kikiwarrior.com>'
-
-function esc(s: string) {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
-}
+// ---------- Email (platform app-email pipeline with fixed security templates) ----------
+export type SecurityTemplate =
+  | 'security-stepup-code' | 'security-new-signin' | 'security-account-locked'
+  | 'security-session-limit' | 'security-password-changed' | 'security-pin-locked'
 
 export async function sendSecurityEmail(opts: {
   to: string
-  subject: string
-  heading: string
-  paragraphs: string[]
-  button?: { label: string; url: string }
-  label: string
+  template: SecurityTemplate
+  device?: string
+  code?: string
+  revokeUrl?: string
 }) {
-  const p = opts.paragraphs
-    .map((t) => `<p style="font-size:15px;color:#636b75;line-height:1.6;margin:0 0 20px">${esc(t)}</p>`)
-    .join('')
-  const btn = opts.button
-    ? `<a href="${esc(opts.button.url)}" style="display:inline-block;background:#d97b2a;color:#ffffff;font-size:14px;font-weight:bold;font-family:'Oswald',Arial,sans-serif;border-radius:12px;padding:14px 28px;text-decoration:none;text-transform:uppercase;letter-spacing:1px">${esc(opts.button.label)}</a>`
-    : ''
-  const html = `<!doctype html><html lang="en"><body style="background:#ffffff;font-family:'DM Sans',Arial,sans-serif"><div style="padding:32px 28px"><h1 style="font-size:24px;font-weight:bold;font-family:'Oswald',Arial,sans-serif;color:#2b3440;margin:0 0 20px;text-transform:uppercase;letter-spacing:0.5px">${esc(opts.heading)}</h1>${p}${btn}<p style="font-size:12px;color:#999999;margin:32px 0 0">This is a security notice from Kiki Warrior.</p></div></body></html>`
-  const text = [opts.heading, '', ...opts.paragraphs, opts.button ? `${opts.button.label}: ${opts.button.url}` : ''].join('\n')
-  const messageId = crypto.randomUUID()
-  await admin.from('email_send_log').insert({ message_id: messageId, template_name: opts.label, recipient_email: opts.to, status: 'pending' })
-  const { error } = await admin.rpc('enqueue_email', {
-    queue_name: 'auth_emails',
-    payload: {
-      run_id: crypto.randomUUID(),
-      message_id: messageId,
-      to: opts.to,
-      from: FROM,
-      sender_domain: SENDER_DOMAIN,
-      subject: opts.subject,
-      html,
-      text,
-      purpose: 'transactional',
-      label: opts.label,
-      queued_at: new Date().toISOString(),
-    },
-  })
-  if (error) console.error('enqueue security email failed', error)
+  try {
+    const { data, error } = await admin.functions.invoke('send-transactional-email', {
+      body: {
+        templateName: opts.template,
+        recipientEmail: opts.to,
+        idempotencyKey: `${opts.template}-${crypto.randomUUID()}`,
+        templateData: { device: opts.device, code: opts.code, revokeUrl: opts.revokeUrl, when: new Date().toUTCString() },
+      },
+    })
+    if (error) console.error('security email send failed', opts.template, error)
+    return data
+  } catch (e) {
+    console.error('security email send threw', opts.template, e)
+  }
 }
 
 export function nowText() {
@@ -202,17 +185,7 @@ export async function registerSession(opts: {
     await logEvent({ user_id: opts.userId, ip: opts.ip, user_agent: opts.ua, event_type: 'session_revoked_limit', details: { session_id: s.session_id } })
   }
   if (extra.length && opts.email) {
-    await sendSecurityEmail({
-      to: opts.email,
-      subject: 'You were signed out on another device',
-      heading: 'Signed out on another device',
-      paragraphs: [
-        'You were signed out on another device because your account was signed in on a new one.',
-        `New sign-in: ${nowText()} on ${opts.ua}.`,
-        'If this was not you, change your password straight away.',
-      ],
-      label: 'security_session_limit',
-    })
+    await sendSecurityEmail({ to: opts.email, template: 'security-session-limit', device: opts.ua })
   }
   await logEvent({ user_id: opts.userId, ip: opts.ip, user_agent: opts.ua, event_type: 'session_registered', details: { session_id: opts.sessionId } })
 }
@@ -243,16 +216,7 @@ export async function createChallenge(opts: {
 }
 
 export async function sendCodeEmail(email: string, code: string) {
-  await sendSecurityEmail({
-    to: email,
-    subject: 'Your Kiki Warrior sign-in code',
-    heading: `Sign-in code: ${code}`,
-    paragraphs: [
-      `Your Kiki Warrior sign-in code is ${code}. It expires in 10 minutes.`,
-      'If you did not try to sign in, change your password.',
-    ],
-    label: 'security_stepup_code',
-  })
+  await sendSecurityEmail({ to: email, template: 'security-stepup-code', code: code })
 }
 
 // ---------- Part 2 helpers ----------
@@ -285,18 +249,7 @@ export async function createRevokeLink(userId: string): Promise<string> {
 
 export async function sendNewSigninEmail(userId: string, email: string, ua: string) {
   const url = await createRevokeLink(userId)
-  await sendSecurityEmail({
-    to: email,
-    subject: 'New sign-in to your Kiki Warrior account',
-    heading: 'New sign-in',
-    paragraphs: [
-      'There was a new sign-in to your Kiki Warrior account.',
-      `When: ${nowText()}. Device: ${ua}.`,
-      'If this was you, there is nothing to do. If it was not you, tap the button below to sign out everywhere.',
-    ],
-    button: { label: "This wasn't me", url },
-    label: 'security_new_signin',
-  })
+  await sendSecurityEmail({ to: email, template: 'security-new-signin', device: ua, revokeUrl: url })
 }
 
 export async function revokeAllSessions(userId: string, reason: string) {

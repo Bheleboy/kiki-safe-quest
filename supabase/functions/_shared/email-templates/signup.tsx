@@ -29,7 +29,7 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Kiki Warrior — verify your email to get started!</Preview>
+    <Preview>Welcome to Kiki Warrior. Verify your email to get started!</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={h1}>Welcome, Warrior! 🛡️</Heading>
@@ -38,7 +38,7 @@ export const SignupEmail = ({
           <Link href={siteUrl} style={link}>
             <strong>Kiki Warrior</strong>
           </Link>
-          — internet safety for families.
+          , internet safety for families.
         </Text>
         <Text style={text}>
           Please verify your email address (

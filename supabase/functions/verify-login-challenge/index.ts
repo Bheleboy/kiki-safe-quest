@@ -105,18 +105,7 @@ Deno.serve(async (req) => {
     purpose: 'revoke_all',
     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60_000).toISOString(),
   })
-  await sendSecurityEmail({
-    to: ch.email,
-    subject: 'New sign-in to your Kiki Warrior account',
-    heading: 'New sign-in',
-    paragraphs: [
-      'There was a new sign-in to your Kiki Warrior account.',
-      `When: ${nowText()}. Device: ${ua}.`,
-      'If this was you, there is nothing to do. If it was not you, tap the button below to sign out everywhere.',
-    ],
-    button: { label: "This wasn't me", url: `${SITE}/security/revoke?token=${rawToken}` },
-    label: 'security_new_signin',
-  })
+  await sendSecurityEmail({ to: ch.email, template: 'security-new-signin', device: ua, revokeUrl: `${SITE}/security/revoke?token=${rawToken}` })
 
   return json(tokens ? { ...tokens } : { ok: true, registered: true })
 })

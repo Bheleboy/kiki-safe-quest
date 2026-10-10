@@ -32,17 +32,6 @@ Deno.serve(async (req) => {
   const { data: others } = await admin.from('user_sessions').select('session_id').eq('user_id', userId).is('revoked_at', null).neq('session_id', claims.session_id)
   for (const s of others ?? []) await revokeSession(s.session_id, 'password_changed')
   await logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'password_changed' })
-  await sendSecurityEmail({
-    to: email,
-    subject: 'Your Kiki Warrior password was changed',
-    heading: 'Password changed',
-    paragraphs: [
-      'Your Kiki Warrior password was changed. Other devices have been signed out.',
-      `When: ${nowText()}. Device: ${ua}.`,
-      'If you did not do this, tap the button below straight away.',
-    ],
-    button: { label: "This wasn't me", url: await createRevokeLink(userId) },
-    label: 'security_password_changed',
-  })
+  await sendSecurityEmail({ to: email, template: 'security-password-changed', device: ua, revokeUrl: await createRevokeLink(userId) })
   return json({ ok: true })
 })
