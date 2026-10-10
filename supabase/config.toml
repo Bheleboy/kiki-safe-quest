@@ -5,6 +5,8 @@ project_id = "cadawrwcoqipuyzypgfx"
     verify_jwt = false
   [functions.admin-parent-reviews]
     verify_jwt = false
+  [functions.admin-security]
+    verify_jwt = false
 
 [functions.send-transactional-email]
 verify_jwt = true
