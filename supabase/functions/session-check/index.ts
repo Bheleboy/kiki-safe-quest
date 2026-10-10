@@ -49,12 +49,14 @@ Deno.serve(async (req) => {
       return json({ valid: false, reason: 'not_registered' })
     }
     const email = (claims.email as string) || ''
-    const count = await trustedCount(userId)
-    if (count === 0 || (await isTrusted(userId, deviceHash))) {
-      await trustDevice(userId, deviceHash, ua)
-      await registerSession({ sessionId, userId, email: email || null, deviceHash, ip, ua })
+    const [count, trustedHere] = await Promise.all([trustedCount(userId), isTrusted(userId, deviceHash)])
+    if (count === 0 || trustedHere) {
+      await Promise.all([
+        trustDevice(userId, deviceHash, ua),
+        registerSession({ sessionId, userId, email: email || null, deviceHash, ip, ua }),
+      ])
       await logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'login_success_oauth' })
-      if (count === 0 && email) await sendNewSigninEmail(userId, email, ua)
+      if (count === 0 && email) sendNewSigninEmail(userId, email, ua)
       return json({ valid: true, registered: true })
     }
     if (!email) return json({ valid: false, reason: 'no_email' })

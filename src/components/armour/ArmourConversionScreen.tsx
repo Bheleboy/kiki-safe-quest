@@ -45,7 +45,7 @@ export function ArmourConversionScreen({ earnedPieces, learnerName }: ArmourConv
           ))}
         </div>
         <p className="font-body text-sm text-charcoal/70 max-w-md mx-auto">
-          {learnerName} has collected all 6 pieces of the Armour of God -- a true Kiki Warrior!
+          {learnerName} has collected all 6 pieces of the Armour of God, a true Kiki Warrior!
         </p>
       </div>
 

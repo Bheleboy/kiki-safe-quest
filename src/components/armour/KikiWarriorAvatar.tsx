@@ -70,7 +70,7 @@ export function KikiWarriorAvatar({
       : isFullArmour
       ? "Full Armour of God!"
       : safetyComplete
-      ? `${earnedCount}/6 Pieces -- Keep Going!`
+      ? `${earnedCount}/6 Pieces, Keep Going!`
       : `${earnedCount}/6 Pieces Earned`;
 
   return (

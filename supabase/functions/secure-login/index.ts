@@ -1,5 +1,5 @@
 import {
-  admin, anonClient, clientIp, cors, createChallenge, decodeJwt, deviceHashFrom, isTrusted, json, logEvent,
+  admin, anonClient, background, clientIp, cors, createChallenge, decodeJwt, deviceHashFrom, isTrusted, json, logEvent,
   maskEmail, nowText, registerSession, sendNewSigninEmail, revokeSession, sendSecurityEmail, sha256, trustDevice, trustedCount, userAgent, isPasswordResetRequired,
 } from '../_shared/security.ts'
 
@@ -102,15 +102,14 @@ Deno.serve(async (req) => {
   const { data, error } = await anon.auth.signInWithPassword({ email, password })
 
   if (error || !data.session || !data.user) {
-    const emailLocked = await recordFailure(et, EMAIL_LIMIT)
-    const ipLocked = await recordFailure(it, IP_LIMIT)
+    const [emailLocked, ipLocked] = await Promise.all([recordFailure(et, EMAIL_LIMIT), recordFailure(it, IP_LIMIT)])
     await logEvent({ email_hash: emailHash, ip, user_agent: ua, event_type: 'login_failed', details: { reason: error?.message ?? 'no_session' } })
     if (emailLocked) {
       await logEvent({ email_hash: emailHash, ip, user_agent: ua, event_type: 'account_locked' })
-      const { data: prof } = await admin.from('profiles').select('id, email').ilike('email', email).maybeSingle()
-      if (prof?.email) {
-        await sendSecurityEmail({ to: prof.email, template: 'security-account-locked', device: ua })
-      }
+      background((async () => {
+        const { data: prof } = await admin.from('profiles').select('id, email').ilike('email', email).maybeSingle()
+        if (prof?.email) sendSecurityEmail({ to: prof.email, template: 'security-account-locked', device: ua })
+      })())
     }
     if (ipLocked) await logEvent({ ip, user_agent: ua, event_type: 'ip_locked' })
     // Confirmed-email errors are reported generically too, to avoid enumeration.
@@ -119,17 +118,21 @@ Deno.serve(async (req) => {
 
   // Account flagged after "This wasn't me" or admin sign-out: old password is not accepted.
   // Only reached with a correct password, so wrong-password attempts learn nothing.
-  if (await isPasswordResetRequired(data.user.id)) {
+  const [resetRequired, count, trustedHere] = await Promise.all([
+    isPasswordResetRequired(data.user.id),
+    trustedCount(data.user.id),
+    isTrusted(data.user.id, deviceHash),
+  ])
+  if (resetRequired) {
     const sid = decodeJwt(data.session.access_token)?.session_id as string | undefined
     if (sid) await admin.rpc('revoke_auth_session', { _session_id: sid })
-    await recordFailure(et, EMAIL_LIMIT)
-    await recordFailure(it, IP_LIMIT)
+    await Promise.all([recordFailure(et, EMAIL_LIMIT), recordFailure(it, IP_LIMIT)])
     await logEvent({ user_id: data.user.id, email_hash: emailHash, ip, user_agent: ua, event_type: 'login_blocked_reset_required' })
     return json({ error: 'password_reset_required', message: 'For your security, please reset your password using the link we emailed you.' }, 403)
   }
 
-  // Success: reset email counters and lock level.
-  await admin.from('login_throttle').upsert({
+  // Success: reset email counters and lock level (runs alongside the session work below).
+  const throttleReset = admin.from('login_throttle').upsert({
     key: emailKey, fail_count: 0, window_start: new Date().toISOString(), lock_level: 0, locked_until: null, updated_at: new Date().toISOString(),
   })
 
@@ -139,20 +142,23 @@ Deno.serve(async (req) => {
   const sessionId = claims?.session_id as string | undefined
   if (!sessionId) return json({ error: 'server_error' }, 500)
 
-  const count = await trustedCount(user.id)
-  if (count === 0) {
-    await trustDevice(user.id, deviceHash, ua)
-    await logEvent({ user_id: user.id, ip, user_agent: ua, event_type: 'device_trusted_first' })
-  } else if (!(await isTrusted(user.id, deviceHash))) {
-    await revokeSession(sessionId, 'step_up_required')
-    const challengeId = await createChallenge({ userId: user.id, email: user.email ?? email, deviceHash, ip, ua })
+  // count includes revoked rows: auto-trust only when the user never had any device.
+  if (count !== 0 && !trustedHere) {
+    const [, challengeId] = await Promise.all([
+      revokeSession(sessionId, 'step_up_required'),
+      createChallenge({ userId: user.id, email: user.email ?? email, deviceHash, ip, ua }),
+      throttleReset,
+    ])
     return json({ step_up: true, challenge_id: challengeId, masked_email: maskEmail(user.email ?? email) })
-  } else {
-    await trustDevice(user.id, deviceHash, ua)
   }
+  if (count === 0) logEvent({ user_id: user.id, ip, user_agent: ua, event_type: 'device_trusted_first' })
 
-  await registerSession({ sessionId, userId: user.id, email: user.email ?? email, deviceHash, ip, ua })
+  await Promise.all([
+    trustDevice(user.id, deviceHash, ua),
+    registerSession({ sessionId, userId: user.id, email: user.email ?? email, deviceHash, ip, ua }),
+    throttleReset,
+  ])
   await logEvent({ user_id: user.id, ip, user_agent: ua, event_type: 'login_success' })
-  if (count === 0) await sendNewSigninEmail(user.id, user.email ?? email, ua)
+  if (count === 0) sendNewSigninEmail(user.id, user.email ?? email, ua)
   return json({ access_token: session.access_token, refresh_token: session.refresh_token })
 })

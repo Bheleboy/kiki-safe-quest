@@ -54,16 +54,28 @@ export function decodeJwt(token: string): Record<string, any> | null {
   }
 }
 
-export async function logEvent(e: {
+/** Runs work after the response is sent (Edge waitUntil), never blocking the caller. */
+export function background(p: Promise<unknown>) {
+  const safe = p.catch((e) => console.error('background task failed', e))
+  try {
+    // deno-lint-ignore no-explicit-any
+    const rt = (globalThis as any).EdgeRuntime
+    if (rt?.waitUntil) rt.waitUntil(safe)
+  } catch { /* not available */ }
+}
+
+export function logEvent(e: {
   user_id?: string | null
   email_hash?: string | null
   ip?: string
   user_agent?: string
   event_type: string
   details?: Record<string, unknown>
-}) {
-  const { error } = await admin.from('security_events').insert(e)
-  if (error) console.error('security_events insert failed', error)
+}): void {
+  background((async () => {
+    const { error } = await admin.from('security_events').insert(e)
+    if (error) console.error('security_events insert failed', error)
+  })())
 }
 
 export function randomCode(): string {
@@ -92,13 +104,20 @@ export type SecurityTemplate =
   | 'security-stepup-code' | 'security-new-signin' | 'security-account-locked'
   | 'security-session-limit' | 'security-password-changed' | 'security-pin-locked'
 
-export async function sendSecurityEmail(opts: {
+type SecurityEmailOpts = {
   to: string
   template: SecurityTemplate
   device?: string
   code?: string
   revokeUrl?: string
-}) {
+}
+
+/** Fire-and-forget: the send continues after the response is returned. */
+export function sendSecurityEmail(opts: SecurityEmailOpts): void {
+  background(sendSecurityEmailNow(opts))
+}
+
+async function sendSecurityEmailNow(opts: SecurityEmailOpts) {
   const fail = async (msg: string) => {
     console.error('security email send failed', opts.template, msg)
     const { error } = await admin.from('email_send_log').insert({
@@ -176,8 +195,10 @@ export async function everTrustedCount(userId: string) {
 }
 
 export async function revokeSession(sessionId: string, reason: string) {
-  await admin.from('user_sessions').update({ revoked_at: new Date().toISOString(), revoke_reason: reason }).eq('session_id', sessionId)
-  const { error } = await admin.rpc('revoke_auth_session', { _session_id: sessionId })
+  const [, { error }] = await Promise.all([
+    admin.from('user_sessions').update({ revoked_at: new Date().toISOString(), revoke_reason: reason }).eq('session_id', sessionId),
+    admin.rpc('revoke_auth_session', { _session_id: sessionId }),
+  ])
   if (error) console.error('revoke_auth_session failed', error)
 }
 
@@ -208,9 +229,9 @@ export async function registerSession(opts: {
     .is('revoked_at', null)
     .order('created_at', { ascending: false })
   const extra = (active ?? []).filter((s) => s.session_id !== opts.sessionId).slice(MAX_SESSIONS - 1)
+  await Promise.all(extra.map((s) => revokeSession(s.session_id, 'session_limit')))
   for (const s of extra) {
-    await revokeSession(s.session_id, 'session_limit')
-    await logEvent({ user_id: opts.userId, ip: opts.ip, user_agent: opts.ua, event_type: 'session_revoked_limit', details: { session_id: s.session_id } })
+    logEvent({ user_id: opts.userId, ip: opts.ip, user_agent: opts.ua, event_type: 'session_revoked_limit', details: { session_id: s.session_id } })
   }
   if (extra.length && opts.email) {
     await sendSecurityEmail({ to: opts.email, template: 'security-session-limit', device: opts.ua })
@@ -275,14 +296,17 @@ export async function createRevokeLink(userId: string): Promise<string> {
   return `${SITE_URL}/security/revoke?token=${raw}`
 }
 
-export async function sendNewSigninEmail(userId: string, email: string, ua: string) {
-  const url = await createRevokeLink(userId)
-  await sendSecurityEmail({ to: email, template: 'security-new-signin', device: ua, revokeUrl: url })
+/** Fire-and-forget: revoke link creation and send happen after the response. */
+export function sendNewSigninEmail(userId: string, email: string, ua: string): void {
+  background((async () => {
+    const url = await createRevokeLink(userId)
+    await sendSecurityEmailNow({ to: email, template: 'security-new-signin', device: ua, revokeUrl: url })
+  })())
 }
 
 export async function revokeAllSessions(userId: string, reason: string) {
   const { data } = await admin.from('user_sessions').select('session_id').eq('user_id', userId).is('revoked_at', null)
-  for (const s of data ?? []) await revokeSession(s.session_id, reason)
+  await Promise.all((data ?? []).map((s) => revokeSession(s.session_id, reason)))
 }
 
 /** Validates a bearer JWT. Returns claims or null. */

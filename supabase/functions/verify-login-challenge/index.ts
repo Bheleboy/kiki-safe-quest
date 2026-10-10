@@ -1,6 +1,6 @@
 import {
   admin, anonClient, clientIp, cors, decodeJwt, deviceHashFrom, json, logEvent, nowText, randomCode, randomToken,
-  registerSession, sendCodeEmail, sendSecurityEmail, sha256, trustDevice, userAgent,
+  registerSession, sendCodeEmail, sendNewSigninEmail, sendSecurityEmail, sha256, trustDevice, userAgent,
 } from '../_shared/security.ts'
 
 const MAX_ATTEMPTS = 5
@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     .select('id')
   if (!consumed?.length) return json({ error: 'challenge_invalid', message: 'This code was already used.' }, 400)
 
-  await trustDevice(ch.user_id, deviceHash, ua)
+  const trusting = trustDevice(ch.user_id, deviceHash, ua)
 
   let tokens: { access_token: string; refresh_token: string } | null = null
   let sessionId: string | null = null
@@ -80,32 +80,29 @@ Deno.serve(async (req) => {
     const { data: cl, error } = await anonClient().auth.getClaims(jwt)
     const claims = cl?.claims as Record<string, any> | undefined
     if (error || !claims || claims.sub !== ch.user_id || claims.session_id !== ch.existing_session_id) {
+      await trusting
       return json({ error: 'session_mismatch', message: 'Please sign in again.' }, 401)
     }
     sessionId = ch.existing_session_id
   } else {
     const { data: link, error: linkErr } = await admin.auth.admin.generateLink({ type: 'magiclink', email: ch.email })
     const hashed = link?.properties?.hashed_token
-    if (linkErr || !hashed) { console.error('generateLink failed', linkErr); return json({ error: 'server_error' }, 500) }
+    if (linkErr || !hashed) { await trusting; console.error('generateLink failed', linkErr); return json({ error: 'server_error' }, 500) }
     const { data: v, error: vErr } = await anonClient().auth.verifyOtp({ token_hash: hashed, type: 'magiclink' })
-    if (vErr || !v.session) { console.error('verifyOtp failed', vErr); return json({ error: 'server_error' }, 500) }
+    if (vErr || !v.session) { await trusting; console.error('verifyOtp failed', vErr); return json({ error: 'server_error' }, 500) }
     tokens = { access_token: v.session.access_token, refresh_token: v.session.refresh_token }
     sessionId = decodeJwt(v.session.access_token)?.session_id ?? null
-    if (!sessionId) return json({ error: 'server_error' }, 500)
+    if (!sessionId) { await trusting; return json({ error: 'server_error' }, 500) }
   }
 
-  await registerSession({ sessionId: sessionId!, userId: ch.user_id, email: ch.email, deviceHash, ip, ua })
+  await Promise.all([
+    trusting,
+    registerSession({ sessionId: sessionId!, userId: ch.user_id, email: ch.email, deviceHash, ip, ua }),
+  ])
   await logEvent({ user_id: ch.user_id, ip, user_agent: ua, event_type: 'stepup_verified', details: { challenge_id: ch.id } })
 
-  // One-time "This wasn't me" token (endpoint arrives in part 2)
-  const rawToken = randomToken(32)
-  await admin.from('security_tokens').insert({
-    user_id: ch.user_id,
-    token_hash: await sha256(rawToken),
-    purpose: 'revoke_all',
-    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60_000).toISOString(),
-  })
-  await sendSecurityEmail({ to: ch.email, template: 'security-new-signin', device: ua, revokeUrl: `${SITE}/security/revoke?token=${rawToken}` })
+  // "This wasn't me" link + notice, sent after the response.
+  sendNewSigninEmail(ch.user_id, ch.email, ua)
 
   return json(tokens ? { ...tokens } : { ok: true, registered: true })
 })
