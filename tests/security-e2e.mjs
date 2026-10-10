@@ -15,7 +15,8 @@ const FN = `${URL_}/functions/v1`;
 const [phase, email, password, arg1, arg2] = process.argv.slice(2);
 const DEV = { A: "A".repeat(40) + "devA01", B: "B".repeat(40) + "devB01", C: "C".repeat(40) + "devC01" };
 const out = { phase, at: new Date().toISOString(), checks: [] };
-const check = (name, pass, detail) => { out.checks.push({ name, pass: !!pass, detail }); console.log(pass ? "PASS" : "FAIL", name, JSON.stringify(detail ?? "")); };
+const scrub = (v) => JSON.parse(JSON.stringify(v ?? null, (k, x) => (/token|password|email/i.test(k) && typeof x === "string" ? "[hidden]" : x)));
+const check = (name, pass, detail) => { detail = scrub(detail); out.checks.push({ name, pass: !!pass, detail }); console.log(pass ? "PASS" : "FAIL", name, JSON.stringify(detail ?? "")); };
 
 async function fn(name, body, token) {
   const r = await fetch(`${FN}/${name}`, {
@@ -76,7 +77,7 @@ try {
     // New device B must get a step-up challenge, no tokens.
     const b = await fn("secure-login", { email, password, device_secret: DEV.B });
     check("new device gets step-up and no tokens", b.body?.step_up === true && !b.body?.access_token, b);
-    out.challenge_id = b.body?.challenge_id;
+    out.challenge_id = b.body?.challenge_id; // not secret on its own (needs the emailed code and device)
     // Lockout on a throwaway email.
     const junk = `nobody-${Date.now()}@example.com`;
     let last;
