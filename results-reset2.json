@@ -1,0 +1,55 @@
+{
+  "phase": "reset2",
+  "at": "2026-10-10T15:38:51.994Z",
+  "checks": [
+    {
+      "name": "recovery link gives a recovery session",
+      "pass": true,
+      "detail": {
+        "status": 303,
+        "redirect_host": "kikiwarrior.com"
+      }
+    },
+    {
+      "name": "reset completed on a different device is refused",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "error": "device_mismatch",
+          "message": "For your security, open this link on the same device and browser where you asked to reset your password."
+        }
+      }
+    },
+    {
+      "name": "breached password refused at reset",
+      "pass": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "error": "weak_password",
+          "message": "This password has appeared in a data breach. Please choose a different one."
+        }
+      }
+    },
+    {
+      "name": "reset on the requesting device works",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      }
+    },
+    {
+      "name": "old password no longer works",
+      "pass": true,
+      "detail": {
+        "error": "invalid_credentials",
+        "message": "Invalid email or password."
+      }
+    }
+  ],
+  "summary": "5/5 passed"
+}
