@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
-import { AgePaths, Missions, Academy, Rewards, Parents } from "@/components/landing/HomeSections";
+import { AgePaths, Missions, Academy, Rewards, ParentReviews, Parents } from "@/components/landing/HomeSections";
 import FooterSection from "@/components/landing/FooterSection";
 
 export default function Index() {
@@ -23,6 +23,7 @@ export default function Index() {
         <Missions />
         <Academy />
         <Rewards />
+        <ParentReviews />
         <Parents />
       </main>
       <FooterSection />

@@ -51,6 +51,8 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
   const [answers, setAnswers] = useState<Record<string, boolean | null>>({});
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [sharePublicly, setSharePublicly] = useState(false);
+  const [displayName, setDisplayName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,6 +75,8 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
         overall_rating: rating || null,
         feedback: feedback.trim() || null,
         reviewed_child_survey_id: childSurveyId || null,
+        share_publicly: sharePublicly,
+        display_name: sharePublicly ? displayName.trim().slice(0, 60) || null : null,
       });
 
     setSubmitting(false);
@@ -91,6 +95,14 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
         <p className="font-body text-sm text-charcoal/70 max-w-sm mx-auto">
           Your feedback helps us continuously improve and keep children safer online.
         </p>
+        <div className="space-y-2">
+          <Button asChild variant="outline" className="h-auto min-h-12 rounded-full border-2 border-primary/35 bg-transparent px-6 font-display uppercase tracking-wider text-charcoal hover:bg-primary/10">
+            <a href="https://www.trustpilot.com/evaluate/kikiwarrior.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
+              <Star className="w-4 h-4 text-primary fill-primary" /> Review us on Trustpilot
+            </a>
+          </Button>
+          <p className="font-body text-xs text-charcoal/60">Public reviews help other parents find Kiki Warrior.</p>
+        </div>
         <Button variant="ghost"
           onClick={onComplete}
           className="btn-copper adventure-button px-6 py-3 text-sm uppercase tracking-widest"
@@ -165,6 +177,33 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
           maxLength={1000}
           className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none transition-colors resize-none"
         />
+      </div>
+
+      <div className="space-y-3">
+        <label className="flex items-center gap-3 min-h-11 cursor-pointer font-body text-sm text-charcoal">
+          <input
+            type="checkbox"
+            checked={sharePublicly}
+            onChange={(e) => setSharePublicly(e.target.checked)}
+            className="w-5 h-5 accent-primary shrink-0"
+          />
+          Show my review on kikiwarrior.com
+        </label>
+        {sharePublicly && (
+          <div>
+            <label htmlFor="review-display-name" className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">Name to show</label>
+            <input
+              id="review-display-name"
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="e.g. Thandi, mom of a 7 year old"
+              maxLength={60}
+              className="w-full min-h-12 rounded-xl border border-primary/20 bg-card px-4 font-body text-charcoal placeholder:text-charcoal/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+        )}
+        <p className="font-body text-xs text-charcoal/60">We only show reviews after a quick check. Your child's details are never shown.</p>
       </div>
 
       <Button variant="ghost"
