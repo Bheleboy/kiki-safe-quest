@@ -18,7 +18,7 @@ async function dismissCookies(page) { for (const t of ["Decline", "Accept"]) { c
 try {
   const c = await ctx(false);
   const page = await c.newPage();
-  await page.goto(`${SITE}/auth`, { waitUntil: "networkidle" });
+  await page.goto(`${SITE}/auth`, { waitUntil: "domcontentloaded" });
   await dismissCookies(page);
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
@@ -56,10 +56,10 @@ try {
     }
     check("signed in after code", !page.url().includes("/auth"), page.url());
     await shot(page, "after-signin");
-    await page.goto(`${SITE}/family`, { waitUntil: "networkidle" }); await page.waitForTimeout(2500);
+    await page.goto(`${SITE}/family`, { waitUntil: "domcontentloaded" }); await page.waitForTimeout(2500);
     check("child picker opens without PIN", (await page.getByText("Test Kid").count()) > 0);
     await shot(page, "family");
-    await page.goto(`${SITE}/parent`, { waitUntil: "networkidle" }); await page.waitForTimeout(2500);
+    await page.goto(`${SITE}/parent`, { waitUntil: "domcontentloaded" }); await page.waitForTimeout(2500);
     const pinPad = await page.getByLabel("4-digit parent PIN").count();
     check("parent dashboard asks for PIN", pinPad > 0);
     await shot(page, "parent-pin");
@@ -69,18 +69,19 @@ try {
       await page.waitForTimeout(4000);
       await shot(page, "parent-dashboard");
     }
-    await page.goto(`${SITE}/course?child=3aeef6da-924f-4422-83c5-bf1dc03ededa`, { waitUntil: "networkidle" }); await page.waitForTimeout(3000);
-    const young = page.getByText(/Young Warriors|Ages 6-9/i).first();
+    await page.goto(`${SITE}/course?child=3aeef6da-924f-4422-83c5-bf1dc03ededa`, { waitUntil: "domcontentloaded" }); await page.waitForTimeout(3000);
+    const young = page.getByText(/Ages 6.9/i).first();
     if (await young.count()) { await young.click().catch(() => {}); await page.waitForTimeout(3000); }
+    await page.waitForTimeout(2000);
     check("course completion screen shows", (await page.getByText("Congratulations!").count()) > 0);
     await shot(page, "course-complete");
     fs.writeFileSync("storage.json", JSON.stringify(await c.storageState()));
     const m = await ctx(true); await m.addCookies((await c.storageState()).cookies);
     const mp = await m.newPage();
-    await mp.goto(`${SITE}/`, { waitUntil: "networkidle" });
+    await mp.goto(`${SITE}/`, { waitUntil: "domcontentloaded" });
     await mp.evaluate((s) => { for (const o of s.origins) if (o.origin.includes("kikiwarrior")) for (const kv of o.localStorage) localStorage.setItem(kv.name, kv.value); }, await c.storageState());
-    await mp.goto(`${SITE}/course?child=3aeef6da-924f-4422-83c5-bf1dc03ededa`, { waitUntil: "networkidle" }); await mp.waitForTimeout(3000);
-    const y2 = mp.getByText(/Young Warriors|Ages 6-9/i).first();
+    await mp.goto(`${SITE}/course?child=3aeef6da-924f-4422-83c5-bf1dc03ededa`, { waitUntil: "domcontentloaded" }); await mp.waitForTimeout(3000);
+    const y2 = mp.getByText(/Ages 6.9/i).first();
     if (await y2.count()) { await y2.click().catch(() => {}); await mp.waitForTimeout(3000); }
     await shot(mp, "course-complete-mobile");
   }
