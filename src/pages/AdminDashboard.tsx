@@ -546,33 +546,37 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
 type ReviewRow = { id: string; display_name: string | null; overall_rating: number | null; feedback: string | null; created_at: string; approved: boolean };
 
 function ParentReviewsPanel() {
+  const { adminSession } = useAdminAuth();
+  const token = adminSession?.access_token;
   const [rows, setRows] = useState<ReviewRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!token) return;
     let mounted = true;
-    supabase
-      .from("parent_surveys")
-      .select("id, display_name, overall_rating, feedback, created_at, approved")
-      .eq("share_publicly", true)
-      .order("created_at", { ascending: false })
+    supabase.functions
+      .invoke("admin-parent-reviews", { body: { action: "list" }, headers: { "x-admin-token": token } })
       .then(({ data, error: err }) => {
         if (!mounted) return;
-        if (err) setError("Could not load reviews. Sign in to the main site with your admin account.");
-        setRows(((data ?? []) as ReviewRow[]).sort((a, b) => Number(a.approved) - Number(b.approved)));
+        if (err || !data?.rows) setError("Could not load reviews. Try signing out of the admin dashboard and back in.");
+        else { setError(null); setRows(data.rows as ReviewRow[]); }
         setLoading(false);
       });
     return () => { mounted = false; };
-  }, []);
+  }, [token]);
 
   async function setApproved(id: string, approved: boolean) {
+    if (!token) return;
     setBusy(id);
-    const approved_at = approved ? new Date().toISOString() : null;
-    const { error: err } = await supabase.from("parent_surveys").update({ approved, approved_at }).eq("id", id);
+    const { data, error: err } = await supabase.functions.invoke("admin-parent-reviews", {
+      body: { action: "set", id, approved },
+      headers: { "x-admin-token": token },
+    });
     setBusy(null);
-    if (err) { setError("Update failed. Check you are signed in as an admin."); return; }
+    if (err || !data?.row) { setError("Update failed. Please try again."); return; }
+    setError(null);
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, approved } : r)).sort((a, b) => Number(a.approved) - Number(b.approved)));
   }
 
