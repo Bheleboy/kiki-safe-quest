@@ -30,7 +30,9 @@ export function InactivityGuard() {
   const isChild = CHILD_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`));
   const timeout = isParent ? PARENT_TIMEOUT : isChild ? CHILD_TIMEOUT : 0;
   const lastActive = useRef(Date.now());
-  const [warnLeft, setWarnLeft] = useState<number | null>(null);  const signOutRef = useRef(signOutWithMessage);
+  const [warnLeft, setWarnLeft] = useState<number | null>(null);
+  const warnLeftRef = useRef<number | null>(null);
+  warnLeftRef.current = warnLeft;  const signOutRef = useRef(signOutWithMessage);
   signOutRef.current = signOutWithMessage;
 
   useEffect(() => {
