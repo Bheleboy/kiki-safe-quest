@@ -136,14 +136,14 @@ export default function CoursePreview() {
               Earn the Armour of God
             </h2>
             <p className="font-body text-sm text-charcoal/70 max-w-lg mx-auto">
-              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God -- a set of six collectible rewards inspired by Ephesians 6. This free course awards all 6 pieces!
+              As your child completes lessons and passes quizzes, they earn pieces of the Armour of God, a set of six collectible rewards inspired by Ephesians 6. This free course awards all 6 pieces!
             </p>
           </div>
 
           {/* Kiki Warrior preview */}
           <div className="flex flex-col items-center">
             <KikiWarriorAvatar earnedPieces={[]} size="lg" showLabel={false} />
-            <p className="font-body text-xs text-charcoal/70 mt-2 italic">Your warrior starts here -- earn armour as you learn!</p>
+            <p className="font-body text-xs text-charcoal/70 mt-2 italic">Your warrior starts here, earn armour as you learn!</p>
           </div>
 
           {/* Free course pieces */}
@@ -214,7 +214,7 @@ export default function CoursePreview() {
             <motion.div key={stream!.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">
-                  {stream!.label} -- {stream!.description}
+                  {stream!.label}, {stream!.description}
                 </h2>
                 <div className="flex items-center gap-3 text-xs font-body text-charcoal/70">
                   <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> {formatTime(streamVideoMinutes)} video</span>
@@ -258,7 +258,7 @@ export default function CoursePreview() {
           </div>
           <h2 className="font-display text-xl font-bold text-charcoal uppercase tracking-wide">Earn Your Armour</h2>
           <p className="font-body text-sm text-charcoal/70 max-w-md mx-auto">
-            Complete each module and pass the quizzes to earn all six pieces -- the Belt of Truth, Shield of Faith, Helmet of Salvation, Breastplate of Righteousness, Sword of the Spirit, and Shoes of Peace!
+            Complete each module and pass the quizzes to earn all six pieces: the Belt of Truth, Shield of Faith, Helmet of Salvation, Breastplate of Righteousness, Sword of the Spirit, and Shoes of Peace!
           </p>
         </motion.div>
 

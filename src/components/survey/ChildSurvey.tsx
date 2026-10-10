@@ -48,7 +48,7 @@ export function ChildSurvey({ userId, childId, childName, streamId, ageBand, isC
           Complete the course first!
         </h3>
         <p className="font-body text-sm text-charcoal/70 max-w-sm mx-auto">
-          {childName} needs to finish all lessons and quizzes before the survey becomes available. Keep going -- you're doing great!
+          {childName} needs to finish all lessons and quizzes before the survey becomes available. Keep going, you're doing great!
         </p>
         <Button variant="ghost" onClick={onSkip} className="text-xs font-body text-charcoal/70 hover:text-charcoal transition-colors">
           Go back

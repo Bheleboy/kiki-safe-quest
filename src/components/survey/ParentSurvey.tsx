@@ -120,7 +120,7 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
           Parent Feedback
         </h3>
         <p className="font-body text-sm text-charcoal/70">
-          Help us keep improving -- your input makes Kiki Warrior better for every family.
+          Help us keep improving, your input makes Kiki Warrior better for every family.
         </p>
       </div>
 

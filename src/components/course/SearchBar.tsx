@@ -60,7 +60,7 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
             >
               <p className="font-display font-medium text-sm text-charcoal uppercase tracking-wide">{r!.lesson.title}</p>
               <p className="text-xs text-charcoal/70 font-body">
-                {r!.stream.label} -- {r!.mod.title}
+                {r!.stream.label}, {r!.mod.title}
               </p>
             </Button>
           ))}

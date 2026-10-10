@@ -105,6 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [navigate]);
 
   /** Returns "ok" | "invalid" | "step_up" | "error" */
+  const freshTokens = useRef<string | null>(null);
   const checkSession = useCallback(async (s: Session, allowRegister: boolean) => {
     try {
       const r = await callFn("session-check", {}, s.access_token);
@@ -158,7 +159,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       lastSessionId = s.access_token.split(".")[1];
       setTimeout(async () => {
         if (!mounted) return;
-        const result = await checkSession(s, true);
+        const fresh = freshTokens.current === s.access_token;
+        freshTokens.current = null;
+        const result = fresh ? "ok" : await checkSession(s, true);
         if (!mounted) return;
         if (result === "invalid") {
           await forceSignOut();
@@ -223,6 +226,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const applyTokens = async (data: any): Promise<SimpleResult> => {
+    // The server registered this session moments ago; skip the redundant check.
+    freshTokens.current = data.access_token;
     const { error } = await supabase.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
     return { error: error ? { message: "Sign-in failed. Please try again." } : null };
   };

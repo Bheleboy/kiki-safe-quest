@@ -122,7 +122,7 @@ export default function PrivacyPolicy() {
               <li>Request deletion of your data ("right to be forgotten").</li>
               <li>Withdraw consent at any time.</li>
               <li>Object to processing based on legitimate interest.</li>
-              <li>Data portability -- receive your data in a structured, machine-readable format.</li>
+              <li>Data portability, receive your data in a structured, machine-readable format.</li>
               <li>Lodge a complaint with the relevant supervisory authority (Information Regulator in South Africa or your local Data Protection Authority under GDPR).</li>
             </ul>
           </section>
@@ -133,8 +133,8 @@ export default function PrivacyPolicy() {
             </h2>
             <p>
               We retain personal data only for as long as necessary to provide our services or as
-              required by law. When an account is deleted, all associated personal data -- including
-              child profiles and progress records -- is permanently removed within 30 days.
+              required by law. When an account is deleted, all associated personal data, including
+              child profiles and progress records, is permanently removed within 30 days.
             </p>
           </section>
 

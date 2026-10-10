@@ -83,8 +83,8 @@ export default function TermsOfService() {
               5. Content & Intellectual Property
             </h2>
             <p>
-              All content on the Kiki Warrior platform -- including courses, illustrations, characters,
-              text, and interactive elements -- is the intellectual property of Kiki Warrior and is
+              All content on the Kiki Warrior platform, including courses, illustrations, characters,
+              text, and interactive elements, is the intellectual property of Kiki Warrior and is
               protected by copyright law. You may not reproduce, distribute, or create derivative
               works from our content without prior written consent.
             </p>
@@ -132,7 +132,7 @@ export default function TermsOfService() {
             </h2>
             <p>
               You may delete your account at any time. Upon account deletion, all personal data --
-              including child profiles, progress, and badges -- will be permanently removed in
+              including child profiles, progress, and badges, will be permanently removed in
               accordance with our Privacy Policy. We reserve the right to terminate accounts that
               violate these terms.
             </p>
