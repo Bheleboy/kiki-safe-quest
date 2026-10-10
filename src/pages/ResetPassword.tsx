@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { useNavigate, Link } from "react-router-dom";
+import { callFn, useAuth } from "@/hooks/useAuth";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -16,6 +17,7 @@ export default function ResetPasswordPage() {
   const [isRecovery, setIsRecovery] = useState(false);
   const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
+  const { setSecurityNotice } = useAuth();
 
   useEffect(() => {
     // Listen for PASSWORD_RECOVERY event from Supabase
@@ -49,14 +51,24 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
+    if (password.length < 10) { setError("Password must be at least 10 characters"); return; }
     if (password !== confirm) { setError("Passwords do not match"); return; }
 
     setSubmitting(true);
-    const { error: err } = await supabase.auth.updateUser({ password });
-    if (err) { setError(err.message); }
-    else { setSuccess(true); setTimeout(() => navigate("/family"), 2000); }
-    setSubmitting(false);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setError("This password reset link is invalid or has expired."); return; }
+      const r = await callFn("complete-password-reset", { new_password: password }, session.access_token);
+      if (!r.ok) { setError(r.data?.message || "Could not update the password. Please try again."); return; }
+      setSuccess(true);
+      try { await supabase.auth.signOut({ scope: "local" }); } catch { /* ignore */ }
+      setSecurityNotice("Password updated. Please sign in.");
+      navigate("/auth", { replace: true });
+    } catch {
+      setError("Could not reach the server. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (checking) {
@@ -98,7 +110,7 @@ export default function ResetPasswordPage() {
         <div className="card-kiki">
           {success ? (
             <div className="text-center py-4">
-              <p className="text-success font-body">Password updated! Redirecting...</p>
+              <p className="text-success font-body">Password updated. Please sign in.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -106,6 +118,7 @@ export default function ResetPasswordPage() {
                 <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">New Password</label>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
                   className="w-full rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 font-body text-charcoal placeholder:text-charcoal/70 focus:border-primary focus:outline-none transition-colors" />
+                <p className="mt-1.5 font-body text-xs text-charcoal/70 leading-relaxed">At least 10 characters. Avoid common or reused passwords.</p>
               </div>
               <div>
                 <label className="font-body text-sm font-medium text-charcoal/70 block mb-1.5">Confirm Password</label>
