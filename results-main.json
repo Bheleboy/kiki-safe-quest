@@ -1,6 +1,6 @@
 {
   "phase": "main",
-  "at": "2026-10-10T14:53:17.612Z",
+  "at": "2026-10-10T15:00:41.062Z",
   "checks": [
     {
       "name": "direct auth login returns a token (expected)",
@@ -72,7 +72,7 @@
         "status": 200,
         "body": {
           "step_up": true,
-          "challenge_id": "41be1a56-e917-4a11-9a55-061840d0ab65",
+          "challenge_id": "f25e5d50-738d-4c1e-8903-b3d05587f057",
           "masked_email": "[hidden]"
         }
       }
@@ -97,6 +97,6 @@
       }
     }
   ],
-  "challenge_id": "41be1a56-e917-4a11-9a55-061840d0ab65",
+  "challenge_id": "f25e5d50-738d-4c1e-8903-b3d05587f057",
   "summary": "10/10 passed"
 }
