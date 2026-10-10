@@ -135,6 +135,32 @@ try {
     const a = await fn("secure-login", { email, password, device_secret: DEV.A });
     check("after revoke, old trusted device needs a code again", a.body?.step_up === true, a.body);
   }
+
+  if (phase === "reset1") {
+    const r = await fn("secure-reset-request", { email, device_secret: DEV.A });
+    check("reset request accepted (generic reply)", r.status === 200, r);
+    const g = await fn("secure-reset-request", { email: `ghost-${Date.now()}@example.com`, device_secret: DEV.A });
+    check("unknown email gets the same reply", g.status === r.status && JSON.stringify(g.body) === JSON.stringify(r.body), g);
+  }
+
+  if (phase === "reset2") {
+    // arg1 = recovery link from the email, arg2 = new password
+    const res = await fetch(arg1, { redirect: "manual" });
+    const loc = res.headers.get("location") || "";
+    const frag = new URLSearchParams(loc.split("#")[1] || "");
+    const rec = frag.get("access_token");
+    check("recovery link gives a recovery session", !!rec, { status: res.status, redirect_host: loc.split("/")[2] });
+    if (rec) {
+      const wrong = await fn("complete-password-reset", { new_password: arg2, device_secret: DEV.C }, rec);
+      check("reset completed on a different device is refused", wrong.status >= 400, wrong);
+      const weak = await fn("complete-password-reset", { new_password: "password123", device_secret: DEV.A }, rec);
+      check("breached password refused at reset", weak.status >= 400, weak);
+      const ok = await fn("complete-password-reset", { new_password: arg2, device_secret: DEV.A }, rec);
+      check("reset on the requesting device works", ok.status === 200, ok);
+      const oldpw = await fn("secure-login", { email, password, device_secret: DEV.A });
+      check("old password no longer works", !oldpw.body?.access_token, oldpw.body);
+    }
+  }
 } catch (e) {
   check("script error", false, String(e?.stack ?? e));
 }
