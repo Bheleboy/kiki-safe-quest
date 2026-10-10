@@ -1,10 +1,11 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, BookOpen, CheckCircle2, Clock, Lock, Mail, Trophy, Users } from "lucide-react";
+import { ArrowUpRight, BookOpen, CheckCircle2, Clock, Lock, Mail, Star, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { courseData } from "@/data/courseData";
 import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
+import { supabase } from "@/integrations/supabase/client";
 
 const container = "max-w-7xl mx-auto px-4 sm:px-6";
 const heading = "mt-4 font-display font-bold uppercase text-charcoal text-4xl sm:text-5xl lg:text-6xl leading-[0.95]";
@@ -88,9 +89,37 @@ const parentFeatures = [
   { icon: Trophy, title: "See their progress", description: "Your dashboard shows completed lessons, quiz scores, armour earned and time spent." },
   { icon: Mail, title: "Parent tips in every lesson", description: "Each lesson has a parent tip to help you continue the conversation at home." },
 ];
+type PublicReview = { id: string; display_name: string | null; overall_rating: number | null; feedback: string | null; created_at: string };
+let reviewsPromise: Promise<PublicReview[]> | null = null;
+function loadReviews() {
+  reviewsPromise ??= Promise.resolve(supabase.rpc("get_public_parent_reviews")).then(({ data, error }) => (error || !data ? [] : (data as PublicReview[])), () => []);
+  return reviewsPromise;
+}
+function usePublicReviews() {
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
+  useEffect(() => { let alive = true; loadReviews().then((r) => { if (alive) setReviews(r); }); return () => { alive = false; }; }, []);
+  return reviews;
+}
+export function ParentReviews() {
+  const reviews = usePublicReviews();
+  if (reviews.length === 0) return null;
+  return <RevealSection id="reviews" className="bg-background py-20 lg:py-28"><div className={container}>
+    <Eyebrow n="05">What parents say</Eyebrow><h2 className={`${heading} max-w-3xl`}>Real families. Real missions.</h2>
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">{reviews.map((review) => {
+      const rating = Math.max(0, Math.min(5, review.overall_rating ?? 0));
+      return <article key={review.id} className="rounded-2xl bg-cream bg-tech-grid border border-primary/15 p-6 flex flex-col">
+        {rating > 0 && <div className="flex gap-1" role="img" aria-label={`${rating} out of 5 stars`}>{[1, 2, 3, 4, 5].map((n) => <Star key={n} aria-hidden className={`w-4 h-4 ${n <= rating ? "text-primary fill-primary" : "text-charcoal/20"}`} />)}</div>}
+        <blockquote className={`${body} mt-4 flex-1`}>"{review.feedback?.replace(/[\u2013\u2014]/g, "-")}"</blockquote>
+        <p className="font-display text-xs uppercase tracking-widest text-charcoal mt-5">{review.display_name || "Kiki Warrior parent"}</p>
+      </article>;
+    })}</div>
+    <Button asChild variant="outline" className="mt-8 h-auto rounded-full border-2 border-primary/35 px-6 min-h-12 font-display uppercase text-charcoal bg-transparent hover:bg-primary/10"><a href="https://www.trustpilot.com/review/kikiwarrior.com" target="_blank" rel="noopener noreferrer">Read more on Trustpilot</a></Button>
+  </div></RevealSection>;
+}
 export function Parents() {
+  const hasReviews = usePublicReviews().length > 0;
   return <RevealSection id="parents" className="bg-cream py-20 lg:py-28"><div className={container}>
-    <Eyebrow n="05">For parents</Eyebrow><h2 className={`${heading} max-w-3xl`}>You stay in control of the adventure.</h2>
+    <Eyebrow n={hasReviews ? "06" : "05"}>For parents</Eyebrow><h2 className={`${heading} max-w-3xl`}>You stay in control of the adventure.</h2>
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">{parentFeatures.map(({ icon: Icon, title, description }) => <article key={title} className="rounded-2xl bg-background p-6 border border-primary/15"><span className="w-11 h-11 rounded-full bg-trust/10 flex items-center justify-center"><Icon aria-hidden className="w-5 h-5 text-trust" /></span><h3 className="font-display uppercase tracking-wide text-charcoal mt-5">{title}</h3><p className={`${body} mt-3`}>{description}</p></article>)}</div>
     <div className="mt-8 rounded-[2rem] bg-peach p-6 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6"><p className="font-display uppercase text-2xl sm:text-3xl text-charcoal leading-tight md:max-w-md">Create your free family account and start the first mission together.</p><div className="flex flex-wrap items-center gap-3 shrink-0"><PrimaryPill to="/auth?mode=signup">Create account</PrimaryPill><Button asChild variant="outline" className="h-auto rounded-full border-2 border-primary/35 px-6 min-h-12 font-display uppercase text-charcoal bg-transparent hover:bg-primary/10"><Link to="/auth">Login</Link></Button></div></div>
   </div></RevealSection>;

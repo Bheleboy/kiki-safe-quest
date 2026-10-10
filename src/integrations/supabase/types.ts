@@ -336,9 +336,12 @@ export type Database = {
       }
       parent_surveys: {
         Row: {
+          approved: boolean
+          approved_at: string | null
           child_id: string | null
           child_more_aware: boolean | null
           created_at: string
+          display_name: string | null
           easy_to_use: boolean | null
           feedback: string | null
           google_review_clicked: boolean | null
@@ -346,14 +349,18 @@ export type Database = {
           id: string
           overall_rating: number | null
           reviewed_child_survey_id: string | null
+          share_publicly: boolean
           stream_id: string | null
           user_id: string
           would_recommend: boolean | null
         }
         Insert: {
+          approved?: boolean
+          approved_at?: string | null
           child_id?: string | null
           child_more_aware?: boolean | null
           created_at?: string
+          display_name?: string | null
           easy_to_use?: boolean | null
           feedback?: string | null
           google_review_clicked?: boolean | null
@@ -361,14 +368,18 @@ export type Database = {
           id?: string
           overall_rating?: number | null
           reviewed_child_survey_id?: string | null
+          share_publicly?: boolean
           stream_id?: string | null
           user_id: string
           would_recommend?: boolean | null
         }
         Update: {
+          approved?: boolean
+          approved_at?: string | null
           child_id?: string | null
           child_more_aware?: boolean | null
           created_at?: string
+          display_name?: string | null
           easy_to_use?: boolean | null
           feedback?: string | null
           google_review_clicked?: boolean | null
@@ -376,6 +387,7 @@ export type Database = {
           id?: string
           overall_rating?: number | null
           reviewed_child_survey_id?: string | null
+          share_publicly?: boolean
           stream_id?: string | null
           user_id?: string
           would_recommend?: boolean | null
@@ -515,6 +527,16 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_public_parent_reviews: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          feedback: string
+          id: string
+          overall_rating: number
+        }[]
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_parent_of_child: {
