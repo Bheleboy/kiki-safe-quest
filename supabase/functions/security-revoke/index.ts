@@ -1,5 +1,5 @@
 import {
-  admin, anonClient, clientIp, cors, json, logEvent, revokeAllSessions, sha256, SITE_URL, userAgent, hitLimit,
+  admin, anonClient, clientIp, cors, json, logEvent, revokeAllSessions, setPasswordResetRequired, sha256, SITE_URL, userAgent, hitLimit,
 } from '../_shared/security.ts'
 
 Deno.serve(async (req) => {
@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
   if (!row) return json({ ok: false, error: 'invalid' }, 400)
 
   const userId = row.user_id as string
+  await setPasswordResetRequired(userId, 'user_reported')
   await revokeAllSessions(userId, 'user_reported')
   await admin.from('trusted_devices').update({ revoked_at: new Date().toISOString() }).eq('user_id', userId).is('revoked_at', null)
 

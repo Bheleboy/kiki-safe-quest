@@ -1,6 +1,6 @@
 import {
   admin, anonClient, clientIp, cors, createChallenge, decodeJwt, deviceHashFrom, isTrusted, json, logEvent,
-  maskEmail, nowText, registerSession, sendNewSigninEmail, revokeSession, sendSecurityEmail, sha256, trustDevice, trustedCount, userAgent,
+  maskEmail, nowText, registerSession, sendNewSigninEmail, revokeSession, sendSecurityEmail, sha256, trustDevice, trustedCount, userAgent, isPasswordResetRequired,
 } from '../_shared/security.ts'
 
 const WINDOW_MS = 15 * 60_000
@@ -115,6 +115,17 @@ Deno.serve(async (req) => {
     if (ipLocked) await logEvent({ ip, user_agent: ua, event_type: 'ip_locked' })
     // Confirmed-email errors are reported generically too, to avoid enumeration.
     return json({ error: 'invalid_credentials', message: GENERIC }, 401)
+  }
+
+  // Account flagged after "This wasn't me" or admin sign-out: old password is not accepted.
+  // Only reached with a correct password, so wrong-password attempts learn nothing.
+  if (await isPasswordResetRequired(data.user.id)) {
+    const sid = decodeJwt(data.session.access_token)?.session_id as string | undefined
+    if (sid) await admin.rpc('revoke_auth_session', { _session_id: sid })
+    await recordFailure(et, EMAIL_LIMIT)
+    await recordFailure(it, IP_LIMIT)
+    await logEvent({ user_id: data.user.id, email_hash: emailHash, ip, user_agent: ua, event_type: 'login_blocked_reset_required' })
+    return json({ error: 'password_reset_required', message: 'For your security, please reset your password using the link we emailed you.' }, 403)
   }
 
   // Success: reset email counters and lock level.
