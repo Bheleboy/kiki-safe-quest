@@ -20,6 +20,9 @@ import AgeVerification from "./pages/AgeVerification";
 import AdminDashboard from "./pages/AdminDashboard";
 import VideoDemo from "./pages/VideoDemo";
 import CookieConsent from "./components/CookieConsent";
+import SecurityRevoke from "./pages/SecurityRevoke";
+import { ParentGate } from "./components/security/ParentGate";
+import { InactivityGuard } from "./components/security/InactivityGuard";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +52,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AgeGate({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
-  const exempt = ["/verify-age", "/privacy", "/terms", "/reset-password"];
+  const exempt = ["/verify-age", "/privacy", "/terms", "/reset-password", "/security/revoke"];
   if (!loading && user && profile && !profile.is_admin && !profile.age_verified && !exempt.includes(location.pathname)) {
     return <Navigate to="/verify-age" replace />;
   }
@@ -75,17 +78,19 @@ const App = () => (
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/verify-age" element={<AgeVerification />} />
               <Route path="/video-demo" element={<VideoDemo />} />
+              <Route path="/security/revoke" element={<SecurityRevoke />} />
 
               {/* Protected */}
-              <Route path="/family" element={<ProtectedRoute><ManageChildren /></ProtectedRoute>} />
+              <Route path="/family" element={<ProtectedRoute><ParentGate><ManageChildren /></ParentGate></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
-              <Route path="/parent" element={<ProtectedRoute><ParentDashboard /></ProtectedRoute>} />
+              <Route path="/parent" element={<ProtectedRoute><ParentGate><ParentDashboard /></ParentGate></ProtectedRoute>} />
               <Route path="/admin" element={<AdminDashboard />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AgeGate>
+          <InactivityGuard />
           <CookieConsent />
         </AuthProvider>
       </BrowserRouter>

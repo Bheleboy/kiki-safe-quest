@@ -1,3 +1,4 @@
+import { markActivity, markVideoPlaying } from "@/components/security/InactivityGuard";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Loader2, PlayCircle } from "lucide-react";
@@ -100,6 +101,10 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
             controls
             playsInline
             preload="metadata"
+            onPlay={() => markVideoPlaying(true)}
+            onPause={() => markVideoPlaying(false)}
+            onEnded={() => markVideoPlaying(false)}
+            onTimeUpdate={markActivity}
             className="absolute inset-0 w-full h-full bg-charcoal"
           />
         ) : showUnavailable ? (

@@ -29,7 +29,8 @@ export function InactivityGuard() {
   const isChild = CHILD_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`));
   const timeout = isParent ? PARENT_TIMEOUT : isChild ? CHILD_TIMEOUT : 0;
   const lastActive = useRef(Date.now());
-  const [warnLeft, setWarnLeft] = useState<number | null>(null);
+  const [warnLeft, setWarnLeft] = useState<number | null>(null);  const signOutRef = useRef(signOutWithMessage);
+  signOutRef.current = signOutWithMessage;
 
   useEffect(() => {
     if (!user || !timeout) { setWarnLeft(null); return; }
@@ -44,7 +45,7 @@ export function InactivityGuard() {
         setWarnLeft(null);
         const minutes = timeout / 60_000;
         const label = minutes >= 120 ? "2 hours" : `${minutes} minutes`;
-        signOutWithMessage(`You were signed out after ${label} of inactivity.`, "inactivity");
+        signOutRef.current(`You were signed out after ${label} of inactivity.`, "inactivity");
       } else if (idle >= timeout - WARNING_MS) {
         setWarnLeft(Math.ceil((timeout - idle) / 1000));
       } else {
@@ -55,10 +56,7 @@ export function InactivityGuard() {
       events.forEach((e) => window.removeEventListener(e, bump, { capture: true } as EventListenerOptions));
       window.clearInterval(iv);
     };
-  }, [user, timeout, signOutWithMessage]);
-
-  const warnLeftRef = useRef<number | null>(null);
-  warnLeftRef.current = warnLeft;
+  }, [user, timeout]);
 
   return (
     <AlertDialog open={warnLeft !== null}>
