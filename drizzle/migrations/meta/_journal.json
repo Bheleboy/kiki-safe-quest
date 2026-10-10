@@ -29,6 +29,13 @@
       "when": 1791643155606,
       "tag": "0003_security_part2",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791645249717,
+      "tag": "0004_security_flags",
+      "breakpoints": true
     }
   ]
 }
