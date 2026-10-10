@@ -24,6 +24,7 @@ jobs:
         if: startsWith(inputs.phase, 'ui')
         env:
           KW_TEST_PASSWORD: ${{ inputs.password }}
+          GH_TOKEN: ${{ github.token }}
         run: node tests/ui-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"
       - name: Run checks
         if: "!startsWith(inputs.phase, 'ui')"

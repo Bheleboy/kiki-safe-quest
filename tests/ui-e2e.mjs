@@ -44,7 +44,7 @@ try {
       for (let i = 0; i < 40 && !code; i++) {
         await new Promise((r) => setTimeout(r, 6000));
         try {
-          const r = await fetch(`https://raw.githubusercontent.com/Bheleboy/kiki-safe-quest/e2e-results/code.txt?${Date.now()}`, { cache: "no-store" });
+          const r = await fetch(`https://api.github.com/repos/Bheleboy/kiki-safe-quest/contents/code.txt?ref=e2e-results&t=${Date.now()}`, { headers: { Accept: "application/vnd.github.raw", ...(process.env.GH_TOKEN ? { Authorization: `Bearer ${process.env.GH_TOKEN}` } : {}) } });
           if (r.ok) { const [ts, c] = (await r.text()).trim().split(":"); if (Number(ts) > Date.parse(out.at)) code = c; }
         } catch {}
       }
