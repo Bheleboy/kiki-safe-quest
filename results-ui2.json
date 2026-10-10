@@ -1,6 +1,6 @@
 {
   "phase": "ui2",
-  "at": "2026-10-10T16:03:04.150Z",
+  "at": "2026-10-10T16:16:22.127Z",
   "checks": [
     {
       "name": "signed in after code",
@@ -27,6 +27,6 @@
     "shots/ui2-course-complete.png",
     "shots/ui2-course-complete-mobile.png"
   ],
-  "signin_ms": 18458,
+  "signin_ms": 6851,
   "summary": "3/4 passed"
 }
