@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
     purpose: 'revoke_all',
     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60_000).toISOString(),
   })
-  await sendSecurityEmail({ to: ch.email, template: 'security-new-signin', device: ua, revokeUrl: `${SITE })
+  await sendSecurityEmail({ to: ch.email, template: 'security-new-signin', device: ua, revokeUrl: `${SITE}/security/revoke?token=${rawToken}` })
 
   return json(tokens ? { ...tokens } : { ok: true, registered: true })
 })

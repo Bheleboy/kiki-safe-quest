@@ -185,7 +185,7 @@ export async function registerSession(opts: {
     await logEvent({ user_id: opts.userId, ip: opts.ip, user_agent: opts.ua, event_type: 'session_revoked_limit', details: { session_id: s.session_id } })
   }
   if (extra.length && opts.email) {
-    await sendSecurityEmail({ to: opts.email, template: 'security-session-limit' })
+    await sendSecurityEmail({ to: opts.email, template: 'security-session-limit', device: opts.ua })
   }
   await logEvent({ user_id: opts.userId, ip: opts.ip, user_agent: opts.ua, event_type: 'session_registered', details: { session_id: opts.sessionId } })
 }
@@ -249,7 +249,7 @@ export async function createRevokeLink(userId: string): Promise<string> {
 
 export async function sendNewSigninEmail(userId: string, email: string, ua: string) {
   const url = await createRevokeLink(userId)
-  await sendSecurityEmail({ to: email, template: 'security-new-signin', device: ua })
+  await sendSecurityEmail({ to: email, template: 'security-new-signin', device: ua, revokeUrl: url })
 }
 
 export async function revokeAllSessions(userId: string, reason: string) {
