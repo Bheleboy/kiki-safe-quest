@@ -1,23 +1,19 @@
 {
   "phase": "ui2",
-  "at": "2026-10-10T15:46:02.193Z",
+  "at": "2026-10-10T15:58:46.934Z",
   "checks": [
-    {
-      "name": "code received from tester",
-      "pass": true
-    },
     {
       "name": "signed in after code",
       "pass": true,
-      "detail": "https://kikiwarrior.com/verify-age"
+      "detail": "https://kikiwarrior.com/family"
     },
     {
       "name": "child picker opens without PIN",
-      "pass": false
+      "pass": true
     },
     {
       "name": "parent dashboard asks for PIN",
-      "pass": false
+      "pass": true
     },
     {
       "name": "course completion screen shows",
@@ -30,12 +26,12 @@
     }
   ],
   "shots": [
-    "shots/ui2-code-screen.png",
     "shots/ui2-after-signin.png",
     "shots/ui2-family.png",
     "shots/ui2-parent-pin.png",
+    "shots/ui2-parent-dashboard.png",
     "shots/ui2-course-complete.png"
   ],
-  "signin_ms": 9881,
-  "summary": "2/6 passed"
+  "signin_ms": 10481,
+  "summary": "3/5 passed"
 }
