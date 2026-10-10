@@ -99,19 +99,42 @@ export async function sendSecurityEmail(opts: {
   code?: string
   revokeUrl?: string
 }) {
+  const fail = async (msg: string) => {
+    console.error('security email send failed', opts.template, msg)
+    const { error } = await admin.from('email_send_log').insert({
+      message_id: crypto.randomUUID(),
+      template_name: opts.template,
+      recipient_email: opts.to,
+      status: 'failed',
+      error_message: `security send: ${msg}`.slice(0, 1000),
+    })
+    if (error) console.error('email_send_log failure insert failed', error)
+  }
   try {
-    const { data, error } = await admin.functions.invoke('send-transactional-email', {
-      body: {
+    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-transactional-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key}`,
+        apikey: key,
+        'x-internal-key': key,
+      },
+      body: JSON.stringify({
         templateName: opts.template,
         recipientEmail: opts.to,
         idempotencyKey: `${opts.template}-${crypto.randomUUID()}`,
         templateData: { device: opts.device, code: opts.code, revokeUrl: opts.revokeUrl, when: new Date().toUTCString() },
-      },
+      }),
     })
-    if (error) console.error('security email send failed', opts.template, error)
-    return data
+    const body = await res.text()
+    if (!res.ok) return await fail(`HTTP ${res.status} ${body.slice(0, 300)}`)
+    try {
+      const j = JSON.parse(body)
+      if (j && j.success === false) await fail(`not sent: ${j.reason ?? body.slice(0, 200)}`)
+    } catch { /* non-JSON 2xx, treat as queued */ }
   } catch (e) {
-    console.error('security email send threw', opts.template, e)
+    await fail(e instanceof Error ? e.message : String(e))
   }
 }
 
