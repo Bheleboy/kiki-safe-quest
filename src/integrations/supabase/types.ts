@@ -290,6 +290,81 @@ export type Database = {
         }
         Relationships: []
       }
+      login_challenges: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          device_hash: string
+          email: string
+          existing_session_id: string | null
+          expires_at: string
+          id: string
+          last_sent_at: string
+          purpose: string
+          resend_count: number
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          device_hash: string
+          email: string
+          existing_session_id?: string | null
+          expires_at: string
+          id?: string
+          last_sent_at?: string
+          purpose?: string
+          resend_count?: number
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          device_hash?: string
+          email?: string
+          existing_session_id?: string | null
+          expires_at?: string
+          id?: string
+          last_sent_at?: string
+          purpose?: string
+          resend_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      login_throttle: {
+        Row: {
+          fail_count: number
+          key: string
+          lock_level: number
+          locked_until: string | null
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          fail_count?: number
+          key: string
+          lock_level?: number
+          locked_until?: string | null
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          fail_count?: number
+          key?: string
+          lock_level?: number
+          locked_until?: string | null
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           child_id: string | null
@@ -486,6 +561,69 @@ export type Database = {
           },
         ]
       }
+      security_events: {
+        Row: {
+          created_at: string
+          details: Json | null
+          email_hash: string | null
+          event_type: string
+          id: number
+          ip: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          email_hash?: string | null
+          event_type: string
+          id?: number
+          ip?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          email_hash?: string | null
+          event_type?: string
+          id?: number
+          ip?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          purpose: string
+          token_hash: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          purpose: string
+          token_hash: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          purpose?: string
+          token_hash?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -507,6 +645,72 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      trusted_devices: {
+        Row: {
+          created_at: string
+          device_hash: string
+          id: string
+          last_seen_at: string
+          revoked_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_hash: string
+          id?: string
+          last_seen_at?: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_hash?: string
+          id?: string
+          last_seen_at?: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string
+          device_hash: string
+          ip: string | null
+          last_seen_at: string
+          revoke_reason: string | null
+          revoked_at: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_hash: string
+          ip?: string | null
+          last_seen_at?: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_hash?: string
+          ip?: string | null
+          last_seen_at?: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -560,6 +764,8 @@ export type Database = {
           read_ct: number
         }[]
       }
+      revoke_auth_session: { Args: { _session_id: string }; Returns: undefined }
+      session_is_registered: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
