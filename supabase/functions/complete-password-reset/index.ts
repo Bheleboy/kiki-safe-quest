@@ -1,6 +1,6 @@
 import {
   admin, clientIp, cors, createRevokeLink, deviceHashFrom, getClaimsFrom, json, logEvent, nowText, passwordPolicy,
-  revokeAllSessions, sendSecurityEmail, userAgent, hitLimit,
+  revokeAllSessions, clearPasswordResetRequired, sendSecurityEmail, userAgent, hitLimit,
 } from '../_shared/security.ts'
 
 const DEVICE_MSG = 'For your security, open this link on the same device and browser where you asked to reset your password.'
@@ -48,6 +48,7 @@ Deno.serve(async (req) => {
   if (error) { console.error('updateUserById failed', error); return json({ error: 'server_error', message: 'Could not update the password. Please try again.' }, 500) }
 
   await admin.from('reset_requests').update({ used_at: new Date().toISOString() }).eq('user_id', userId).is('used_at', null)
+  await clearPasswordResetRequired(userId)
   await revokeAllSessions(userId, 'password_reset')
   if (claims.session_id) await admin.rpc('revoke_auth_session', { _session_id: claims.session_id })
   await logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'password_reset_completed' })
