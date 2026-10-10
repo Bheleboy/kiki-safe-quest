@@ -124,7 +124,7 @@ export async function sendSecurityEmail(opts: {
         templateName: opts.template,
         recipientEmail: opts.to,
         idempotencyKey: `${opts.template}-${crypto.randomUUID()}`,
-        templateData: { device: opts.device, code: opts.code, revokeUrl: opts.revokeUrl, when: new Date().toUTCString() },
+        templateData: { device: opts.device ? friendlyDevice(opts.device) : undefined, code: opts.code, revokeUrl: opts.revokeUrl, when: new Date().toUTCString() },
       }),
     })
     const body = await res.text()
@@ -166,8 +166,13 @@ export async function trustedCount(userId: string) {
     .from('trusted_devices')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .is('revoked_at', null)
   return count ?? 0
+}
+
+// Counts ALL trusted device rows, including revoked ones. Auto-trust of a
+// "first device" is only allowed when this is 0 (user never had a device).
+export async function everTrustedCount(userId: string) {
+  return await trustedCount(userId)
 }
 
 export async function revokeSession(sessionId: string, reason: string) {
@@ -373,7 +378,24 @@ export function friendlyDevice(ua: string | null | undefined): string {
 }
 
 export async function setPasswordResetRequired(userId: string, reason: string) {
-  const { error } = await admin.from('profiles').update({ password_reset_required: true }).eq('id', userId)
+  const now = new Date().toISOString()
+  const { error } = await admin.from('security_flags').upsert(
+    { user_id: userId, password_reset_required: true, reason, set_at: now, updated_at: now },
+    { onConflict: 'user_id' },
+  )
   if (error) console.error('setPasswordResetRequired failed', error)
   await logEvent({ user_id: userId, event_type: 'password_reset_required', details: { reason } })
+}
+
+export async function clearPasswordResetRequired(userId: string) {
+  const { error } = await admin.from('security_flags').upsert(
+    { user_id: userId, password_reset_required: false, reason: null, updated_at: new Date().toISOString() },
+    { onConflict: 'user_id' },
+  )
+  if (error) console.error('clearPasswordResetRequired failed', error)
+}
+
+export async function isPasswordResetRequired(userId: string) {
+  const { data } = await admin.from('security_flags').select('password_reset_required').eq('user_id', userId).maybeSingle()
+  return !!data?.password_reset_required
 }
