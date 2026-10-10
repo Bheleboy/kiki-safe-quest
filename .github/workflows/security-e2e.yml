@@ -1,0 +1,33 @@
+name: Security E2E checks (test account only)
+on:
+  workflow_dispatch:
+    inputs:
+      phase: { description: "signup | confirm | main | verify | revoke", required: true }
+      email: { description: "Test account email", required: true }
+      arg1: { description: "Phase argument 1", required: false, default: "" }
+      arg2: { description: "Phase argument 2", required: false, default: "" }
+permissions:
+  contents: write
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Run checks
+        env:
+          KW_TEST_PASSWORD: ${{ secrets.KW_TEST_PASSWORD }}
+        run: node tests/security-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"
+      - name: Publish results
+        if: always()
+        run: |
+          cp results.json /tmp/r.json || echo '{"error":"no results"}' > /tmp/r.json
+          git config user.name "kw-e2e"; git config user.email "noreply@kikiwarrior.com"
+          git fetch origin e2e-results || true
+          git checkout -B e2e-results origin/e2e-results 2>/dev/null || git checkout --orphan e2e-results
+          git rm -rq --cached . 2>/dev/null || true
+          cp /tmp/r.json "results-${{ inputs.phase }}.json"
+          git add "results-${{ inputs.phase }}.json"
+          git commit -qm "e2e ${{ inputs.phase }} ${{ github.run_id }}" && git push -q origin e2e-results
