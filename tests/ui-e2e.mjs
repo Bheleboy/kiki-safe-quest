@@ -22,8 +22,14 @@ try {
   await dismissCookies(page);
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
+  const t0 = Date.now();
   await page.click('button[type="submit"]');
-  await page.waitForTimeout(5000);
+  await Promise.race([
+    page.getByLabel("6-digit sign-in code").waitFor({ timeout: 40000 }).catch(() => {}),
+    page.waitForURL((u) => !u.pathname.startsWith("/auth"), { timeout: 40000 }).catch(() => {}),
+  ]);
+  out.signin_ms = Date.now() - t0;
+  await page.waitForTimeout(1000);
   const codeScreen = await page.getByLabel("6-digit sign-in code").count();
   if (phase === "ui1") {
     check("new browser is asked for an emailed code", codeScreen > 0);
@@ -34,7 +40,8 @@ try {
     if (codeScreen) {
       await page.getByLabel("6-digit sign-in code").fill(arg1);
       await page.click('button[type="submit"]');
-      await page.waitForTimeout(6000);
+      await page.waitForURL((u) => !u.pathname.startsWith("/auth"), { timeout: 40000 }).catch(() => {});
+      await page.waitForTimeout(3000);
     }
     check("signed in after code", !page.url().includes("/auth"), page.url());
     await shot(page, "after-signin");
