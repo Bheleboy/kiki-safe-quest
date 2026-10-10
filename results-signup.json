@@ -1,0 +1,29 @@
+{
+  "phase": "signup",
+  "at": "2026-10-10T14:50:41.005Z",
+  "checks": [
+    {
+      "name": "weak/breached password rejected at signup",
+      "pass": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "error": "weak_password",
+          "message": "This password has appeared in a data breach. Please choose a different one."
+        }
+      }
+    },
+    {
+      "name": "signup accepted",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "message": "Check your email for a verification link!"
+        }
+      }
+    }
+  ],
+  "summary": "2/2 passed"
+}
