@@ -1,0 +1,47 @@
+{
+  "phase": "revoke",
+  "at": "2026-10-10T15:11:48.156Z",
+  "checks": [
+    {
+      "name": "fake revoke token refused",
+      "pass": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "ok": false,
+          "error": "invalid"
+        }
+      }
+    },
+    {
+      "name": "real revoke link signs out everywhere",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      }
+    },
+    {
+      "name": "revoke link only works once",
+      "pass": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "ok": false,
+          "error": "invalid"
+        }
+      }
+    },
+    {
+      "name": "after revoke, old trusted device needs a code again",
+      "pass": false,
+      "detail": {
+        "access_token": "[hidden]",
+        "refresh_token": "[hidden]"
+      }
+    }
+  ],
+  "summary": "3/4 passed"
+}
