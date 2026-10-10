@@ -1,6 +1,6 @@
 {
   "phase": "ui2",
-  "at": "2026-10-10T15:58:46.934Z",
+  "at": "2026-10-10T16:03:04.150Z",
   "checks": [
     {
       "name": "signed in after code",
@@ -13,25 +13,20 @@
     },
     {
       "name": "parent dashboard asks for PIN",
-      "pass": true
-    },
-    {
-      "name": "course completion screen shows",
       "pass": false
     },
     {
-      "name": "script error",
-      "pass": false,
-      "detail": "page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"https://kikiwarrior.com/\", waiting until \"networkidle\"\n\n    at /home/runner/work/kiki-safe-quest/kiki-safe-quest/tests/ui-e2e.mjs:80:14"
+      "name": "course completion screen shows",
+      "pass": true
     }
   ],
   "shots": [
     "shots/ui2-after-signin.png",
     "shots/ui2-family.png",
     "shots/ui2-parent-pin.png",
-    "shots/ui2-parent-dashboard.png",
-    "shots/ui2-course-complete.png"
+    "shots/ui2-course-complete.png",
+    "shots/ui2-course-complete-mobile.png"
   ],
-  "signin_ms": 10481,
-  "summary": "3/5 passed"
+  "signin_ms": 18458,
+  "summary": "3/4 passed"
 }
