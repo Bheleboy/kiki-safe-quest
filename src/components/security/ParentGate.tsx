@@ -4,11 +4,12 @@ import { Eyebrow } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ShieldIcon } from "@/components/course/CourseIcons";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { callFn, useAuth } from "@/hooks/useAuth";
 
 const UNLOCK_KEY = "kw_parent_unlock";
 
-function readUnlock(userId: string | undefined): boolean {
+export function readUnlock(userId: string | undefined): boolean {
   if (!userId) return false;
   try {
     const raw = sessionStorage.getItem(UNLOCK_KEY);
@@ -26,7 +27,24 @@ function writeUnlock(userId: string, until: number) {
 type Mode = "loading" | "create" | "enter" | "forgot" | "unlocked" | "error";
 
 export function ParentGate({ children }: { children: React.ReactNode }) {
-  const { user, session, profile } = useAuth();
+  const { user, profile } = useAuth();
+  const [unlocked, setUnlocked] = useState(() => readUnlock(user?.id));
+  useEffect(() => {
+    if (!unlocked || !user) return;
+    const iv = window.setInterval(() => { if (!readUnlock(user.id)) setUnlocked(false); }, 30_000);
+    return () => window.clearInterval(iv);
+  }, [unlocked, user]);
+  if (profile?.is_admin || unlocked) return <>{children}</>;
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md"><PinPad onUnlocked={() => setUnlocked(true)} /></div>
+    </div>
+  );
+}
+
+/** PIN create / unlock / reset UI. Calls onUnlocked once the server confirms. */
+export function PinPad({ onUnlocked, onCancel }: { onUnlocked: () => void; onCancel?: () => void }) {
+  const { user, session } = useAuth();
   const [mode, setMode] = useState<Mode>(() => (readUnlock(user?.id) ? "unlocked" : "loading"));
   const [pin, setPin] = useState("");
   const [password, setPassword] = useState("");
@@ -48,12 +66,7 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
     return () => { cancelled = true; };
   }, [mode, token]);
 
-  // Re-lock when the unlock window ends
-  useEffect(() => {
-    if (mode !== "unlocked" || !user) return;
-    const iv = window.setInterval(() => { if (!readUnlock(user.id)) { setPin(""); setMode("enter"); } }, 30_000);
-    return () => window.clearInterval(iv);
-  }, [mode, user]);
+  useEffect(() => { if (mode === "unlocked") onUnlocked(); }, [mode, onUnlocked]);
 
   const submit = useCallback(async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -78,9 +91,7 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
     }
   }, [token, user, pin, mode, password]);
 
-  // Admins skip the gate (they are not in a family context)
-  if (profile?.is_admin && mode !== "unlocked") return <>{children}</>;
-  if (mode === "unlocked") return <>{children}</>;
+  if (mode === "unlocked") return null;
 
   const heading = mode === "create" ? "Set a parent PIN" : mode === "forgot" ? "Reset your PIN" : "Parent PIN";
   const intro =
@@ -89,9 +100,8 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
     : "This area is for parents. Enter your 4-digit PIN.";
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+      <div>
+        <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-4">
             <ShieldIcon size={32} className="stroke-primary-foreground" />
           </div>
@@ -136,15 +146,40 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
                   <Button type="button" variant="ghost" onClick={() => { setMode("enter"); setError(""); setPin(""); }} className="text-sm font-body text-primary hover:underline">Back</Button>
                 )}
                 <div>
-                  <Button asChild variant="ghost" className="text-sm font-body text-charcoal/70 hover:underline">
-                    <Link to="/dashboard">Back to lessons</Link>
-                  </Button>
+                  {onCancel ? (
+                    <Button type="button" variant="ghost" onClick={onCancel} className="text-sm font-body text-charcoal/70 hover:underline">Cancel</Button>
+                  ) : (
+                    <Button asChild variant="ghost" className="text-sm font-body text-charcoal/70 hover:underline">
+                      <Link to="/family">Back to lessons</Link>
+                    </Button>
+                  )}
                 </div>
               </div>
             </form>
           )}
         </div>
       </div>
-    </div>
   );
+}
+
+/** Runs an action only after the parent PIN is unlocked; renders the PIN pad in a dialog. */
+export function useParentPin() {
+  const { user, profile } = useAuth();
+  const [pending, setPending] = useState<null | (() => void)>(null);
+  const guard = useCallback((action: () => void) => {
+    if (profile?.is_admin || readUnlock(user?.id)) action();
+    else setPending(() => action);
+  }, [user, profile]);
+  const onUnlocked = useCallback(() => {
+    setPending((p) => { if (p) setTimeout(p, 0); return null; });
+  }, []);
+  const dialog = (
+    <Dialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>
+      <DialogContent className="rounded-2xl border border-primary/15 bg-background max-w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogTitle className="sr-only">Parent PIN</DialogTitle>
+        {pending && <PinPad onUnlocked={onUnlocked} onCancel={() => setPending(null)} />}
+      </DialogContent>
+    </Dialog>
+  );
+  return { guard, dialog };
 }

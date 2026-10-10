@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useParentPin } from "@/components/security/ParentGate";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { Plus, Trash2, ArrowRight, LogOut, Users, BookOpen, ExternalLink } from "lucide-react";
 import { ChildArmourAvatar } from "@/components/armour/ChildArmourAvatar";
@@ -25,6 +26,7 @@ const AVATAR_COLORS = [
 ];
 
 export default function ManageChildren() {
+  const { guard, dialog: pinDialog } = useParentPin();
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [children, setChildren] = useState<Child[]>([]);
@@ -129,6 +131,7 @@ export default function ManageChildren() {
 
   return (
     <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
+      {pinDialog}
       <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-primary/15 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -138,7 +141,7 @@ export default function ManageChildren() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={() => navigate("/parent")} className="text-charcoal/70 hover:text-charcoal transition-colors p-2" title="Parent Dashboard">
+            <Button variant="ghost" onClick={() => guard(() => navigate("/parent"))} className="text-charcoal/70 hover:text-charcoal transition-colors p-2" title="Parent Dashboard">
               <Users className="w-5 h-5" />
             </Button>
             <Button variant="ghost" onClick={handleLogout} className="text-charcoal/70 hover:text-charcoal transition-colors p-2">
@@ -202,7 +205,7 @@ export default function ManageChildren() {
                   </div>
                 </div>
                 <Button variant="ghost"
-                  onClick={() => removeChild(child.id)}
+                  onClick={() => guard(() => removeChild(child.id))}
                   className="p-2 text-destructive hover:text-destructive transition-colors"
                   title="Remove child"
                 >
@@ -286,7 +289,7 @@ export default function ManageChildren() {
           <MotionButton variant="ghost"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            onClick={() => setShowAdd(true)}
+            onClick={() => guard(() => setShowAdd(true))}
             className="w-full card-kiki flex items-center justify-center gap-2 py-4 text-primary hover:border-primary/40 transition-all"
           >
             <Plus className="w-5 h-5" />

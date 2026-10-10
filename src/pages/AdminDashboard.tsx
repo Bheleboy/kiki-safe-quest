@@ -6,7 +6,8 @@ import { ShieldIcon } from "@/components/course/CourseIcons";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { Users, Baby, BookOpen, TrendingUp, Search, LogOut, Star } from "lucide-react";
+import { Users, Baby, BookOpen, TrendingUp, Search, LogOut, Star, Shield } from "lucide-react";
+import { SecurityPanel } from "@/components/admin/SecurityPanel";
 
 const KIKI_CLIENT_ID = "7a197200-b63e-4a04-80b7-6c3bdcfd93d7";
 
@@ -346,6 +347,13 @@ function AdminDashboardView() {
             <Star size={20} className="text-primary" /> Parent reviews
           </h2>
           <ParentReviewsPanel />
+        </section>
+
+        <section>
+          <h2 className="font-display text-xl uppercase tracking-wider mb-4 flex items-center gap-2 text-charcoal font-bold">
+            <Shield size={20} className="text-primary" /> Security
+          </h2>
+          <SecurityPanel />
         </section>
 
         {/* Section 5: Google Search Console */}
