@@ -1,10 +1,11 @@
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 
 const BOOK_ID = "armour-of-god";
@@ -60,6 +61,8 @@ const armourComponents = [
 
 export default function BookArmourOfGod() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [purchasedStores, setPurchasedStores] = useState<string[]>([]);
 
   useEffect(() => {
@@ -76,10 +79,14 @@ export default function BookArmourOfGod() {
   }, [user]);
 
   const handleBuyClick = async (storeName: string, storeUrl: string) => {
-    // Open the store straight away so popup blockers do not suppress the new tab.
-    window.open(storeUrl, "_blank", "noopener,noreferrer");
-
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Account required",
+        description: "Please sign in or create an account to purchase this book.",
+      });
+      navigate("/auth", { state: { returnTo: "/books/armour-of-god" } });
+      return;
+    }
 
     // Save bookmark if not already saved for this store
     if (!purchasedStores.includes(storeName)) {
@@ -92,6 +99,9 @@ export default function BookArmourOfGod() {
       });
       setPurchasedStores((prev) => [...prev, storeName]);
     }
+
+    // Open external store
+    window.open(storeUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
