@@ -193,7 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
-  }, [fetchProfile, checkSession, forceSignOut]);
+  }, [fetchProfile, checkSession, forceSignOut, navigate]);
 
   // Periodic and focus-based checks
   useEffect(() => {
