@@ -95,14 +95,6 @@ export function ParentSurvey({ userId, childId, childName, streamId, childSurvey
         <p className="font-body text-sm text-charcoal/70 max-w-sm mx-auto">
           Your feedback helps us continuously improve and keep children safer online.
         </p>
-        <div className="space-y-2">
-          <Button asChild variant="outline" className="h-auto min-h-12 rounded-full border-2 border-primary/35 bg-transparent px-6 font-display uppercase tracking-wider text-charcoal hover:bg-primary/10">
-            <a href="https://www.trustpilot.com/evaluate/kikiwarrior.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
-              <Star className="w-4 h-4 text-primary fill-primary" /> Review us on Trustpilot
-            </a>
-          </Button>
-          <p className="font-body text-xs text-charcoal/60">Public reviews help other parents find Kiki Warrior.</p>
-        </div>
         <Button variant="ghost"
           onClick={onComplete}
           className="btn-copper adventure-button px-6 py-3 text-sm uppercase tracking-widest"
