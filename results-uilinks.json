@@ -1,6 +1,6 @@
 {
   "phase": "links",
-  "at": "2026-10-11T11:54:23.059Z",
+  "at": "2026-10-11T12:07:57.572Z",
   "checks": [
     {
       "name": "desktop / loads",
@@ -173,8 +173,11 @@
     },
     {
       "name": "external https://gdpr.eu",
-      "pass": false,
-      "detail": "Error: apiRequestContext.get: Connection timeout\nCall log:\n  - → GET https://gdpr.eu/\n  -   user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Sa"
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "final": "https://gdpr.eu/"
+      }
     },
     {
       "name": "mailto mailto:privacy@kikiwarrior.com",
@@ -548,6 +551,10 @@
     "https://popia.co.za": {
       "status": 200,
       "final": "https://popia.co.za/"
+    },
+    "https://gdpr.eu": {
+      "status": 200,
+      "final": "https://gdpr.eu/"
     }
   },
   "stores": [
@@ -577,9 +584,9 @@
       "url": "https://www.amazon.com.br/dp/B0FBX2XS3H",
       "status": 200,
       "final": "https://www.amazon.com.br/dp/B0FBX2XS3H",
-      "title": "",
+      "title": "Kiki's Armour of God (English Edition)",
       "price": "",
-      "page_title": "Amazon.com.br"
+      "page_title": "Kiki's Armour of God (English Edition) - eBooks em Inglês na Amazon.com.br"
     },
     {
       "url": "https://www.amazon.com/dp/B0FBX2XS3H",
@@ -606,5 +613,5 @@
       "page_title": "Amazon.co.za"
     }
   ],
-  "summary": "30/35 passed"
+  "summary": "31/35 passed"
 }
