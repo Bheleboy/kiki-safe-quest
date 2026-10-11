@@ -112,6 +112,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (r.data?.valid) return "ok";
       if (r.status >= 500) return "error";
       if (allowRegister && r.data?.reason === "not_registered") {
+        // A code was already emailed for this Google sign-in: do not send another on reload.
+        if (loadChallenge()?.oauth) return "step_up";
         const reg = await callFn("session-check", { action: "register" }, s.access_token);
         if (reg.data?.valid) return "ok";
         if (reg.data?.step_up && reg.data?.challenge_id) {
@@ -172,6 +174,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Keep the session locally but do not expose the user until verified.
           setUser(null);
           setLoading(false);
+          // Google returns to the homepage; the code screen lives on /auth.
+          // The code screen already explains the emailed code, so no extra message.
+          if (window.location.pathname !== "/auth") navigate("/auth", { replace: true });
           return;
         }
         hadUser.current = true;
@@ -265,7 +270,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const r = await callFn("verify-login-challenge", { challenge_id: pendingChallenge.challenge_id, code }, token);
       const d = r.data ?? {};
       if (!r.ok) {
-        if (d.error === "challenge_invalid" || d.error === "device_mismatch" || d.error === "session_mismatch") setChallenge(null);
+        if (d.error === "challenge_invalid" || d.error === "device_mismatch" || d.error === "session_mismatch") {
+          setChallenge(null);
+          if (pendingChallenge.oauth && d.error !== "device_mismatch") {
+            // Stale Google challenge: sign out locally so the parent can simply click Google again.
+            manualSignOut.current = true;
+            try { await supabase.auth.signOut({ scope: "local" }); } catch { /* ignore */ }
+            manualSignOut.current = false;
+          }
+        }
         return { error: { message: d.message || "That code did not work. Please try again." } };
       }
       setChallenge(null);
