@@ -113,7 +113,6 @@ export function ParentReviews() {
         <p className="font-display text-xs uppercase tracking-widest text-charcoal mt-5">{review.display_name || "Kiki Warrior parent"}</p>
       </article>;
     })}</div>
-    <Button asChild variant="outline" className="mt-8 h-auto rounded-full border-2 border-primary/35 px-6 min-h-12 font-display uppercase text-charcoal bg-transparent hover:bg-primary/10"><a href="https://www.trustpilot.com/review/kikiwarrior.com" target="_blank" rel="noopener noreferrer">Read more on Trustpilot</a></Button>
   </div></RevealSection>;
 }
 export function Parents() {
