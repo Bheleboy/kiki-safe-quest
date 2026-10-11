@@ -35,7 +35,7 @@ export default function AuthPage() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
-  const { signUp, signIn, resetPassword, user, pendingChallenge, verifyChallenge, resendChallenge, cancelChallenge, securityMessage, clearSecurityMessage } = useAuth();
+  const { loading: authLoading, signUp, signIn, resetPassword, user, pendingChallenge, verifyChallenge, resendChallenge, cancelChallenge, securityMessage, clearSecurityMessage } = useAuth();
   const [captchaNeeded, setCaptchaNeeded] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | undefined>();
   const [code, setCode] = useState("");
@@ -57,10 +57,20 @@ export default function AuthPage() {
   };
   const navigate = useNavigate();
   const location = useLocation();
-  const returnTo = (location.state as any)?.returnTo || "/family";
+  const [returnTo] = useState<string>(() => {
+    const fromState = (location.state as any)?.returnTo as string | undefined;
+    let stashed: string | null = null;
+    try { stashed = sessionStorage.getItem("kw_oauth_return"); } catch { /* ignore */ }
+    const safe = (v?: string | null) => (v && v.startsWith("/") && !v.startsWith("//") ? v : undefined);
+    return safe(fromState) || safe(stashed) || "/family";
+  });
+  const oauthReturn = typeof window !== "undefined" && /[#&?](access_token|code)=/.test(window.location.hash + window.location.search);
 
   useEffect(() => {
-    if (user) navigate(returnTo, { replace: true });
+    if (user) {
+      try { sessionStorage.removeItem("kw_oauth_return"); } catch { /* ignore */ }
+      navigate(returnTo, { replace: true });
+    }
   }, [user, navigate, returnTo]);
 
   const domainBlocked = !isAllowedAuthDomain();
@@ -68,8 +78,9 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     if (domainBlocked) { setError("Authentication is only available on the official website."); return; }
     setError("");
+    try { sessionStorage.setItem("kw_oauth_return", returnTo); } catch { /* ignore */ }
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: getProductionOrigin(),
+      redirect_uri: getProductionOrigin() + "/auth",
     });
     if (error) setError(error.message || "Google sign-in failed");
   };
@@ -115,6 +126,14 @@ export default function AuthPage() {
       setSubmitting(false);
     }
   };
+
+  if ((authLoading && (oauthReturn || !!user)) || (user && !pendingChallenge)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-live="polite">
+        <p className="font-display text-lg uppercase tracking-widest text-charcoal/70">Signing you in...</p>
+      </div>
+    );
+  }
 
   return (
     <PublicPage><main className="editorial-focus mx-auto flex w-full flex-col items-center justify-center px-4 py-12 sm:py-16">
