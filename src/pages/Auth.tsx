@@ -13,6 +13,9 @@ import { Turnstile } from "@/components/Turnstile";
 
 type Mode = "login" | "signup" | "forgot";
 
+// Upgrade line for returning parents: shown until 15 Nov 2026, then hidden automatically.
+const UPGRADE_LINE_UNTIL = new Date("2026-11-16T00:00:00Z").getTime();
+
 const signupSchema = z.object({
   firstName: z.string().trim().min(1, "Name is required").max(50),
   email: z.string().trim().email("Invalid email").max(255),
@@ -158,6 +161,11 @@ export default function AuthPage() {
           </p>
         </div>
 
+        {Date.now() < UPGRADE_LINE_UNTIL && mode !== "signup" && (
+          <p className="mb-4 rounded-lg bg-primary/10 px-4 py-2 text-center font-body text-sm text-charcoal">
+            Kiki Warrior has been upgraded. Please sign in again to continue.
+          </p>
+        )}
         {/* Card */}
         {pendingChallenge ? (
         <div className="card-kiki">
