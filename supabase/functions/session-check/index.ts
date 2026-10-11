@@ -60,6 +60,11 @@ Deno.serve(async (req) => {
       return json({ valid: true, registered: true })
     }
     if (!email) return json({ valid: false, reason: 'no_email' })
+    const { data: open } = await admin.from('login_challenges').select('id')
+      .eq('existing_session_id', sessionId).eq('user_id', userId).eq('device_hash', deviceHash)
+      .is('consumed_at', null).gt('expires_at', new Date().toISOString()).lt('attempts', 5)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle()
+    if (open?.id) return json({ valid: false, step_up: true, challenge_id: open.id, masked_email: maskEmail(email) })
     const challengeId = await createChallenge({ userId, email, deviceHash, existingSessionId: sessionId, ip, ua })
     return json({ valid: false, step_up: true, challenge_id: challengeId, masked_email: maskEmail(email) })
   }

@@ -106,7 +106,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /** Returns "ok" | "invalid" | "step_up" | "error" */
   const freshTokens = useRef<string | null>(null);
-  const checkSession = useCallback(async (s: Session, allowRegister: boolean) => {
+  const inflightChecks = useRef<Map<string, Promise<"ok" | "invalid" | "step_up" | "error">>>(new Map());
+  const runCheckSession = useCallback(async (s: Session, allowRegister: boolean): Promise<"ok" | "invalid" | "step_up" | "error"> => {
     try {
       const r = await callFn("session-check", {}, s.access_token);
       if (r.data?.valid) return "ok";
@@ -126,6 +127,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return "error"; // network hiccup: keep the session; the database still enforces registration
     }
   }, [setChallenge]);
+  // One check per access token at a time (INITIAL_SESSION and SIGNED_IN can fire together).
+  const checkSession = useCallback((s: Session, allowRegister: boolean) => {
+    const key = `${allowRegister ? "r" : "c"}:${s.access_token}`;
+    const existing = inflightChecks.current.get(key);
+    if (existing) return existing;
+    const p = runCheckSession(s, allowRegister).finally(() => inflightChecks.current.delete(key));
+    inflightChecks.current.set(key, p);
+    return p;
+  }, [runCheckSession]);
 
   useEffect(() => {
     let mounted = true;
