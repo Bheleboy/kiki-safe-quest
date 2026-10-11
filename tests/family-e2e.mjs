@@ -73,12 +73,13 @@ try {
   check("active child marked 'Learning on this device'", (await p.getByText("Learning on this device").count()) > 0);
   await card("Lwazi").getByRole("button", { name: /learn/i }).click(); await p.waitForTimeout(2000);
   check("switching to sibling asks for parent PIN", (await pinVisible()) && p.url().includes("/family"), p.url());
+  check("PIN pad says it is for switching learner", (await p.getByText("Ask a parent to enter the PIN to switch learner.").count()) > 0);
   await shot("switch-pin");
   await p.keyboard.press("Escape"); await p.waitForTimeout(800);
 
   // URL edit cannot bypass.
   await p.goto(`${SITE}/course?child=${B}`, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(4000);
-  check("editing the address to a sibling shows the PIN pad", (await pinVisible()) && (await p.getByText("Switching to another child needs the parent PIN.").count()) > 0, p.url());
+  check("editing the address to a sibling shows the PIN pad", (await pinVisible()) && (await p.getByText("Ask a parent to enter the PIN to switch learner.").count()) > 0, p.url());
   await shot("url-pin");
   await p.getByLabel("4-digit parent PIN").click(); await p.keyboard.type(PIN);
   await p.getByRole("button", { name: /unlock|continue|enter/i }).first().click().catch(() => {});
