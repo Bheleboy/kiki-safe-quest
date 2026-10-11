@@ -26,8 +26,9 @@ try {
   const user = await (await fetch(`${URL_}/auth/v1/user`, { headers: { apikey: KEY, Authorization: `Bearer ${tok}` } })).json();
   const pinSet = await fn("parent-pin", { action: "set", pin: PIN, password }, tok);
   check("setup: parent PIN set", pinSet.status === 200, pinSet.body);
-  const kids = [];
-  for (const [first_name, age_band] of [["Ayanda", "6-9"], ["Lwazi", "10-13"]]) {
+  const existing = await (await fetch(`${URL_}/rest/v1/children?select=id,first_name&order=created_at`, { headers: { apikey: KEY, Authorization: `Bearer ${tok}` } })).json();
+  const kids = Array.isArray(existing) && existing.length >= 2 ? existing.slice(0, 2).map((k) => k.id) : [];
+  if (!kids.length) for (const [first_name, age_band] of [["Ayanda", "6-9"], ["Lwazi", "10-13"]]) {
     const r = await fetch(`${URL_}/rest/v1/children`, { method: "POST", headers: { apikey: KEY, Authorization: `Bearer ${tok}`, "Content-Type": "application/json", Prefer: "return=representation" }, body: JSON.stringify({ parent_id: user.id, first_name, age_band }) });
     const j = await r.json(); kids.push(j?.[0]?.id);
   }
@@ -43,6 +44,13 @@ try {
   const pinVisible = async () => (await p.getByLabel("4-digit parent PIN").count()) > 0;
 
   await p.goto(`${SITE}/family`, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(5000);
+  if (p.url().includes("/verify-age")) {
+    await p.getByPlaceholder("DD").fill("15"); await p.getByPlaceholder("MM").fill("06"); await p.getByPlaceholder("YYYY").fill("1985");
+    for (const cb of await p.locator('input[type="checkbox"]').all()) await cb.check();
+    await p.locator('button[type="submit"]').click(); await p.waitForTimeout(4000);
+    check("new parent completes age check", !p.url().includes("/verify-age"), p.url());
+    await p.goto(`${SITE}/family`, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(5000);
+  }
   check("family page shows both children", (await p.getByText("Ayanda").count()) > 0 && (await p.getByText("Lwazi").count()) > 0, p.url());
   check("hint about switching shown", (await p.getByText("Switching to another child needs the parent PIN.").count()) > 0);
   await shot("family");
