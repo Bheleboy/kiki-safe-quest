@@ -25,7 +25,7 @@ jobs:
         env:
           KW_TEST_PASSWORD: ${{ inputs.password }}
           GH_TOKEN: ${{ github.token }}
-        run: if [ "${{ inputs.phase }}" = "uishots" ]; then node tests/shots.mjs; elif [ "${{ inputs.phase }}" = "uilinks" ]; then node tests/links.mjs; elif [ "${{ inputs.phase }}" = "uifamily" ]; then node tests/family-e2e.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; else node tests/ui-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"; fi
+        run: if [ "${{ inputs.phase }}" = "uishots" ]; then node tests/shots.mjs; elif [ "${{ inputs.phase }}" = "uilinks" ]; then node tests/links.mjs; elif [ "${{ inputs.phase }}" = "uidiag" ]; then node tests/diag.mjs; elif [ "${{ inputs.phase }}" = "uifamily" ]; then node tests/family-e2e.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; else node tests/ui-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"; fi
       - name: Run checks
         if: "!startsWith(inputs.phase, 'ui')"
         env:
