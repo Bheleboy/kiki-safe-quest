@@ -64,7 +64,7 @@ export default function AuthPage() {
     const safe = (v?: string | null) => (v && v.startsWith("/") && !v.startsWith("//") ? v : undefined);
     return safe(fromState) || safe(stashed) || "/family";
   });
-  const oauthReturn = typeof window !== "undefined" && /[#&?](access_token|code)=/.test(window.location.hash + window.location.search);
+  const [oauthReturn] = useState(() => typeof window !== "undefined" && /[#&?](access_token|code)=/.test(window.location.hash + window.location.search));
 
   useEffect(() => {
     if (user) {
