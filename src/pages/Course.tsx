@@ -13,6 +13,7 @@ import { ARMOUR_PIECES, getArmourPiecesForModule } from "@/data/armourData";
 import { SearchBar } from "@/components/course/SearchBar";
 import { ModuleCard } from "@/components/course/ModuleCard";
 import { LessonView } from "@/components/course/LessonView";
+import { setUpdateBlocked } from "@/lib/appVersion";
 import { LessonSidebar } from "@/components/course/LessonSidebar";
 import { ProgressBar } from "@/components/course/ProgressBar";
 
@@ -37,6 +38,11 @@ type ChildInfo = Pick<Tables<"children">, "id" | "first_name" | "age_band">;
 
 export default function CoursePage() {
   const [view, setView] = useState<View>({ type: "home" });
+  // Hold any new-version reload while a lesson or quiz is open.
+  useEffect(() => {
+    setUpdateBlocked(view.type === "lesson");
+    return () => setUpdateBlocked(false);
+  }, [view.type]);
   const { user, profile, signOut } = useAuth();
   const [searchParams] = useSearchParams();
   const childId = searchParams.get("child");

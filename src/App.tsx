@@ -20,6 +20,7 @@ import AgeVerification from "./pages/AgeVerification";
 import AdminDashboard from "./pages/AdminDashboard";
 import VideoDemo from "./pages/VideoDemo";
 import CookieConsent from "./components/CookieConsent";
+import VersionWatcher from "./components/VersionWatcher";
 import SecurityRevoke from "./pages/SecurityRevoke";
 import Unsubscribe from "./pages/Unsubscribe";
 import { ParentGate } from "./components/security/ParentGate";
@@ -66,6 +67,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <VersionWatcher />
         <AuthProvider>
           <AgeGate>
             <Routes>
