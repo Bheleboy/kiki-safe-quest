@@ -202,7 +202,7 @@ export async function revokeSession(sessionId: string, reason: string) {
   if (error) console.error('revoke_auth_session failed', error)
 }
 
-const MAX_SESSIONS = 2
+const MAX_SESSIONS = 3
 
 export async function registerSession(opts: {
   sessionId: string

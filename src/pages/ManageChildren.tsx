@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useParentPin } from "@/components/security/ParentGate";
+import { readUnlock, useParentPin } from "@/components/security/ParentGate";
+import { canSwitchFreely, clearActiveLearner, readActiveLearner, writeActiveLearner } from "@/lib/activeLearner";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { Plus, Trash2, ArrowRight, LogOut, Users, BookOpen, ExternalLink } from "lucide-react";
 import { ChildArmourAvatar } from "@/components/armour/ChildArmourAvatar";
@@ -37,6 +38,8 @@ export default function ManageChildren() {
   const [newName, setNewName] = useState("");
   const [newAge, setNewAge] = useState<"6-9" | "10-13">("6-9");
   const [submitting, setSubmitting] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(() => readActiveLearner(user?.id));
+  useEffect(() => { setActiveId(readActiveLearner(user?.id)); }, [user]);
 
   const fetchChildProgress = useCallback(async (childList: Child[]) => {
     if (!user || childList.length === 0) return;
@@ -110,10 +113,18 @@ export default function ManageChildren() {
   const removeChild = async (id: string) => {
     await supabase.from("children").delete().eq("id", id);
     setChildren((prev) => prev.filter((c) => c.id !== id));
+    clearActiveLearner(id);
+    setActiveId(readActiveLearner(user?.id));
   };
 
   const startCourse = (child: Child) => {
-    navigate(`/course?child=${child.id}`);
+    if (!user) return;
+    const go = () => {
+      writeActiveLearner(user.id, child.id);
+      navigate(`/course?child=${child.id}`);
+    };
+    if (profile?.is_admin || canSwitchFreely(readActiveLearner(user.id), child.id, readUnlock(user.id))) go();
+    else guard(go);
   };
 
   const handleLogout = async () => {
@@ -196,6 +207,7 @@ export default function ManageChildren() {
                   </div>
                   <p className="text-xs text-charcoal/70 font-body">
                     Ages {child.age_band}
+                    {activeId === child.id && <span className="ml-2 font-semibold text-primary">Learning on this device</span>}
                   </p>
                   <div className="mt-1.5 h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
                     <div
@@ -220,6 +232,9 @@ export default function ManageChildren() {
               </motion.div>
             ))}
           </AnimatePresence>
+          {children.length > 1 && (
+            <p className="text-xs text-charcoal/70 font-body text-center pt-1">Switching to another child needs the parent PIN.</p>
+          )}
         </div>
 
         <AnimatePresence>

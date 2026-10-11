@@ -11,12 +11,14 @@ import { ShieldIcon, StarIcon, CertBadgeIcon } from "@/components/course/CourseI
 import { ArmourCollection } from "@/components/armour/ArmourCollection";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { LogOut } from "lucide-react";
+import { useParentPin } from "@/components/security/ParentGate";
 
 export default function DashboardPage() {
   const { user, profile, signOut } = useAuth();
   const { progress, loading } = useProgress(user?.id);
   const { earnedPieces, loading: armourLoading, getPieceProgress } = useArmour(user?.id);
   const navigate = useNavigate();
+  const { guard, dialog: pinDialog } = useParentPin();
 
   if (loading || armourLoading) {
     return (
@@ -48,6 +50,7 @@ export default function DashboardPage() {
 
   return (
     <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
+      {pinDialog}
       <header className="border-b border-primary/15 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -56,7 +59,7 @@ export default function DashboardPage() {
               Kiki<span className="text-primary">Warrior</span>
             </span>
           </div>
-          <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2 text-sm font-body text-charcoal/70 hover:text-charcoal transition-colors">
+          <Button variant="ghost" onClick={() => guard(() => { void handleLogout(); })} className="flex items-center gap-2 text-sm font-body text-charcoal/70 hover:text-charcoal transition-colors">
             <LogOut className="w-4 h-4" /> Sign Out
           </Button>
         </div>

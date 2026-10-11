@@ -9,7 +9,7 @@ import {
 const PARENT_ROUTES = ["/parent", "/family"];
 const CHILD_ROUTES = ["/course", "/dashboard"];
 const PARENT_TIMEOUT = 30 * 60_000;
-const CHILD_TIMEOUT = 2 * 60 * 60_000;
+const CHILD_TIMEOUT = 8 * 60 * 60_000;
 const WARNING_MS = 60_000;
 
 function anyVideoPlaying() {
@@ -48,7 +48,7 @@ export function InactivityGuard() {
       if (idle >= timeout) {
         setWarnLeft(null);
         const minutes = timeout / 60_000;
-        const label = minutes >= 120 ? "2 hours" : `${minutes} minutes`;
+        const label = minutes >= 60 ? `${minutes / 60} hours` : `${minutes} minutes`;
         signOutRef.current(`You were signed out after ${label} of inactivity.`, "inactivity");
       } else if (idle >= timeout - WARNING_MS) {
         setWarnLeft(Math.ceil((timeout - idle) / 1000));
