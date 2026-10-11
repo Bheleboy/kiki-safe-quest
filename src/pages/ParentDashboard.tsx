@@ -1,4 +1,5 @@
 import { Eyebrow } from "@/components/ui/editorial";
+import { FamilyUpdateNotice } from "@/components/FamilyUpdateNotice";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2, ArrowRight, ClipboardList, Bell, Shield, AlertCircle } from "lucide-react";
@@ -212,6 +213,7 @@ export default function ParentDashboard() {
               {children.length > 0 ? `Tracking ${children.length} learner${children.length > 1 ? "s" : ""}` : "No children added yet"}
             </p>
 </div>
+        <FamilyUpdateNotice />
         {notifications.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
             <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide flex items-center gap-2">

@@ -91,10 +91,10 @@ Deno.serve(async (req) => {
     )
   }
 
-  // Security notices may only be triggered by trusted server code.
+  // Every template may only be triggered by trusted server code (there are no public templates).
   // Internal callers send x-internal-key = this project's service key (constant-time compare).
   // A gateway-verified service_role JWT is also accepted.
-  if (templateName.startsWith('security-')) {
+  {
     const provided = req.headers.get('x-internal-key') || ''
     const expected = supabaseServiceKey
     let ok = false

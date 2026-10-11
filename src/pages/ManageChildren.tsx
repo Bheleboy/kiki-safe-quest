@@ -1,4 +1,5 @@
 import { Eyebrow } from "@/components/ui/editorial";
+import { FamilyUpdateNotice } from "@/components/FamilyUpdateNotice";
 import { MotionButton } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
@@ -174,6 +175,8 @@ export default function ManageChildren() {
               : "Choose a learner to start or continue their course."}
           </p>
         </motion.div>
+
+        <FamilyUpdateNotice />
 
         <div className="grid gap-4">
           <AnimatePresence>
