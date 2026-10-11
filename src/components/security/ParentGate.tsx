@@ -43,7 +43,7 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
 }
 
 /** PIN create / unlock / reset UI. Calls onUnlocked once the server confirms. */
-export function PinPad({ onUnlocked, onCancel }: { onUnlocked: () => void; onCancel?: () => void }) {
+export function PinPad({ onUnlocked, onCancel, message }: { onUnlocked: () => void; onCancel?: () => void; message?: string }) {
   const { user, session } = useAuth();
   const [mode, setMode] = useState<Mode>(() => (readUnlock(user?.id) ? "unlocked" : "loading"));
   const [pin, setPin] = useState("");
@@ -97,7 +97,7 @@ export function PinPad({ onUnlocked, onCancel }: { onUnlocked: () => void; onCan
   const intro =
     mode === "create" ? "Set a 4-digit parent PIN so your child can't change settings."
     : mode === "forgot" ? "Enter your account password and choose a new 4-digit PIN."
-    : "This area is for parents. Enter your 4-digit PIN.";
+    : (message ?? "This area is for parents. Enter your 4-digit PIN.");
 
   return (
       <div>
@@ -166,9 +166,10 @@ export function PinPad({ onUnlocked, onCancel }: { onUnlocked: () => void; onCan
 export function useParentPin() {
   const { user, profile } = useAuth();
   const [pending, setPending] = useState<null | (() => void)>(null);
-  const guard = useCallback((action: () => void) => {
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const guard = useCallback((action: () => void, msg?: string) => {
     if (profile?.is_admin || readUnlock(user?.id)) action();
-    else setPending(() => action);
+    else { setMessage(msg); setPending(() => action); }
   }, [user, profile]);
   const onUnlocked = useCallback(() => {
     setPending((p) => { if (p) setTimeout(p, 0); return null; });
@@ -177,7 +178,7 @@ export function useParentPin() {
     <Dialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>
       <DialogContent className="rounded-2xl border border-primary/15 bg-background max-w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">Parent PIN</DialogTitle>
-        {pending && <PinPad onUnlocked={onUnlocked} onCancel={() => setPending(null)} />}
+        {pending && <PinPad onUnlocked={onUnlocked} onCancel={() => setPending(null)} message={message} />}
       </DialogContent>
     </Dialog>
   );

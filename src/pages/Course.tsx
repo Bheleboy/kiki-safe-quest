@@ -150,8 +150,7 @@ export default function CoursePage() {
     return (
       <div className="editorial-page min-h-screen bg-cream bg-tech-grid flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-4">
-          <p className="font-body text-sm text-charcoal/70 text-center">Switching to another child needs the parent PIN.</p>
-          <PinPad onUnlocked={() => setLearnerOk(true)} onCancel={() => navigate("/family")} />
+          <PinPad onUnlocked={() => setLearnerOk(true)} onCancel={() => navigate("/family")} message="Ask a parent to enter the PIN to switch learner." />
         </div>
       </div>
     );

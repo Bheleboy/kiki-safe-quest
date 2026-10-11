@@ -124,7 +124,7 @@ export default function ManageChildren() {
       navigate(`/course?child=${child.id}`);
     };
     if (profile?.is_admin || canSwitchFreely(readActiveLearner(user.id), child.id, readUnlock(user.id))) go();
-    else guard(go);
+    else guard(go, "Ask a parent to enter the PIN to switch learner.");
   };
 
   const handleLogout = async () => {
