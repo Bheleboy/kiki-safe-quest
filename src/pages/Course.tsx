@@ -25,6 +25,8 @@ import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { PinPad, readUnlock, useParentPin } from "@/components/security/ParentGate";
+import { canSwitchFreely, readActiveLearner, writeActiveLearner } from "@/lib/activeLearner";
 
 type View =
   | { type: "home" }
@@ -40,6 +42,14 @@ export default function CoursePage() {
   const childId = searchParams.get("child");
   const [child, setChild] = useState<ChildInfo | null>(null);
   const navigate = useNavigate();
+  const { guard, dialog: pinDialog } = useParentPin();
+  const [learnerOk, setLearnerOk] = useState(false);
+  const learnerAllowed =
+    !childId || !user || !!profile?.is_admin || learnerOk ||
+    canSwitchFreely(readActiveLearner(user.id), childId, readUnlock(user.id));
+  useEffect(() => {
+    if (user && childId && learnerAllowed) writeActiveLearner(user.id, childId);
+  }, [user, childId, learnerAllowed]);
   const [unlockQueue, setUnlockQueue] = useState<string[]>([]);
   const [unlockTotal, setUnlockTotal] = useState(0);
   const [showSurvey, setShowSurvey] = useState(false);
@@ -47,7 +57,7 @@ export default function CoursePage() {
 
   // Fetch child info
   useEffect(() => {
-    if (!childId || !user) return;
+    if (!childId || !user || !learnerAllowed) return;
     supabase
       .from("children")
       .select("id, first_name, age_band")
@@ -57,7 +67,7 @@ export default function CoursePage() {
       .then(({ data }) => {
         if (data) setChild(data);
       });
-  }, [childId, user]);
+  }, [childId, user, learnerAllowed]);
 
   const {
     progress,
@@ -136,8 +146,20 @@ export default function CoursePage() {
     ? courseData.filter((s) => s.id === ageBand)
     : courseData;
 
+  if (!learnerAllowed) {
+    return (
+      <div className="editorial-page min-h-screen bg-cream bg-tech-grid flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md space-y-4">
+          <p className="font-body text-sm text-charcoal/70 text-center">Switching to another child needs the parent PIN.</p>
+          <PinPad onUnlocked={() => setLearnerOk(true)} onCancel={() => navigate("/family")} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="editorial-page min-h-screen bg-cream bg-tech-grid">
+      {pinDialog}
       {/* Top Bar */}
       <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-primary/15 px-4 py-3">
         <div className={`editorial-course-bar mx-auto flex items-center gap-3 ${view.type === "lesson" ? "max-w-7xl" : "max-w-4xl"}`}>
@@ -164,7 +186,7 @@ export default function CoursePage() {
           >
             <Users className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" onClick={handleLogout} className="text-charcoal/70 hover:text-charcoal transition-colors p-2">
+          <Button variant="ghost" onClick={() => guard(() => { void handleLogout(); })} className="text-charcoal/70 hover:text-charcoal transition-colors p-2">
             <LogOut className="w-5 h-5" />
           </Button>
         </div>

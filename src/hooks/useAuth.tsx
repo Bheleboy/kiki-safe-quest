@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
+import { clearActiveLearner } from "@/lib/activeLearner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getDeviceSecret, loadChallenge, saveChallenge, type PendingChallenge } from "@/lib/device";
@@ -338,6 +339,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     manualSignOut.current = true;
+    clearActiveLearner();
     await revokeSelf("sign_out");
     try { await supabase.auth.signOut({ scope: "local" }); } catch { /* ignore */ }
     manualSignOut.current = false;
