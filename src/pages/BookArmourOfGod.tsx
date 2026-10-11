@@ -1,11 +1,10 @@
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 
 const BOOK_ID = "armour-of-god";
@@ -14,7 +13,7 @@ const BOOK_TITLE = "Kiki's Armour of God";
 const bookLinks = [
   {
     name: "Amazon",
-    url: "https://www.amazon.com.br/Kikis-Armour-English-Nonala-Dagada-ebook/dp/B0FBX2XS3H",
+    url: "https://www.amazon.com/dp/B0FBX2XS3H",
     icon: (
       <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
         <path d="M.045 18.02c.07-.116.36-.326.906-.546 1.457-.586 2.636-.907 3.536-.907.305 0 .57.042.795.126.224.084.42.21.585.378.166.168.3.378.404.63.104.252.156.546.156.882 0 .672-.18 1.326-.54 1.962s-.87 1.17-1.53 1.602c-.66.432-1.41.648-2.25.648-.42 0-.81-.084-1.17-.252-.36-.168-.54-.378-.54-.63 0-.084.03-.168.09-.252l.558-.84zm6.394-2.2c0-.672.156-1.284.468-1.836.312-.552.744-1.002 1.296-1.35.552-.348 1.164-.588 1.836-.72.672-.132 1.392-.198 2.16-.198h.78v-.42c0-.63-.144-1.092-.432-1.386-.288-.294-.756-.442-1.404-.442-.648 0-1.452.168-2.412.504l-.756-1.848c1.08-.504 2.304-.756 3.672-.756 1.32 0 2.298.33 2.934.99.636.66.954 1.614.954 2.862v4.284c0 .336.072.576.216.72.144.144.384.216.72.216v1.89c-.336.084-.612.138-.828.162-.216.024-.444.036-.684.036-.504 0-.876-.108-1.116-.324-.24-.216-.396-.504-.468-.864-.72.84-1.74 1.26-3.06 1.26-.864 0-1.578-.27-2.142-.81-.564-.54-.846-1.254-.846-2.142 0-.756.21-1.374.63-1.854.42-.48 1.014-.81 1.782-.99l2.898-.63v-.378c0-.378-.108-.666-.324-.864-.216-.198-.552-.297-1.008-.297-.456 0-.87.108-1.242.324-.372.216-.66.504-.864.864l-1.74-1.02zm5.76 1.26h-.42c-.624 0-1.14.132-1.548.396-.408.264-.612.648-.612 1.152 0 .384.12.684.36.9.24.216.564.324.972.324.552 0 1.02-.186 1.404-.558.384-.372.576-.834.576-1.386v-.828h-.732zm-8.502 6.462c1.596.924 3.33 1.386 5.202 1.386 1.296 0 2.544-.216 3.744-.648 1.2-.432 2.244-1.02 3.132-1.764.12-.096.24-.144.36-.144.168 0 .3.072.396.216.096.144.144.3.144.468 0 .168-.072.336-.216.504-.936.936-2.136 1.68-3.6 2.232-1.464.552-2.976.828-4.536.828-2.088 0-3.924-.456-5.508-1.368l.882-1.71z" />
@@ -32,7 +31,7 @@ const bookLinks = [
   },
   {
     name: "Kobo",
-    url: "https://www.kobo.com/my/en/ebook/kiki-s-armour-of-god?srsltid=AfmBOoqvK_TjSdiDbibLAheuxUT98Yv1thfGO9L9CyQCPFTp7dzdENP4",
+    url: "https://www.kobo.com/za/en/ebook/kiki-s-armour-of-god",
     icon: (
       <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H7V8h4v8zm6 0h-4V8h4v8z" />
@@ -61,8 +60,6 @@ const armourComponents = [
 
 export default function BookArmourOfGod() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const [purchasedStores, setPurchasedStores] = useState<string[]>([]);
 
   useEffect(() => {
@@ -79,14 +76,10 @@ export default function BookArmourOfGod() {
   }, [user]);
 
   const handleBuyClick = async (storeName: string, storeUrl: string) => {
-    if (!user) {
-      toast({
-        title: "Account required",
-        description: "Please sign in or create an account to purchase this book.",
-      });
-      navigate("/auth", { state: { returnTo: "/books/armour-of-god" } });
-      return;
-    }
+    // Open the store straight away so popup blockers do not suppress the new tab.
+    window.open(storeUrl, "_blank", "noopener,noreferrer");
+
+    if (!user) return;
 
     // Save bookmark if not already saved for this store
     if (!purchasedStores.includes(storeName)) {
@@ -99,9 +92,6 @@ export default function BookArmourOfGod() {
       });
       setPurchasedStores((prev) => [...prev, storeName]);
     }
-
-    // Open external store
-    window.open(storeUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
