@@ -1,8 +1,21 @@
 {
-  "phase": "uishots",
-  "at": "2026-10-11T11:38:14.667Z",
-  "checks": [],
-  "shots": [],
-  "signin_ms": 40369,
-  "summary": "0/0 passed"
+  "phase": "shots",
+  "at": "2026-10-11T11:38:51.800Z",
+  "checks": [
+    {
+      "name": "done",
+      "pass": true
+    }
+  ],
+  "shots": [
+    "shots/hero-desktop.png",
+    "shots/sec-paths.png",
+    "shots/sec-missions.png",
+    "shots/sec-academy.png",
+    "shots/sec-rewards.png",
+    "shots/sec-parents.png",
+    "shots/auth-desktop.png",
+    "shots/course-preview.png",
+    "shots/hero-mobile.png"
+  ]
 }
