@@ -1,0 +1,49 @@
+{
+  "phase": "family",
+  "at": "2026-10-11T13:55:42.222Z",
+  "checks": [
+    {
+      "name": "setup: sign in on first device",
+      "pass": true,
+      "detail": [
+        "access_token",
+        "refresh_token"
+      ]
+    },
+    {
+      "name": "setup: parent PIN set",
+      "pass": true,
+      "detail": {
+        "ok": true,
+        "unlock_until": 1791727848013
+      }
+    },
+    {
+      "name": "setup: two children added",
+      "pass": true,
+      "detail": [
+        "a068309e-cd81-42e2-88aa-176d6e1e4602",
+        "00531b76-25ca-4990-ab59-03dbbb753856"
+      ]
+    },
+    {
+      "name": "family page shows both children",
+      "pass": false,
+      "detail": "https://kikiwarrior.com/verify-age"
+    },
+    {
+      "name": "hint about switching shown",
+      "pass": false,
+      "detail": null
+    },
+    {
+      "name": "script error",
+      "pass": false,
+      "detail": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('div').filter({ has: getByText('Ayanda', { exact: true }) }).filter({ has: getByRole('button', { name: /learn/i }) }).last().getByRole('button', { name: /learn/i })\n\n    at /home/runner/work/kiki-safe-quest/kiki-safe-quest/tests/family-e2e.mjs:52:64"
+    }
+  ],
+  "shots": [
+    "shots/fam-family.png"
+  ],
+  "summary": "3/6 passed"
+}
