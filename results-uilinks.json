@@ -1,0 +1,610 @@
+{
+  "phase": "links",
+  "at": "2026-10-13T07:23:46.569Z",
+  "checks": [
+    {
+      "name": "desktop / loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /auth loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /auth?mode=signup loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /courses/internet-safety loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /books/armour-of-god loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /privacy loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /terms loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "desktop /verify-age loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile / loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /auth loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /auth?mode=signup loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /courses/internet-safety loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /books/armour-of-god loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /privacy loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /terms loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "mobile /verify-age loads",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "internal /",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/"
+      }
+    },
+    {
+      "name": "internal /#missions",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/#missions",
+        "anchor_found": true
+      }
+    },
+    {
+      "name": "internal /#academy",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/#academy",
+        "anchor_found": true
+      }
+    },
+    {
+      "name": "internal /#rewards",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/#rewards",
+        "anchor_found": true
+      }
+    },
+    {
+      "name": "internal /#parents",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/#parents",
+        "anchor_found": true
+      }
+    },
+    {
+      "name": "internal /auth",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/auth"
+      }
+    },
+    {
+      "name": "internal /courses/internet-safety",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/courses/internet-safety"
+      }
+    },
+    {
+      "name": "internal /auth?mode=signup",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/auth?mode=signup"
+      }
+    },
+    {
+      "name": "internal /books/armour-of-god",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/books/armour-of-god"
+      }
+    },
+    {
+      "name": "internal /privacy",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/privacy"
+      }
+    },
+    {
+      "name": "internal /terms",
+      "pass": true,
+      "detail": {
+        "final": "https://kikiwarrior.com/terms"
+      }
+    },
+    {
+      "name": "external https://popia.co.za",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "final": "https://popia.co.za/"
+      }
+    },
+    {
+      "name": "external https://gdpr.eu",
+      "pass": false,
+      "detail": "Error: apiRequestContext.get: Connection timeout\nCall log:\n  - → GET https://gdpr.eu/\n  -   user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Sa"
+    },
+    {
+      "name": "mailto mailto:privacy@kikiwarrior.com",
+      "pass": true,
+      "detail": {
+        "note": "address only, not sent"
+      }
+    },
+    {
+      "name": "mailto mailto:support@kikiwarrior.com",
+      "pass": true,
+      "detail": {
+        "note": "address only, not sent"
+      }
+    },
+    {
+      "name": "book button Amazon (signed out)",
+      "pass": false,
+      "detail": {
+        "store": "Amazon",
+        "opened_store": null,
+        "page_after": "https://kikiwarrior.com/auth"
+      }
+    },
+    {
+      "name": "book button Apple Books (signed out)",
+      "pass": false,
+      "detail": {
+        "store": "Apple Books",
+        "opened_store": null,
+        "page_after": "https://kikiwarrior.com/auth"
+      }
+    },
+    {
+      "name": "book button Kobo (signed out)",
+      "pass": false,
+      "detail": {
+        "store": "Kobo",
+        "opened_store": null,
+        "page_after": "https://kikiwarrior.com/auth"
+      }
+    },
+    {
+      "name": "book button Barnes & Noble (signed out)",
+      "pass": false,
+      "detail": {
+        "store": "Barnes & Noble",
+        "opened_store": null,
+        "page_after": "https://kikiwarrior.com/auth"
+      }
+    }
+  ],
+  "links": {
+    "/": {
+      "texts": [
+        "KIKIWARRIOR",
+        "",
+        "BACK TO HOME"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/#missions": {
+      "texts": [
+        "MISSIONS",
+        "Missions",
+        "01MISSIONS"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/#academy": {
+      "texts": [
+        "ACADEMY",
+        "Academy",
+        "02ACADEMY"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/#rewards": {
+      "texts": [
+        "REWARDS",
+        "Rewards",
+        "03REWARDS"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/#parents": {
+      "texts": [
+        "FOR PARENTS",
+        "For parents",
+        "For Parents",
+        "04FOR PARENTS"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/auth": {
+      "texts": [
+        "LOGIN",
+        "Login"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/courses/internet-safety": {
+      "texts": [
+        "START YOUR ADVENTURE",
+        "START YOUR QUEST",
+        "Go to the Internet Safety course",
+        "AGES 6-9\nYOUNG WARRIORS\n\nNarration plays automatically, so e",
+        "AGES 10-13\nWARRIOR TRAINEES\n\nDeeper missions on privacy, sca",
+        "VIEW THE FREE COURSE",
+        "Free course",
+        "Start Your Adventure"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/auth?mode=signup": {
+      "texts": [
+        "JOIN THE PRE-LAUNCH",
+        "CREATE ACCOUNT",
+        "Create account",
+        "START FREE COURSE",
+        "← Back to Sign Up"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/books/armour-of-god": {
+      "texts": [
+        "SEE THE BOOK",
+        "Armour of God book"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/privacy": {
+      "texts": [
+        "Privacy policy",
+        "Privacy Policy"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "/terms": {
+      "texts": [
+        "Terms of service",
+        "Terms of Service"
+      ],
+      "on": [
+        "desktop:/",
+        "desktop:/auth",
+        "desktop:/auth?mode=signup",
+        "desktop:/courses/internet-safety",
+        "desktop:/books/armour-of-god",
+        "desktop:/privacy",
+        "desktop:/terms",
+        "desktop:/verify-age",
+        "mobile:/",
+        "mobile:/auth",
+        "mobile:/auth?mode=signup",
+        "mobile:/courses/internet-safety",
+        "mobile:/books/armour-of-god",
+        "mobile:/privacy",
+        "mobile:/terms",
+        "mobile:/verify-age"
+      ]
+    },
+    "mailto:privacy@kikiwarrior.com": {
+      "texts": [
+        "privacy@kikiwarrior.com"
+      ],
+      "on": [
+        "desktop:/privacy",
+        "mobile:/privacy"
+      ]
+    },
+    "mailto:support@kikiwarrior.com": {
+      "texts": [
+        "support@kikiwarrior.com"
+      ],
+      "on": [
+        "desktop:/terms",
+        "mobile:/terms"
+      ]
+    },
+    "https://popia.co.za": {
+      "texts": [
+        "POPIA"
+      ],
+      "on": [
+        "desktop:/verify-age",
+        "mobile:/verify-age"
+      ]
+    },
+    "https://gdpr.eu": {
+      "texts": [
+        "GDPR"
+      ],
+      "on": [
+        "desktop:/verify-age",
+        "mobile:/verify-age"
+      ]
+    }
+  },
+  "external": {
+    "https://popia.co.za": {
+      "status": 200,
+      "final": "https://popia.co.za/"
+    }
+  },
+  "stores": [
+    {
+      "store": "Amazon",
+      "opened_store": null,
+      "page_after": "https://kikiwarrior.com/auth"
+    },
+    {
+      "store": "Apple Books",
+      "opened_store": null,
+      "page_after": "https://kikiwarrior.com/auth"
+    },
+    {
+      "store": "Kobo",
+      "opened_store": null,
+      "page_after": "https://kikiwarrior.com/auth"
+    },
+    {
+      "store": "Barnes & Noble",
+      "opened_store": null,
+      "page_after": "https://kikiwarrior.com/auth"
+    }
+  ],
+  "amazon": [
+    {
+      "url": "https://www.amazon.com.br/dp/B0FBX2XS3H",
+      "status": 200,
+      "final": "https://www.amazon.com.br/dp/B0FBX2XS3H",
+      "title": "",
+      "price": "",
+      "page_title": "Amazon.com.br"
+    },
+    {
+      "url": "https://www.amazon.com/dp/B0FBX2XS3H",
+      "status": 200,
+      "final": "https://www.amazon.com/dp/B0FBX2XS3H",
+      "title": "",
+      "price": "",
+      "page_title": "Amazon.com"
+    },
+    {
+      "url": "https://www.amazon.co.uk/dp/B0FBX2XS3H",
+      "status": 200,
+      "final": "https://www.amazon.co.uk/dp/B0FBX2XS3H",
+      "title": "",
+      "price": "",
+      "page_title": "Amazon.co.uk"
+    },
+    {
+      "url": "https://www.amazon.co.za/dp/B0FBX2XS3H",
+      "status": 200,
+      "final": "https://www.amazon.co.za/dp/B0FBX2XS3H",
+      "title": "",
+      "price": "",
+      "page_title": "Amazon.co.za"
+    }
+  ],
+  "summary": "30/35 passed"
+}
