@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { act } from "react-dom/test-utils";
+import * as React from "react";
 import { createRoot, type Root } from "react-dom/client";
 import type { ReactElement } from "react";
 import { VideoPlayer } from "./VideoPlayer";
+
+// React 19 exposes act() directly; older versions only via react-dom/test-utils.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const act: (cb: () => void) => void = (React as any).act ?? require("react-dom/test-utils").act;
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
 const MP4 = "https://project.supabase.co/storage/v1/object/public/videos/lessons-v2/clip.mp4";
 
