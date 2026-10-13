@@ -7,7 +7,6 @@ interface VideoPlayerProps {
   videoUrl: string;
   fallbackUrl?: string;
   title: string;
-  videoCredit?: string;
   durationMinutes?: number;
 }
 
@@ -40,8 +39,9 @@ function toFallbackUrl(videoUrl: string, fallbackUrl?: string): string | undefin
 }
 
 const LOAD_TIMEOUT_MS = 6000;
+const MP4_LOAD_ERROR = "This video couldn't load. Please check your connection and tap play again.";
 
-export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, durationMinutes }: VideoPlayerProps) {
+export function VideoPlayer({ videoUrl, fallbackUrl, title, durationMinutes }: VideoPlayerProps) {
   // Native MP4s (our rendered Kiki lesson videos) play directly in a <video> tag.
   const isMp4 = videoUrl.toLowerCase().split("?")[0].endsWith(".mp4");
 
@@ -57,6 +57,7 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
   const [activated, setActivated] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [iframeFailed, setIframeFailed] = useState(false);
+  const [mp4Failed, setMp4Failed] = useState(false);
   const timeoutRef = useRef<number | null>(null);
 
   // Probe video availability via thumbnail dimensions (no API key required).
@@ -77,6 +78,11 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
     img.onerror = () => setAvailable(false);
     img.src = thumbProbeUrl;
   }, [thumbProbeUrl]);
+
+  // A new lesson video gets a fresh chance to load.
+  useEffect(() => {
+    setMp4Failed(false);
+  }, [videoUrl]);
 
   // Fail-fast: if iframe doesn't load quickly after activation, show fallback CTA.
   useEffect(() => {
@@ -105,7 +111,11 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
             onPause={() => markVideoPlaying(false)}
             onEnded={() => markVideoPlaying(false)}
             onTimeUpdate={markActivity}
-            className="absolute inset-0 w-full h-full bg-charcoal"
+            onError={() => {
+              markVideoPlaying(false);
+              setMp4Failed(true);
+            }}
+            className={`absolute inset-0 w-full h-full ${mp4Failed ? "bg-primary/10" : "bg-charcoal"}`}
           />
         ) : showUnavailable ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center bg-primary/10">
@@ -171,14 +181,19 @@ export function VideoPlayer({ videoUrl, fallbackUrl, title, videoCredit, duratio
           </>
         )}
       </div>
-      <div className="flex items-center justify-between px-1">
-        {(videoCredit || durationMinutes) && (
-          <p className="text-[11px] font-body text-charcoal/70">
-            {durationMinutes && <span>🎬 {durationMinutes} min</span>}
-            {durationMinutes && videoCredit && <span> · </span>}
-            {videoCredit && <span>📹 {videoCredit} · Used under Creative Commons licence</span>}
-          </p>
-        )}
+      <div className="flex items-center justify-between gap-2 px-1">
+        <div className="min-w-0">
+          {mp4Failed && (
+            <p className="text-xs font-body text-charcoal/70" role="status">
+              {MP4_LOAD_ERROR}
+            </p>
+          )}
+          {durationMinutes && (
+            <p className="text-[11px] font-body text-charcoal/70">
+              <span>🎬 {durationMinutes} min</span>
+            </p>
+          )}
+        </div>
         {watchUrl && (
           <a
             href={watchUrl}
