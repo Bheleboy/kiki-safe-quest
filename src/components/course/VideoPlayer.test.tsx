@@ -1,22 +1,44 @@
-import { describe, expect, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { act } from "react-dom/test-utils";
+import { createRoot, type Root } from "react-dom/client";
+import type { ReactElement } from "react";
 import { VideoPlayer } from "./VideoPlayer";
 
 const MP4 = "https://project.supabase.co/storage/v1/object/public/videos/lessons-v2/clip.mp4";
 
+let container: HTMLDivElement | null = null;
+let root: Root | null = null;
+
+function mount(ui: ReactElement) {
+  container = document.createElement("div");
+  document.body.appendChild(container);
+  root = createRoot(container);
+  act(() => {
+    root!.render(ui);
+  });
+}
+
+afterEach(() => {
+  if (root) act(() => root!.unmount());
+  root = null;
+  container?.remove();
+  container = null;
+});
+
 describe("VideoPlayer hosted mp4", () => {
   it("shows a friendly retry message instead of a blank box when the video cannot load", () => {
-    render(<VideoPlayer videoUrl={MP4} title="Lesson" durationMinutes={3} />);
+    mount(<VideoPlayer videoUrl={MP4} title="Lesson" durationMinutes={3} />);
 
-    const video = document.querySelector("video");
+    const video = container!.querySelector("video");
     expect(video).not.toBeNull();
-    expect(screen.queryByRole("status")).toBeNull();
+    expect(container!.querySelector('[role="status"]')).toBeNull();
 
-    fireEvent(video!, new Event("error"));
+    act(() => {
+      video!.dispatchEvent(new Event("error"));
+    });
 
-    const notice = screen.getByRole("status");
-    expect(notice.textContent!.trim().length).toBeGreaterThan(0);
-
-    cleanup();
+    const notice = container!.querySelector('[role="status"]');
+    expect(notice).not.toBeNull();
+    expect(notice!.textContent!.trim().length).toBeGreaterThan(0);
   });
 });
