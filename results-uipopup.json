@@ -1,0 +1,37 @@
+{
+  "phase": "popup",
+  "at": "2026-10-13T07:20:23.978Z",
+  "checks": [
+    {
+      "name": "sign-in page shows upgrade line",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "desktop: pop-up shows after sign-in",
+      "pass": true,
+      "detail": "https://kikiwarrior.com/family"
+    },
+    {
+      "name": "desktop: pop-up does not return after Got it",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "mobile: pop-up shows after sign-in",
+      "pass": true,
+      "detail": "https://kikiwarrior.com/family"
+    },
+    {
+      "name": "mobile: pop-up does not return after Got it",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "shots": [
+    "shots/popup-auth.png",
+    "shots/popup-desktop.png",
+    "shots/popup-mobile.png"
+  ],
+  "summary": "5/5 passed"
+}
