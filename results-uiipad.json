@@ -1,0 +1,40 @@
+{
+  "phase": "ipad",
+  "at": "2026-10-13T06:52:35.486Z",
+  "checks": [
+    {
+      "name": "live site lesson video links",
+      "pass": true,
+      "detail": {
+        "count": 41,
+        "host": [
+          "github.com",
+          "cadawrwcoqipuyzypgfx.supabase.co"
+        ]
+      }
+    },
+    {
+      "name": "every lesson video loads in Safari engine",
+      "pass": true,
+      "detail": {
+        "ok": 41,
+        "total": 41,
+        "bad": []
+      }
+    },
+    {
+      "name": "lesson page video ready on iPad",
+      "pass": false,
+      "detail": null
+    },
+    {
+      "name": "no third-party credit caption",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "shots": [
+    "shots/ipad-lesson.png"
+  ],
+  "summary": "3/4 passed"
+}
