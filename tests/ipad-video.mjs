@@ -42,8 +42,10 @@ try {
   await c.addInitScript(([d, k, v, kidId, uid]) => { try { if (!sessionStorage.getItem("seed")) { localStorage.setItem("kw_device", d); localStorage.setItem(k, v); localStorage.setItem("cookie-consent", "declined"); localStorage.setItem("kw_active_learner", JSON.stringify({ uid, childId: kidId })); localStorage.setItem(`kw_notice_family-update-2026-10_${uid}`, "1"); sessionStorage.setItem("seed", "1"); } } catch {} }, [DEV, `sb-${REF}-auth-token`, JSON.stringify(sess), kid.id, user.id]);
   const p = await c.newPage(); await p.goto(`${SITE}/course?child=${kid.id}`, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(6000);
   const stream = p.getByText(/Ages 6.9/i).first(); if (await stream.count()) { await stream.click().catch(() => {}); await p.waitForTimeout(3000); }
-  const lesson = p.getByText(/Kindness on the Internet/i).first();
+  const mod = p.getByText(/What is the Internet\?/i).first(); if (await mod.count()) { await mod.click().catch(() => {}); await p.waitForTimeout(3000); }
+  const lesson = p.getByText(/Big Playground/i).first();
   if (await lesson.count()) { await lesson.click().catch(() => {}); await p.waitForTimeout(6000); }
+  out.lesson_url = p.url();
   const vstate = await p.evaluate(() => { const v = document.querySelector("video:not([src*='/hero/'])"); return v ? { src: v.currentSrc || v.src, rs: v.readyState, err: v.error && v.error.code, dur: v.duration } : null; });
   check("lesson page video ready on iPad", vstate && vstate.rs >= 1 && !vstate.err, vstate);
   check("no third-party credit caption", (await p.getByText(/Creative Commons|BrainPOP/).count()) === 0);
