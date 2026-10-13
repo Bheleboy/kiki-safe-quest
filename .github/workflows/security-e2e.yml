@@ -19,13 +19,13 @@ jobs:
         with: { node-version: 20 }
       - name: Install browser
         if: startsWith(inputs.phase, 'ui')
-        run: npm i --no-save playwright@1.48.2 && npx playwright install chromium --with-deps
+        run: npm i --no-save playwright@1.48.2 && npx playwright install chromium webkit --with-deps
       - name: Run UI checks
         if: startsWith(inputs.phase, 'ui')
         env:
           KW_TEST_PASSWORD: ${{ inputs.password }}
           GH_TOKEN: ${{ github.token }}
-        run: if [ "${{ inputs.phase }}" = "uishots" ]; then node tests/shots.mjs; elif [ "${{ inputs.phase }}" = "uilinks" ]; then node tests/links.mjs; elif [ "${{ inputs.phase }}" = "uiupload" ]; then node tests/upload-videos.mjs; elif [ "${{ inputs.phase }}" = "uirange" ]; then node tests/range.mjs; elif [ "${{ inputs.phase }}" = "uipopup" ]; then node tests/popup.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; elif [ "${{ inputs.phase }}" = "uidiag" ]; then node tests/diag.mjs; elif [ "${{ inputs.phase }}" = "uifamily" ]; then node tests/family-e2e.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; else node tests/ui-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"; fi
+        run: if [ "${{ inputs.phase }}" = "uishots" ]; then node tests/shots.mjs; elif [ "${{ inputs.phase }}" = "uilinks" ]; then node tests/links.mjs; elif [ "${{ inputs.phase }}" = "uiipad" ]; then node tests/ipad-video.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; elif [ "${{ inputs.phase }}" = "uiupload" ]; then node tests/upload-videos.mjs; elif [ "${{ inputs.phase }}" = "uirange" ]; then node tests/range.mjs; elif [ "${{ inputs.phase }}" = "uipopup" ]; then node tests/popup.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; elif [ "${{ inputs.phase }}" = "uidiag" ]; then node tests/diag.mjs; elif [ "${{ inputs.phase }}" = "uifamily" ]; then node tests/family-e2e.mjs "${{ inputs.email }}" "$KW_TEST_PASSWORD"; else node tests/ui-e2e.mjs "${{ inputs.phase }}" "${{ inputs.email }}" "$KW_TEST_PASSWORD" "${{ inputs.arg1 }}" "${{ inputs.arg2 }}"; fi
       - name: Run checks
         if: "!startsWith(inputs.phase, 'ui')"
         env:
