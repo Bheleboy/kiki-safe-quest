@@ -1,6 +1,6 @@
 {
   "phase": "ipad",
-  "at": "2026-10-13T06:58:14.232Z",
+  "at": "2026-10-13T07:02:36.178Z",
   "checks": [
     {
       "name": "live site lesson video links",
@@ -39,8 +39,13 @@
     },
     {
       "name": "lesson page video ready on iPad",
-      "pass": false,
-      "detail": null
+      "pass": true,
+      "detail": {
+        "src": "https://cadawrwcoqipuyzypgfx.supabase.co/storage/v1/object/public/videos/lessons-v2/ages_6_9_m1_l1_the_internet_a_big_playground.mp4",
+        "rs": 4,
+        "err": null,
+        "dur": 50.603
+      }
     },
     {
       "name": "no third-party credit caption",
@@ -51,5 +56,6 @@
   "shots": [
     "shots/ipad-lesson.png"
   ],
-  "summary": "5/6 passed"
+  "lesson_url": "https://kikiwarrior.com/course?child=a068309e-cd81-42e2-88aa-176d6e1e4602",
+  "summary": "6/6 passed"
 }
