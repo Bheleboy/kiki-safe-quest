@@ -1,6 +1,6 @@
 {
   "phase": "ipad",
-  "at": "2026-10-13T06:52:35.486Z",
+  "at": "2026-10-13T06:58:14.232Z",
   "checks": [
     {
       "name": "live site lesson video links",
@@ -8,9 +8,24 @@
       "detail": {
         "count": 41,
         "host": [
-          "github.com",
           "cadawrwcoqipuyzypgfx.supabase.co"
         ]
+      }
+    },
+    {
+      "name": "new storage labels files as video with streaming",
+      "pass": true,
+      "detail": {
+        "status": 206,
+        "type": "video/mp4",
+        "disp": null
+      }
+    },
+    {
+      "name": "no lesson still served from GitHub",
+      "pass": true,
+      "detail": {
+        "github": 0
       }
     },
     {
@@ -36,5 +51,5 @@
   "shots": [
     "shots/ipad-lesson.png"
   ],
-  "summary": "3/4 passed"
+  "summary": "5/6 passed"
 }
