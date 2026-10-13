@@ -38,7 +38,7 @@ try {
   // Browser on the same device with that session.
   const c = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const sess = { access_token: tok, refresh_token: s1.refresh_token, token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user };
-  await c.addInitScript(([d, k, s]) => { try { if (!sessionStorage.getItem("kw_seeded")) { localStorage.setItem("kw_device", d); localStorage.setItem(k, s); localStorage.setItem("cookie-consent", "declined"); sessionStorage.setItem("kw_seeded", "1"); } } catch {} }, [DEV, `sb-${REF}-auth-token`, JSON.stringify(sess)]);
+  await c.addInitScript(([d, k, v, uid]) => { try { if (!sessionStorage.getItem("kw_seeded")) { localStorage.setItem("kw_device", d); localStorage.setItem(k, v); localStorage.setItem("cookie-consent", "declined"); localStorage.setItem(`kw_notice_family-update-2026-10_${uid}`, "1"); sessionStorage.setItem("kw_seeded", "1"); } } catch {} }, [DEV, `sb-${REF}-auth-token`, JSON.stringify(sess), user.id]);
   const p = await c.newPage();
   const shot = async (n) => { const f = `shots/fam-${n}.png`; await p.screenshot({ path: f }); out.shots.push(f); };
   const pinVisible = async () => (await p.getByLabel("4-digit parent PIN").count()) > 0;
