@@ -12,3 +12,8 @@
 - [x] Check mobile/desktop pages and behavior-preservation diff; report unreachable protected views.
 
 Verification limits: admin data view requires its separate magic link; password recovery form requires a valid recovery link; completion-triggered armour and child survey states were reviewed without changing learner progress.
+
+# Admin stats export
+- [x] Verify the four stats RPCs deny anon/authenticated and allow service_role.
+- [x] Add one SiteChecker-authenticated export function without modifying existing functions or pages.
+- [ ] Test and deploy the export function.
