@@ -9,6 +9,9 @@ import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
 import { courseData } from "@/data/courseData";
+import SEO from "@/components/SEO";
+import { SITE_URL } from "@/data/routes";
+
 
 export default function CoursePreview() {
   const { courseId } = useParams();
@@ -17,6 +20,7 @@ export default function CoursePreview() {
   if (courseId !== "internet-safety") {
     return (
       <PublicPage>
+        <SEO title="Course not found | Kiki Warrior" description="This course could not be found." noindex />
         <main className="editorial-focus flex flex-col items-center justify-center px-4 text-center space-y-4">
           <Eyebrow>Free course</Eyebrow>
           <h1 className="font-display text-2xl font-bold text-charcoal uppercase">Course Not Found</h1>
@@ -59,8 +63,39 @@ export default function CoursePreview() {
     "Video lessons with narration support",
   ];
 
+  const courseLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: "Internet Safety for Kids",
+      description: `Free online safety course for children aged 6-9 and 10-13: ${totalLessons} short video lessons covering the internet, privacy and passwords, cyberbullying, scams and phishing, and being kind online, with quizzes and rewards.`,
+      url: `${SITE_URL}/courses/internet-safety`,
+      inLanguage: "en",
+      isAccessibleForFree: true,
+      educationalLevel: "Ages 6-13",
+      audience: { "@type": "EducationalAudience", educationalRole: "student", audienceType: "Children aged 6 to 13" },
+      provider: { "@type": "EducationalOrganization", name: "Kiki Warrior", url: `${SITE_URL}/` },
+      hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: `PT${totalEstimatedMinutes}M` },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "ZAR", category: "Free" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+        { "@type": "ListItem", position: 2, name: "Internet Safety for Kids", item: `${SITE_URL}/courses/internet-safety` },
+      ],
+    },
+  ];
+
   return (
     <PublicPage>
+      <SEO
+        title="Internet Safety Course for Kids (Free) | Kiki Warrior"
+        description={`A free internet safety course for kids aged 6-13. ${totalLessons} short video lessons on privacy, passwords, cyberbullying, scams and kindness online, with quizzes, rewards and parent progress tracking.`}
+        path="/courses/internet-safety"
+        jsonLd={courseLd}
+      />
       {/* Nav */}
       
 

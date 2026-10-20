@@ -564,7 +564,7 @@ export const courseData: AgeStream[] = [
             videoUrl: "https://cadawrwcoqipuyzypgfx.supabase.co/storage/v1/object/public/videos/lessons-v2/ages_10_13_internet_safety_101.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
-            narrationText: "The internet is a global network connecting billions of devices. It's an incredible tool for learning, communication, and entertainment — but it comes with responsibilities.",
+            narrationText: "The internet is a global network connecting billions of devices. It's an incredible tool for learning, communication, and entertainment - but it comes with responsibilities.",
             explanationText: "The internet connects computers worldwide through a network of servers. Understanding how it works helps you make smarter choices about what you share, click, and trust online.",
             quiz: [
               {
@@ -749,7 +749,7 @@ export const courseData: AgeStream[] = [
                   { label: "No, passwords are private!", emoji: "🔒" },
                 ],
                 correctIndex: 1,
-                explanation: "Never share passwords — not even with best friends! Only trusted adults should know.",
+                explanation: "Never share passwords - not even with best friends! Only trusted adults should know.",
               },
               {
                 question: "How often should you change your passwords?",
@@ -904,7 +904,7 @@ export const courseData: AgeStream[] = [
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
             narrationText: "Your online profile tells the world about you. Make sure you're only sharing what you want everyone to see. Check your privacy settings on every app and social media!",
-            explanationText: "1. Set profiles to private. 2. Think before you post — would you show it to a teacher? 3. Don't share your location. 4. Be careful with photos. 5. Review your friends/followers list regularly.",
+            explanationText: "1. Set profiles to private. 2. Think before you post - would you show it to a teacher? 3. Don't share your location. 4. Be careful with photos. 5. Review your friends/followers list regularly.",
             quiz: [
               {
                 question: "Your social media profile should be...",
@@ -932,7 +932,7 @@ export const courseData: AgeStream[] = [
                   { label: "A book you liked", emoji: "📖" },
                 ],
                 correctIndex: 1,
-                explanation: "Never share your current location online — it tells strangers where to find you!",
+                explanation: "Never share your current location online - it tells strangers where to find you!",
               },
             ],
             parentTip: "Sit with your child and review the privacy settings on their apps and social media accounts together. Make it a regular activity.",
@@ -1076,7 +1076,7 @@ export const courseData: AgeStream[] = [
             videoUrl: "https://cadawrwcoqipuyzypgfx.supabase.co/storage/v1/object/public/videos/lessons-v2/ages_10_13_cyber_bullying_and_respect_what_is_cyberbullying.mp4",
             videoDurationMinutes: 5,
             estimatedMinutes: 12,
-            narrationText: "Cyberbullying is when someone uses technology to hurt, embarrass, or threaten others. If it happens to you, don't respond — save the evidence and tell a trusted adult.",
+            narrationText: "Cyberbullying is when someone uses technology to hurt, embarrass, or threaten others. If it happens to you, don't respond - save the evidence and tell a trusted adult.",
             explanationText: "Cyberbullying includes mean messages, sharing embarrassing photos, excluding someone on purpose, or spreading rumours online. It's never okay, and it's not your fault. Always report it!",
             quiz: [
               {

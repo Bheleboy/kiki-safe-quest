@@ -1,3 +1,4 @@
+import SEO from "@/components/SEO";
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
@@ -13,6 +14,7 @@ const NotFound = () => {
 
   return (
     <PublicPage>
+      <SEO title="Page not found | Kiki Warrior" description="The page you are looking for could not be found." noindex />
       <main className="editorial-focus flex items-center justify-center bg-cream bg-tech-grid px-4">
       <div className="text-center">
         <Eyebrow>Find your way</Eyebrow>

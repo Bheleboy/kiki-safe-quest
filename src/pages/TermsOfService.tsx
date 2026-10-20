@@ -1,3 +1,4 @@
+import SEO from "@/components/SEO";
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Link } from "react-router-dom";
 import { ShieldIcon } from "@/components/course/CourseIcons";
@@ -6,6 +7,7 @@ import { motion } from "framer-motion";
 export default function TermsOfService() {
   return (
     <PublicPage>
+      <SEO title="Terms of Service | Kiki Warrior" description="The terms that apply when families use the Kiki Warrior online safety course and website." path="/terms" />
       {/* Header */}
       
 

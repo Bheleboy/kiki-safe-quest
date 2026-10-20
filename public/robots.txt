@@ -1,16 +1,45 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# Kiki Warrior - public pages are open to search engines and AI assistants.
+# Family, learner and admin areas are private and are not crawled.
 
 User-agent: *
 Allow: /
+Allow: /courses/
+Disallow: /admin
+Disallow: /parent
+Disallow: /dashboard
+Disallow: /family
+Disallow: /course$
+Disallow: /verify-age
+Disallow: /reset-password
+Disallow: /security/
+Disallow: /unsubscribe
+Disallow: /video-demo
+
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: DuckDuckBot
+User-agent: Twitterbot
+User-agent: facebookexternalhit
+Allow: /
+Allow: /courses/
+Disallow: /admin
+Disallow: /parent
+Disallow: /dashboard
+Disallow: /family
+Disallow: /course$
+Disallow: /verify-age
+Disallow: /reset-password
+Disallow: /security/
+Disallow: /unsubscribe
+Disallow: /video-demo
 
 Sitemap: https://kikiwarrior.com/sitemap.xml

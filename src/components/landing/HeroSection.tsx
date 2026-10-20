@@ -83,7 +83,7 @@ function KikiFigure({ reduce }: { reduce: boolean }) {
       <div className="relative z-20 w-full h-full">
         {still ? (
           <motion.img
-            src="/hero/kiki-full.png"
+            src="/hero/kiki-full.webp"
             alt="Kiki the young warrior with her spear and shield"
             className="w-full h-full object-contain object-bottom"
             animate={!reduce ? { y: [0, -8, 0] } : undefined}
@@ -93,7 +93,7 @@ function KikiFigure({ reduce }: { reduce: boolean }) {
           <video
             ref={videoRef}
             src="/hero/kiki-idle.webm"
-            poster="/hero/kiki-full.png"
+            poster="/hero/kiki-full.webp"
             muted
             playsInline
             autoPlay
@@ -213,7 +213,7 @@ function QuestCard({ reduce }: { reduce: boolean }) {
           </motion.p>
         </AnimatePresence>
       </div>
-      <img src="/images/kiki-warrior-learning.png" alt="Kiki, Nonala and Ma learning together in the lounge" className="w-full aspect-[3/2] object-cover rounded-2xl my-5 shadow-sm" />
+      <img src="/images/kiki-warrior-learning.jpg" alt="Kiki, Nonala and Ma learning together in the lounge" className="w-full aspect-[3/2] object-cover rounded-2xl my-5 shadow-sm" />
       <p className="font-body text-xs text-foreground/50 text-center">Learning together at home</p>
       <div className="flex items-end justify-between mt-5">
         <div>

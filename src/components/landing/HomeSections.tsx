@@ -26,7 +26,7 @@ function lessonCount(id: string) {
 }
 const paths = [
   { id: "6-9", age: "Ages 6-9", title: "Young Warriors", note: "Narration plays automatically, so early readers can follow along.", image: "/images/young-warriors-kids.webp", alt: "Three young warriors ready for their first mission" },
-  { id: "10-13", age: "Ages 10-13", title: "Warrior Trainees", note: "Deeper missions on privacy, scams and digital footprint.", image: "/images/kiki-safety-warrior.png", alt: "Kiki ready for an online safety adventure" },
+  { id: "10-13", age: "Ages 10-13", title: "Warrior Trainees", note: "Deeper missions on privacy, scams and digital footprint.", image: "/images/kiki-safety-warrior.jpg", alt: "Kiki ready for an online safety adventure" },
 ];
 export function AgePaths() {
   return <RevealSection id="paths" className="bg-background py-20 lg:py-28"><div className={container}>
@@ -66,7 +66,7 @@ export function Academy() {
     <article className="rounded-[2rem] bg-background p-6 sm:p-10 border border-primary/15 min-w-0">
       <Eyebrow n="03">Christian academy</Eyebrow><h2 className="mt-4 font-display font-bold uppercase text-charcoal text-4xl sm:text-5xl leading-[0.95]">Warrior Academy</h2>
       <p className={`${body} mt-5`}>A journey through biblical stories, character building and practical faith, designed for children ages 5-12, with weekly lessons and devotions.</p>
-      <img src="/images/kiki-safety-course.png" alt="Kiki and a young learner exploring together" loading="lazy" className="w-full rounded-2xl aspect-[3/2] object-cover mt-6" />
+      <img src="/images/kiki-safety-course.jpg" alt="Kiki and a young learner exploring together" loading="lazy" className="w-full rounded-2xl aspect-[3/2] object-cover mt-6" />
       <span className="inline-flex items-center gap-2 mt-6 rounded-full bg-charcoal/[0.06] px-4 py-2 font-display text-xs uppercase tracking-widest text-charcoal/70"><Clock className="w-4 h-4" />Coming soon</span>
     </article>
     <article className="rounded-[2rem] bg-peach p-6 sm:p-10 flex flex-col sm:flex-row lg:flex-col gap-6 min-w-0">

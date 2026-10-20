@@ -1,3 +1,4 @@
+import SEO from "@/components/SEO";
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -139,7 +140,7 @@ export default function AuthPage() {
   }
 
   return (
-    <PublicPage><main className="editorial-focus mx-auto flex w-full flex-col items-center justify-center px-4 py-12 sm:py-16">
+    <PublicPage><SEO title="Sign in or create an account | Kiki Warrior" description="Sign in or create a free family account to start the Kiki Warrior online safety course." noindex /><main className="editorial-focus mx-auto flex w-full flex-col items-center justify-center px-4 py-12 sm:py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

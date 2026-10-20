@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import SEO from "@/components/SEO";
+import { SITE_URL } from "@/data/routes";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -104,8 +106,39 @@ export default function BookArmourOfGod() {
     window.open(storeUrl, "_blank", "noopener,noreferrer");
   };
 
+  const bookLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Book",
+      name: "Kiki's Armour of God",
+      author: { "@type": "Person", name: "Nonala Tose Dagada" },
+      bookFormat: "https://schema.org/EBook",
+      inLanguage: "en",
+      audience: { "@type": "PeopleAudience", suggestedMinAge: 4, suggestedMaxAge: 12 },
+      about: ["Armour of God", "Ephesians 6", "Christian faith for children"],
+      description:
+        "A Christian workbook for children aged 4-12 that teaches the Armour of God from Ephesians 6 through activities, prayers and Bible verses.",
+      url: `${SITE_URL}/books/armour-of-god`,
+      image: `${SITE_URL}/images/kiki-armour-of-god.png`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+        { "@type": "ListItem", position: 2, name: "Kiki's Armour of God", item: `${SITE_URL}/books/armour-of-god` },
+      ],
+    },
+  ];
+
   return (
     <PublicPage>
+      <SEO
+        title="Kiki's Armour of God | Christian Workbook for Kids Aged 4-12"
+        description="Kiki's Armour of God by Nonala Tose Dagada: a Christian workbook for children aged 4-12 teaching the Belt of Truth, Shield of Faith and more from Ephesians 6, with activities, prayers and Bible verses."
+        path="/books/armour-of-god"
+        jsonLd={bookLd}
+      />
       {/* Nav */}
       <div className="border-b border-primary/15 bg-peach">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">

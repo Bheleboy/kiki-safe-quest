@@ -1,3 +1,4 @@
+import SEO from "@/components/SEO";
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Link } from "react-router-dom";
 import { ShieldIcon } from "@/components/course/CourseIcons";
@@ -6,6 +7,7 @@ import { motion } from "framer-motion";
 export default function PrivacyPolicy() {
   return (
     <PublicPage>
+      <SEO title="Privacy Policy | Kiki Warrior" description="How Kiki Warrior collects, uses and protects information about parents and children using the online safety course." path="/privacy" />
       {/* Header */}
       
 
