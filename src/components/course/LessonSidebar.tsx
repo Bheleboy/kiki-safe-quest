@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Lock } from "lucide-react";
 import { CourseIcon } from "./CourseIcons";
 import type { AgeStream } from "@/data/courseData";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,8 @@ interface LessonSidebarProps {
   currentLessonId: string;
   isLessonComplete: (id: string) => boolean;
   onSelectLesson: (moduleId: string, lessonIndex: number) => void;
+  /** Optional Warrior Pass lock check. When absent, the sidebar renders as before. */
+  isLessonLocked?: (id: string) => boolean;
 }
 
 export function LessonSidebar({
@@ -16,6 +18,7 @@ export function LessonSidebar({
   currentLessonId,
   isLessonComplete,
   onSelectLesson,
+  isLessonLocked,
 }: LessonSidebarProps) {
   let globalIndex = 0;
 
@@ -49,6 +52,7 @@ export function LessonSidebar({
                 globalIndex++;
                 const isCurrent = lesson.id === currentLessonId;
                 const completed = isLessonComplete(lesson.id);
+                const locked = !!isLessonLocked?.(lesson.id);
 
                 return (
                   <Button variant="ghost"
@@ -79,6 +83,9 @@ export function LessonSidebar({
                           }`}
                         >
                           {lesson.title}
+                          {locked && (
+                            <Lock className="inline-block w-3 h-3 ml-1.5 -mt-0.5 text-charcoal/60" aria-label="Warrior Pass lesson" />
+                          )}
                         </p>
                         <span className="text-[10px] text-charcoal/60 font-body">
                           🎬 {lesson.videoDurationMinutes} min · ⏱ ~{lesson.estimatedMinutes} min

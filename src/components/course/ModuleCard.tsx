@@ -5,7 +5,7 @@ import { CourseIcon } from "./CourseIcons";
 import { ArmourPieceIcon } from "@/components/armour/ArmourPieceIcon";
 import type { Module } from "@/data/courseData";
 import type { ArmourPiece } from "@/data/armourData";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Lock } from "lucide-react";
 
 interface ModuleCardProps {
   module: Module;
@@ -14,9 +14,11 @@ interface ModuleCardProps {
   armourPieces?: ArmourPiece[];
   isPieceEarned?: (pieceId: string) => boolean;
   onClick: () => void;
+  /** True only when every lesson in the module is behind the Warrior Pass. */
+  locked?: boolean;
 }
 
-export function ModuleCard({ module, index, progress, armourPieces = [], isPieceEarned = () => false, onClick }: ModuleCardProps) {
+export function ModuleCard({ module, index, progress, armourPieces = [], isPieceEarned = () => false, onClick, locked = false }: ModuleCardProps) {
   const isComplete = progress === 1;
 
   return (
@@ -37,6 +39,12 @@ export function ModuleCard({ module, index, progress, armourPieces = [], isPiece
               {module.title}
             </h3>
             {isComplete && <CheckCircle className="w-4 h-4 text-success shrink-0" />}
+            {locked && (
+              <span className="inline-flex items-center gap-1 shrink-0 font-display text-[10px] uppercase tracking-wide font-medium text-charcoal/60">
+                <Lock className="w-3 h-3" />
+                Warrior Pass
+              </span>
+            )}
           </div>
           <p className="text-xs text-charcoal/70 font-body mt-1">
             {module.lessons.length} lesson{module.lessons.length !== 1 ? "s" : ""}

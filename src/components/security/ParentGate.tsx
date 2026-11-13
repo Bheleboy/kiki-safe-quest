@@ -43,9 +43,9 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
 }
 
 /** PIN create / unlock / reset UI. Calls onUnlocked once the server confirms. */
-export function PinPad({ onUnlocked, onCancel, message }: { onUnlocked: () => void; onCancel?: () => void; message?: string }) {
+export function PinPad({ onUnlocked, onCancel, message, force }: { onUnlocked: () => void; onCancel?: () => void; message?: string; force?: boolean }) {
   const { user, session } = useAuth();
-  const [mode, setMode] = useState<Mode>(() => (readUnlock(user?.id) ? "unlocked" : "loading"));
+  const [mode, setMode] = useState<Mode>(() => (!force && readUnlock(user?.id) ? "unlocked" : "loading"));
   const [pin, setPin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -167,9 +167,12 @@ export function useParentPin() {
   const { user, profile } = useAuth();
   const [pending, setPending] = useState<null | (() => void)>(null);
   const [message, setMessage] = useState<string | undefined>(undefined);
-  const guard = useCallback((action: () => void, msg?: string) => {
-    if (profile?.is_admin || readUnlock(user?.id)) action();
-    else { setMessage(msg); setPending(() => action); }
+  const [force, setForce] = useState(false);
+  /** Pass { force: true } to always ask for the PIN, even inside the unlock window. */
+  const guard = useCallback((action: () => void, opts?: string | { message?: string; force?: boolean }) => {
+    const o = typeof opts === "string" ? { message: opts } : opts ?? {};
+    if (profile?.is_admin || (!o.force && readUnlock(user?.id))) action();
+    else { setMessage(o.message); setForce(!!o.force); setPending(() => action); }
   }, [user, profile]);
   const onUnlocked = useCallback(() => {
     setPending((p) => { if (p) setTimeout(p, 0); return null; });
@@ -178,7 +181,7 @@ export function useParentPin() {
     <Dialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>
       <DialogContent className="rounded-2xl border border-primary/15 bg-background max-w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">Parent PIN</DialogTitle>
-        {pending && <PinPad onUnlocked={onUnlocked} onCancel={() => setPending(null)} message={message} />}
+        {pending && <PinPad onUnlocked={onUnlocked} onCancel={() => setPending(null)} message={message} force={force} />}
       </DialogContent>
     </Dialog>
   );

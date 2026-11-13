@@ -1,7 +1,7 @@
 import { Eyebrow } from "@/components/ui/editorial";
 import { MotionButton } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { ChildSurvey } from "@/components/survey/ChildSurvey";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, LogOut, Users, Home } from "lucide-react";
@@ -28,6 +28,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { PinPad, readUnlock, useParentPin } from "@/components/security/ParentGate";
 import { canSwitchFreely, readActiveLearner, writeActiveLearner } from "@/lib/activeLearner";
+import { useCourseAccess } from "@/hooks/useCourseAccess";
+import { WarriorPassGate } from "@/components/course/WarriorPassGate";
 
 type View =
   | { type: "home" }
@@ -93,6 +95,46 @@ export default function CoursePage() {
   } = useArmour(user?.id, childId);
 
   const getStream = (id: string) => courseData.find((s) => s.id === id)!;
+
+  // Warrior Pass gate. Fails open: nothing is locked unless the paywall is on.
+  const access = useCourseAccess(user?.id, profile?.is_admin);
+  const lockedFor = (stream: AgeStream, lessonId: string) =>
+    access.isLessonLocked(stream, lessonId, isLessonComplete(lessonId));
+  const currentLessonLocked = (() => {
+    if (view.type !== "lesson" || !access.paywallActive) return false;
+    const stream = getStream(view.streamId);
+    const lessonId = stream.modules.find((m) => m.id === view.moduleId)?.lessons[view.lessonIndex]?.id;
+    return !!lessonId && lockedFor(stream, lessonId);
+  })();
+
+  // Tell the parent once per child when they reach the gate (real paywall only).
+  const notifiedGate = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!currentLessonLocked || access.isPreview || !user || !childId || !child) return;
+    if (notifiedGate.current.has(childId)) return;
+    notifiedGate.current.add(childId);
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("child_id", childId)
+          .eq("type", "warrior_pass_ready")
+          .limit(1);
+        if (error || (data && data.length > 0)) return;
+        await supabase.from("notifications").insert({
+          user_id: user.id,
+          child_id: childId,
+          type: "warrior_pass_ready",
+          title: `${child.first_name} is ready for the Warrior Pass`,
+          message: `${child.first_name} has finished the free lessons and is ready for the Warrior Pass`,
+        });
+      } catch {
+        /* never block the child on a notification problem */
+      }
+    })();
+  }, [currentLessonLocked, access.isPreview, user, childId, child]);
 
   const getAllLessonIds = (stream: AgeStream) =>
     stream.modules.flatMap((m) => m.lessons.map((l) => l.id));
@@ -325,6 +367,8 @@ export default function CoursePage() {
                 <div className="grid gap-4">
                   {stream.modules.map((mod, i) => {
                     const armourPieces = getArmourPiecesForModule(view.streamId, mod.id);
+                    const firstOpen = mod.lessons.findIndex((l) => !lockedFor(stream, l.id));
+                    const moduleLocked = access.paywallActive && firstOpen === -1;
                     return (
                       <div key={mod.id}>
                         <ModuleCard
@@ -333,12 +377,13 @@ export default function CoursePage() {
                           progress={getModuleProgress(mod.lessons.map((l) => l.id))}
                           armourPieces={armourPieces}
                           isPieceEarned={isPieceEarned}
+                          {...(moduleLocked ? { locked: true } : {})}
                           onClick={() =>
                             setView({
                               type: "lesson",
                               streamId: stream.id,
                               moduleId: mod.id,
-                              lessonIndex: 0,
+                              lessonIndex: firstOpen === -1 ? 0 : firstOpen,
                             })
                           }
                         />
@@ -460,6 +505,13 @@ export default function CoursePage() {
                 </div>
 
                 <div className="flex-1 min-w-0">
+                  {currentLessonLocked ? (
+                  <WarriorPassGate
+                    learnerName={learnerName}
+                    earnedPieces={earnedPieces}
+                    onBack={() => setView({ type: "stream", streamId: view.streamId })}
+                  />
+                  ) : (
                   <LessonView
                     lesson={current.lesson}
                     module={current.module}
@@ -496,6 +548,7 @@ export default function CoursePage() {
                     }}
                     onBack={() => setView({ type: "stream", streamId: view.streamId })}
                   />
+                  )}
                 </div>
 
                 <div className="hidden lg:block w-80 shrink-0">
@@ -505,6 +558,7 @@ export default function CoursePage() {
                       currentLessonId={current.lesson.id}
                       isLessonComplete={isLessonComplete}
                       onSelectLesson={handleSelectLesson}
+                      {...(access.paywallActive ? { isLessonLocked: (id: string) => lockedFor(stream, id) } : {})}
                     />
                   </div>
                 </div>

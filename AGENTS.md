@@ -11,3 +11,4 @@
 - Switching the active learner on a device (stored per device in localStorage) requires the parent PIN on both the family page and /course, so siblings cannot do each other's work by editing the URL.
 - Admin stats exports verify SiteChecker sessions and client membership server-side before using local service-role RPC access, so the separate dashboard never needs this project's private key.
 - Warrior Pass tables (app_settings, orders, entitlements, armour_kits, shipments, warrior_points, bulk codes) reference users via public.profiles, are written only by service-role edge functions, and paid access is decided solely by `public.has_course_access`, so client writes or book_purchases can never grant access.
+- The Warrior Pass course gate lives in `useCourseAccess` as pure, tested helpers and fails open (loading, errors, missing or malformed settings mean full access), so a network or policy problem can never lock a child out.

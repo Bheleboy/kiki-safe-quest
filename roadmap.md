@@ -20,3 +20,4 @@ Verification limits: admin data view requires its separate magic link; password 
 
 # Warrior Pass
 - [x] Phase 1a: additive database tables, policies, settings seed and has_course_access (switched off).
+- [x] Phase 1b: fail-open course gate, child locked screen, forced parent PIN, parent notification (switched off).
