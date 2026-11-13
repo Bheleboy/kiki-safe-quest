@@ -5,7 +5,7 @@ import type { TemplateEntry } from './registry.ts'
 
 // Receipt with FIXED copy. Only validated, length-limited values are injected.
 interface Item { label?: string; amount?: string }
-interface Props { orderNumber?: string; items?: Item[]; amount?: string; date?: string }
+interface Props { orderNumber?: string; items?: Item[]; amount?: string; date?: string; kind?: string }
 
 const safeOrder = (v?: string) => (v && /^KW-[A-Z0-9]{4,12}$/.test(v) ? v : 'KW-ORDER')
 const safeAmount = (v?: string) => (v && /^R\d{1,6}\.\d{2}$/.test(v) ? v : '')
@@ -20,14 +20,22 @@ const Receipt = (p: Props) => {
       <Body style={main}>
         <Container style={container}>
           <Heading style={h1}>Thank you for your order</Heading>
-          <Text style={text}>Your payment was received and the Warrior Pass is now active for your family.</Text>
+          <Text style={text}>
+            {p.kind === 'book'
+              ? 'Your payment was received. The book is ready to download in the Family library on your parent dashboard.'
+              : p.kind === 'extra_kit'
+                ? 'Your payment was received and the extra Armour Kit is confirmed.'
+                : 'Your payment was received and the Warrior Pass is now active for your family.'}
+          </Text>
           <Text style={label}>Order number: {safeOrder(p.orderNumber)}</Text>
           <Text style={label}>Date: {safeText(p.date, 40)}</Text>
           {items.map((it, i) => (
             <Text key={i} style={row}>{safeText(it.label)}: {safeAmount(it.amount)}</Text>
           ))}
           <Text style={total}>Total paid: {safeAmount(p.amount)}</Text>
-          <Text style={text}>Each Armour Kit ships when that child finishes the course. We will email you before it is sent.</Text>
+          {p.kind !== 'book' && (
+            <Text style={text}>Each Armour Kit ships when that child finishes the course. We will email you before it is sent.</Text>
+          )}
           <Text style={footer}>This is a receipt from Kiki Warrior. Keep it for your records.</Text>
         </Container>
       </Body>

@@ -25,6 +25,7 @@ export default function PassReturn() {
   const orderId = params.get("order") ?? "";
   const state = params.get("state");
   const [status, setStatus] = useState<Status>("checking");
+  const [kind, setKind] = useState<string | null>(null);
   const backPath = readPassReturnPath();
 
   useEffect(() => {
@@ -35,10 +36,11 @@ export default function PassReturn() {
     const started = Date.now();
     const check = async () => {
       if (stopped) return;
-      const { data, error } = await supabase.from("orders").select("status").eq("id", orderId).maybeSingle();
+      const { data, error } = await supabase.from("orders").select("status, kind").eq("id", orderId).maybeSingle();
       if (stopped) return;
       if (!error && !data) { setStatus("missing"); return; }
       const s = data?.status;
+      if (data?.kind) setKind(data.kind);
       if (s === "paid") { setStatus("paid"); notifyCourseAccessChanged(); return; }
       if (s === "failed" || s === "cancelled" || state === "cancelled" || state === "failed") { setStatus("stopped"); return; }
       if (Date.now() - started >= MAX_MS) { setStatus("slow"); return; }
@@ -50,7 +52,11 @@ export default function PassReturn() {
 
   const content = {
     checking: { title: "Confirming your payment", text: "This usually takes a few seconds. Please keep this page open." },
-    paid: { title: "Warrior Pass unlocked", text: "Thank you. Every lesson is now open for every child in your family. A receipt is on its way to your email." },
+    paid: kind === "book"
+      ? { title: "Family library unlocked", text: "Thank you. The book is ready to download in the Family library on your parent dashboard. A receipt is on its way to your email." }
+      : kind === "extra_kit"
+        ? { title: "Armour Kit added", text: "Thank you. The extra Armour Kit is confirmed and ships when your child finishes the course. A receipt is on its way to your email." }
+        : { title: "Warrior Pass unlocked", text: "Thank you. Every lesson is now open for every child in your family. A receipt is on its way to your email." },
     stopped: { title: "Payment not completed", text: "No money was taken for this order. You can try again whenever you are ready." },
     slow: { title: "Still confirming", text: "We are still confirming your payment. You will get an email as soon as it is confirmed. Nothing has been lost." },
     missing: { title: "Order not found", text: "We could not find this order on your account. If you were charged, you will get an email as soon as the payment is confirmed." },
@@ -75,7 +81,7 @@ export default function PassReturn() {
             onClick={() => navigate(backPath)}
             className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest"
           >
-            {status === "stopped" ? "Try again" : "Back to the course"}
+            {status === "stopped" ? "Try again" : backPath.startsWith("/parent") ? "Back to the parent dashboard" : "Back to the course"}
           </Button>
         )}
       </div>

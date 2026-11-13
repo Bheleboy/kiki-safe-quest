@@ -1,6 +1,7 @@
 import { Eyebrow } from "@/components/ui/editorial";
 import { FamilyUpdateNotice } from "@/components/FamilyUpdateNotice";
 import { WarriorPassStatusCard } from "@/components/pass/WarriorPassStatusCard";
+import { FamilyLibraryCard } from "@/components/pass/FamilyLibraryCard";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Trophy, BarChart3, BookOpen, Star, CheckCircle2, ArrowRight, ClipboardList, Bell, Shield, AlertCircle } from "lucide-react";
@@ -216,6 +217,7 @@ export default function ParentDashboard() {
 </div>
         <FamilyUpdateNotice />
         <WarriorPassStatusCard children={children} />
+        <FamilyLibraryCard />
         {notifications.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
             <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide flex items-center gap-2">

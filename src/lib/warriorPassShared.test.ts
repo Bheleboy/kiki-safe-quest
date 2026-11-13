@@ -148,3 +148,22 @@ describe("Yoco webhook signature", () => {
     expect(await verifyWebhookSignature({ secret, id: null, timestamp: ts, signatureHeader: "v1,abc", body, nowSeconds: 1763000000 })).toBe(false);
   });
 });
+
+describe("Family library book pricing", () => {
+  const withBook = parsePrices({
+    family_pass_cents: 29900, launch_family_pass_cents: 24900, launch_limit: 100, extra_kit_cents: 9900, currency: "ZAR", book_cents: 14900,
+  })!;
+
+  it("refuses a book order while book_cents is not set", () => {
+    expect(prices.book_cents).toBeNull();
+    expect(computeCheckout({ kind: "book", includedKitChildId: null, extraKitChildIds: [] }, ctx()))
+      .toEqual({ ok: false, error: "book_not_available" });
+  });
+
+  it("charges book_cents once per family", () => {
+    const r = computeCheckout({ kind: "book", includedKitChildId: null, extraKitChildIds: [] }, ctx({ prices: withBook }));
+    expect(r.ok && r.amount_cents).toBe(14900);
+    expect(computeCheckout({ kind: "book", includedKitChildId: null, extraKitChildIds: [] }, ctx({ prices: withBook, hasBook: true })))
+      .toEqual({ ok: false, error: "already_has_book" });
+  });
+});

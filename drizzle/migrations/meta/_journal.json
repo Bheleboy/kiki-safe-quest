@@ -50,6 +50,13 @@
       "when": 1794599919645,
       "tag": "0006_warrior_pass_phase2_checkout",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794600669786,
+      "tag": "0007_warrior_pass_phase3_rewards_library",
+      "breakpoints": true
     }
   ]
 }

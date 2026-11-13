@@ -42,6 +42,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   consent_required: "Please tick the box to confirm you agree.",
   too_many: "Too many attempts. Please wait a few minutes and try again.",
   not_available: "The Warrior Pass is not available yet.",
+  book_not_available: "The book is coming soon.",
+  already_has_book: "Your family already owns the book.",
+  not_owned: "Buy the book first to download it.",
 };
 
 export function checkoutErrorMessage(data: { error?: string; field?: string; message?: string } | undefined): string {
@@ -51,13 +54,16 @@ export function checkoutErrorMessage(data: { error?: string; field?: string; mes
 }
 
 export const KIT_STATUS: Record<string, string> = {
-  locked: "Ships when the course is finished",
-  earned: "Earned. We will be in touch about delivery",
-  address_needed: "Earned. We will be in touch about delivery",
+  locked: "Locked until the course is finished",
+  earned: "Earned",
+  address_needed: "We need your delivery details",
   ready_to_ship: "Getting ready to ship",
-  shipped: "On its way",
+  shipped: "Shipped",
   delivered: "Delivered",
 };
+
+/** Kit statuses that mean the child has earned it (shown to the child as "on its way"). */
+export const KIT_EARNED_STATUSES = ["earned", "address_needed", "ready_to_ship", "shipped", "delivered"];
 
 export const PROVINCES = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo",

@@ -13,6 +13,8 @@ import { ShieldIcon } from "@/components/course/CourseIcons";
 import { Plus, Trash2, ArrowRight, LogOut, Users, BookOpen, ExternalLink } from "lucide-react";
 import { ChildArmourAvatar } from "@/components/armour/ChildArmourAvatar";
 import { courseData } from "@/data/courseData";
+import { useCourseAccess } from "@/hooks/useCourseAccess";
+import { AskGrownUpBookCard } from "@/components/pass/AskGrownUpBookCard";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Child = Pick<Tables<"children">, "id" | "first_name" | "age_band" | "avatar_color">;
@@ -31,6 +33,9 @@ export default function ManageChildren() {
   const { guard, dialog: pinDialog } = useParentPin();
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  // Warrior Pass: while the paywall is on (or an admin previews), learners see "Ask a grown-up" instead of store links.
+  const access = useCourseAccess(user?.id, profile?.is_admin);
+  const libraryMode = access.paywallActive || access.isPreview;
   const [children, setChildren] = useState<Child[]>([]);
   const [bookPurchases, setBookPurchases] = useState<BookPurchase[]>([]);
   const [childProgress, setChildProgress] = useState<Record<string, number>>({});
@@ -315,7 +320,11 @@ export default function ManageChildren() {
           </MotionButton>
         )}
 
-        {bookPurchases.length > 0 && (
+        {bookPurchases.length > 0 && libraryMode && (
+          <AskGrownUpBookCard onAsk={() => guard(() => navigate(`/parent${access.isPreview ? "?previewPaywall=1" : ""}#family-library`))} />
+        )}
+
+        {bookPurchases.length > 0 && !libraryMode && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mt-8">
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-primary" />

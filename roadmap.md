@@ -23,3 +23,5 @@ Verification limits: admin data view requires its separate magic link; password 
 - [x] Phase 1b: fail-open course gate, child locked screen, forced parent PIN, parent notification (switched off).
 - [x] Phase 2: Yoco checkout (create-checkout, yoco-webhook, unlock card, return page, parent status card), switched off.
 - [ ] Phase 2 go-live: add Yoco secret key and webhook secret, register the webhook URL with Yoco, run one real test payment.
+- [x] Phase 3: Warrior Points (award-points), Armour Kit release + save-delivery, certificate, family library (book checkout, library-link), tests. Switched off.
+- [ ] Phase 3 go-live: confirm Armour Kit contents for the reward email, upload the book PDF and set library_book_path, set prices.book_cents.

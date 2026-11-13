@@ -4,6 +4,7 @@ import {
   securitySessionLimit, securityStepupCode,
 } from './security-emails.tsx'
 import { warriorPassReceipt } from './warrior-pass-emails.tsx'
+import { rewardUnlocked } from './reward-emails.tsx'
 
 export interface TemplateEntry {
   component: React.ComponentType<any>
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'security-password-changed': securityPasswordChanged,
   'security-pin-locked': securityPinLocked,
   'warrior-pass-receipt': warriorPassReceipt,
+  'reward-unlocked': rewardUnlocked,
 }

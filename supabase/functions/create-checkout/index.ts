@@ -2,56 +2,11 @@
 // action "checkout" verifies the parent PIN, creates or reuses a pending order
 // and opens a Yoco hosted checkout. Prices are only ever computed here.
 import { admin, clientIp, cors, getClaimsFrom, hitLimit, isRegisteredSession, json, logEvent, userAgent } from '../_shared/security.ts'
-import { computeCheckout, parsePrices, quotePrices, sameOrderContents, type CheckoutKind } from '../_shared/warrior-pass.ts'
+import { computeCheckout, parseDelivery, parsePrices, quotePrices, sameOrderContents, type CheckoutKind } from '../_shared/warrior-pass.ts'
 import { allowedReturnOrigin, isAdminUser, verifyParentPin, yocoConfig } from '../_shared/warrior-pass-server.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const REUSE_MS = 15 * 60_000
-
-const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
-
-type Delivery = {
-  delivery_method: 'door' | 'locker'
-  recipient_name: string
-  phone: string
-  address_line1: string | null
-  address_line2: string | null
-  suburb: string | null
-  city: string | null
-  province: string | null
-  postal_code: string | null
-  locker_code: string | null
-}
-
-function parseDelivery(d: any): { ok: true; value: Delivery } | { ok: false; field: string } {
-  if (!d || typeof d !== 'object') return { ok: false, field: 'delivery' }
-  const method = d.method
-  if (method !== 'door' && method !== 'locker') return { ok: false, field: 'method' }
-  const recipient_name = str(d.recipient_name, 100)
-  if (recipient_name.length < 2) return { ok: false, field: 'recipient_name' }
-  const phone = str(d.phone, 30).replace(/[\s()-]/g, '')
-  if (!/^\+?\d{9,15}$/.test(phone)) return { ok: false, field: 'phone' }
-  if (method === 'locker') {
-    const locker_code = str(d.locker_code, 40)
-    if (!/^[A-Za-z0-9][A-Za-z0-9 -]{1,39}$/.test(locker_code)) return { ok: false, field: 'locker_code' }
-    return { ok: true, value: { delivery_method: 'locker', recipient_name, phone, locker_code, address_line1: null, address_line2: null, suburb: null, city: null, province: null, postal_code: null } }
-  }
-  const address_line1 = str(d.address_line1, 200)
-  const city = str(d.city, 100)
-  const province = str(d.province, 60)
-  const postal_code = str(d.postal_code, 10)
-  if (address_line1.length < 3) return { ok: false, field: 'address_line1' }
-  if (city.length < 2) return { ok: false, field: 'city' }
-  if (province.length < 2) return { ok: false, field: 'province' }
-  if (!/^\d{4}$/.test(postal_code)) return { ok: false, field: 'postal_code' }
-  return {
-    ok: true,
-    value: {
-      delivery_method: 'door', recipient_name, phone, address_line1, city, province, postal_code,
-      address_line2: str(d.address_line2, 200) || null, suburb: str(d.suburb, 100) || null, locker_code: null,
-    },
-  }
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
@@ -83,12 +38,14 @@ Deno.serve(async (req) => {
   if (limit.blocked) return json({ error: 'too_many', message: 'Too many attempts. Please wait a few minutes and try again.' }, 429)
 
   const prices = parsePrices(settings.get('prices'))
-  const [childrenRes, passRes, paidRes] = await Promise.all([
+  const [childrenRes, passRes, paidRes, bookRes] = await Promise.all([
     admin.from('children').select('id, first_name').eq('parent_id', userId).order('created_at'),
     admin.from('entitlements').select('id, granted_at').eq('user_id', userId).eq('kind', 'family_pass').is('revoked_at', null).maybeSingle(),
     admin.from('orders').select('id', { count: 'exact', head: true }).eq('kind', 'family_pass').eq('status', 'paid'),
+    admin.from('entitlements').select('id').eq('user_id', userId).eq('kind', 'book').is('revoked_at', null).maybeSingle(),
   ])
-  if (childrenRes.error || passRes.error || paidRes.error) return json({ error: 'server_error' }, 500)
+  if (childrenRes.error || passRes.error || paidRes.error || bookRes.error) return json({ error: 'server_error' }, 500)
+  const hasBook = !!bookRes.data
   const children = childrenRes.data ?? []
   const childIds = children.map((c) => c.id)
   const kitsRes = childIds.length
@@ -108,6 +65,7 @@ Deno.serve(async (req) => {
     return json({
       payments_configured: configured,
       has_pass: hasPass,
+      has_book: hasBook,
       pass_since: passRes.data?.granted_at ?? null,
       price: quotePrices(prices, paidCount),
       children: children.map((c) => ({ id: c.id, first_name: c.first_name, has_kit: withKits.includes(c.id) })),
@@ -126,8 +84,13 @@ Deno.serve(async (req) => {
     return json({ error: 'invalid_child' }, 400)
   }
   if (body?.consent !== true) return json({ error: 'consent_required' }, 400)
-  const delivery = parseDelivery(body?.delivery)
-  if (!delivery.ok) return json({ error: 'invalid_delivery', field: delivery.field }, 400)
+  // A book order has no Armour Kit, so it needs no delivery details.
+  if (kind === 'book') {
+    if (!prices || prices.book_cents === null) return json({ error: 'book_not_available' }, 409)
+    if (hasBook) return json({ error: 'already_has_book' }, 400)
+  }
+  const delivery = kind === 'book' ? null : parseDelivery(body?.delivery)
+  if (delivery && !delivery.ok) return json({ error: 'invalid_delivery', field: delivery.field }, 400)
 
   // Paying always needs a fresh parent PIN, admin accounts included.
   const pin = await verifyParentPin(userId, email, body?.pin, { ip, ua })
@@ -135,16 +98,21 @@ Deno.serve(async (req) => {
 
   const result = computeCheckout(
     { kind, includedKitChildId: included, extraKitChildIds: extras },
-    { prices, paidFamilyPassCount: paidCount, hasActivePass: hasPass, ownedChildIds: childIds, childrenWithKits: withKits },
+    { prices, paidFamilyPassCount: paidCount, hasActivePass: hasPass, ownedChildIds: childIds, childrenWithKits: withKits, hasBook },
   )
-  if (!result.ok) return json({ error: result.error }, result.error === 'prices_unavailable' ? 503 : 400)
+  if (!result.ok) {
+    const status = result.error === 'prices_unavailable' ? 503 : result.error === 'book_not_available' ? 409 : 400
+    return json({ error: result.error }, status)
+  }
 
   const now = new Date().toISOString()
-  const { error: dpError } = await admin.from('delivery_profiles').upsert(
-    { user_id: userId, ...delivery.value, consent_at: now, updated_at: now },
-    { onConflict: 'user_id' },
-  )
-  if (dpError) return json({ error: 'server_error' }, 500)
+  if (delivery?.ok) {
+    const { error: dpError } = await admin.from('delivery_profiles').upsert(
+      { user_id: userId, ...delivery.value, consent_at: now, updated_at: now },
+      { onConflict: 'user_id' },
+    )
+    if (dpError) return json({ error: 'server_error' }, 500)
+  }
 
   // Double click protection: reuse a matching pending order from the last 15 minutes.
   const { data: recent } = await admin.from('orders')
@@ -198,7 +166,7 @@ Deno.serve(async (req) => {
         metadata: { order_id: orderId, user_id: userId },
         externalId: orderId,
         lineItems: lines.map((l: any) => ({
-          displayName: l.type === 'family_pass' ? 'Family Warrior Pass' : 'Extra Armour Kit',
+          displayName: l.type === 'family_pass' ? 'Family Warrior Pass' : l.type === 'book' ? "Kiki's Armour of God (PDF)" : 'Extra Armour Kit',
           quantity: 1,
           pricingDetails: { price: l.amount_cents },
         })),

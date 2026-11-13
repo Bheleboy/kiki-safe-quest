@@ -6,6 +6,8 @@ export interface Prices {
   launch_family_pass_cents: number
   launch_limit: number
   extra_kit_cents: number
+  /** Family library book price. Null until app_settings.prices.book_cents is set. */
+  book_cents: number | null
   currency: string
 }
 
@@ -24,6 +26,7 @@ export function parsePrices(value: unknown): Prices | null {
     launch_family_pass_cents: v.launch_family_pass_cents,
     launch_limit: v.launch_limit,
     extra_kit_cents: v.extra_kit_cents,
+    book_cents: isCents(v.book_cents) ? v.book_cents : null,
     currency: 'ZAR',
   }
 }
@@ -32,6 +35,7 @@ export interface Quote {
   family_pass_cents: number
   launch: boolean
   extra_kit_cents: number
+  book_cents: number | null
   currency: string
 }
 
@@ -42,11 +46,12 @@ export function quotePrices(prices: Prices, paidFamilyPassCount: number): Quote 
     family_pass_cents: launch ? prices.launch_family_pass_cents : prices.family_pass_cents,
     launch,
     extra_kit_cents: prices.extra_kit_cents,
+    book_cents: prices.book_cents,
     currency: prices.currency,
   }
 }
 
-export type CheckoutKind = 'family_pass' | 'extra_kit'
+export type CheckoutKind = 'family_pass' | 'extra_kit' | 'book'
 
 export interface CheckoutInput {
   kind: CheckoutKind
@@ -60,10 +65,12 @@ export interface CheckoutContext {
   hasActivePass: boolean
   ownedChildIds: string[]
   childrenWithKits: string[]
+  /** Optional so older callers keep working; only used for book orders. */
+  hasBook?: boolean
 }
 
 export interface PriceLine {
-  type: 'family_pass' | 'extra_kit'
+  type: 'family_pass' | 'extra_kit' | 'book'
   child_id: string | null
   amount_cents: number
 }
@@ -71,6 +78,7 @@ export interface PriceLine {
 export type CheckoutError =
   | 'prices_unavailable' | 'invalid_kind' | 'already_has_pass' | 'included_child_required'
   | 'pass_required' | 'invalid_child' | 'kit_exists' | 'duplicate_child' | 'empty_order'
+  | 'book_not_available' | 'already_has_book'
 
 export type CheckoutResult =
   | {
@@ -88,7 +96,17 @@ export type CheckoutResult =
 /** Server-side price and eligibility check. The client never computes prices. */
 export function computeCheckout(input: CheckoutInput, ctx: CheckoutContext): CheckoutResult {
   if (!ctx.prices) return { ok: false, error: 'prices_unavailable' }
-  if (input.kind !== 'family_pass' && input.kind !== 'extra_kit') return { ok: false, error: 'invalid_kind' }
+  if (input.kind !== 'family_pass' && input.kind !== 'extra_kit' && input.kind !== 'book') return { ok: false, error: 'invalid_kind' }
+  if (input.kind === 'book') {
+    if (ctx.prices.book_cents === null) return { ok: false, error: 'book_not_available' }
+    if (input.includedKitChildId || input.extraKitChildIds.length) return { ok: false, error: 'invalid_kind' }
+    if (ctx.hasBook) return { ok: false, error: 'already_has_book' }
+    return {
+      ok: true, kind: 'book', amount_cents: ctx.prices.book_cents, currency: ctx.prices.currency, launch: false,
+      included_kit_child_id: null, extra_kit_child_ids: [],
+      lines: [{ type: 'book', child_id: null, amount_cents: ctx.prices.book_cents }],
+    }
+  }
   const owned = new Set(ctx.ownedChildIds)
   const withKits = new Set(ctx.childrenWithKits)
   const extras = Array.from(new Set(input.extraKitChildIds)).sort()
@@ -139,6 +157,54 @@ export function sameOrderContents(
   return a.kind === b.kind && a.amount_cents === b.amount_cents &&
     (a.included_kit_child_id ?? null) === (b.included_kit_child_id ?? null) &&
     ax.length === bx.length && ax.every((v, i) => v === bx[i])
+}
+
+// ---------- Delivery details ----------
+
+const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
+
+export type Delivery = {
+  delivery_method: 'door' | 'locker'
+  recipient_name: string
+  phone: string
+  address_line1: string | null
+  address_line2: string | null
+  suburb: string | null
+  city: string | null
+  province: string | null
+  postal_code: string | null
+  locker_code: string | null
+}
+
+/** Validates delivery details from the browser. Returns the first bad field. */
+export function parseDelivery(d: any): { ok: true; value: Delivery } | { ok: false; field: string } {
+  if (!d || typeof d !== 'object') return { ok: false, field: 'delivery' }
+  const method = d.method
+  if (method !== 'door' && method !== 'locker') return { ok: false, field: 'method' }
+  const recipient_name = str(d.recipient_name, 100)
+  if (recipient_name.length < 2) return { ok: false, field: 'recipient_name' }
+  const phone = str(d.phone, 30).replace(/[\s()-]/g, '')
+  if (!/^\+?\d{9,15}$/.test(phone)) return { ok: false, field: 'phone' }
+  if (method === 'locker') {
+    const locker_code = str(d.locker_code, 40)
+    if (!/^[A-Za-z0-9][A-Za-z0-9 -]{1,39}$/.test(locker_code)) return { ok: false, field: 'locker_code' }
+    return { ok: true, value: { delivery_method: 'locker', recipient_name, phone, locker_code, address_line1: null, address_line2: null, suburb: null, city: null, province: null, postal_code: null } }
+  }
+  const address_line1 = str(d.address_line1, 200)
+  const city = str(d.city, 100)
+  const province = str(d.province, 60)
+  const postal_code = str(d.postal_code, 10)
+  if (address_line1.length < 3) return { ok: false, field: 'address_line1' }
+  if (city.length < 2) return { ok: false, field: 'city' }
+  if (province.length < 2) return { ok: false, field: 'province' }
+  if (!/^\d{4}$/.test(postal_code)) return { ok: false, field: 'postal_code' }
+  return {
+    ok: true,
+    value: {
+      delivery_method: 'door', recipient_name, phone, address_line1, city, province, postal_code,
+      address_line2: str(d.address_line2, 200) || null, suburb: str(d.suburb, 100) || null, locker_code: null,
+    },
+  }
 }
 
 // ---------- Webhook signatures (Standard Webhooks style, as documented by Yoco) ----------

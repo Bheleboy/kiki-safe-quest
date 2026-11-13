@@ -1068,6 +1068,7 @@ export type Database = {
           postal_code: string | null
           province: string | null
           recipient_name: string | null
+          shipment_group_id: string | null
           shipped_at: string | null
           status: string
           suburb: string | null
@@ -1091,6 +1092,7 @@ export type Database = {
           postal_code?: string | null
           province?: string | null
           recipient_name?: string | null
+          shipment_group_id?: string | null
           shipped_at?: string | null
           status?: string
           suburb?: string | null
@@ -1114,6 +1116,7 @@ export type Database = {
           postal_code?: string | null
           province?: string | null
           recipient_name?: string | null
+          shipment_group_id?: string | null
           shipped_at?: string | null
           status?: string
           suburb?: string | null

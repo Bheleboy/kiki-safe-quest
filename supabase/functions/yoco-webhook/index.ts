@@ -37,7 +37,9 @@ async function sendReceipt(order: any) {
     const who = l.child_id ? names.get(l.child_id) : null
     const label = l.type === 'family_pass'
       ? `Family Warrior Pass${order.metadata?.launch_price ? ' (Founding Family price)' : ''}${who ? `, Armour Kit for ${who}` : ''}`
-      : `Extra Armour Kit${who ? ` for ${who}` : ''}`
+      : l.type === 'book'
+        ? "Kiki's Armour of God, family library PDF"
+        : `Extra Armour Kit${who ? ` for ${who}` : ''}`
     return { label, amount: rand(l.amount_cents) }
   })
   sendAppEmail({
@@ -46,6 +48,7 @@ async function sendReceipt(order: any) {
     idempotencyKey: `warrior-pass-receipt-${order.id}`,
     data: {
       orderNumber: `KW-${String(order.id).slice(0, 8).toUpperCase()}`,
+      kind: order.kind,
       items,
       amount: rand(order.amount_cents),
       date: new Date().toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg', day: 'numeric', month: 'long', year: 'numeric' }),

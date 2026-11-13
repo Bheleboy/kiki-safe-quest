@@ -30,6 +30,10 @@ import { PinPad, readUnlock, useParentPin } from "@/components/security/ParentGa
 import { canSwitchFreely, readActiveLearner, writeActiveLearner } from "@/lib/activeLearner";
 import { useCourseAccess } from "@/hooks/useCourseAccess";
 import { WarriorPassGate } from "@/components/course/WarriorPassGate";
+import { useWarriorRewards } from "@/hooks/useWarriorRewards";
+import { KitEarnedCard, WarriorPointsCard } from "@/components/pass/WarriorRewardsCards";
+import { WarriorCertificateButton } from "@/components/pass/WarriorCertificate";
+import { KIT_EARNED_STATUSES } from "@/lib/warriorPass";
 
 type View =
   | { type: "home" }
@@ -112,6 +116,9 @@ export default function CoursePage() {
   // While progress is still loading nothing counts as locked (fail open), so a completed lesson never flashes the gate.
   const lockedFor = (stream: AgeStream, lessonId: string) =>
     progressReady && access.isLessonLocked(stream, lessonId, isLessonComplete(lessonId));
+  // Warrior Pass rewards only appear when the paywall is on and the family has access, or in admin preview.
+  const rewardsOn = (access.paywallActive && access.hasAccess) || access.isPreview;
+  const { rewards, refresh: refreshRewards } = useWarriorRewards(childId, rewardsOn && !!childId);
   const currentLessonLocked = (() => {
     if (view.type !== "lesson" || !access.paywallActive) return false;
     const stream = getStream(view.streamId);
@@ -167,6 +174,8 @@ export default function CoursePage() {
     async (lessonId: string, score: number, timeSeconds: number, moduleId: string) => {
       if (score < 70) return;
       await completeLesson(lessonId, score, timeSeconds);
+      // Server awards Warrior Points in the background; failures are ignored.
+      if (rewardsOn) void refreshRewards();
       if (score === 100) earnBadge(`star-${lessonId}`);
 
       if (view.type === "lesson") {
@@ -192,7 +201,7 @@ export default function CoursePage() {
         }
       }
     },
-    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece, earnedPieces]
+    [completeLesson, earnBadge, isLessonComplete, view, progress.completedLessons, checkUnlocks, earnPiece, earnedPieces, rewardsOn, refreshRewards]
   );
 
   const handleLogout = async () => {
@@ -360,6 +369,9 @@ export default function CoursePage() {
 
                 <ProgressBar progress={getModuleProgress(allIds)} label="Overall Progress" />
 
+                {rewardsOn && rewards && rewards.kitStatus && KIT_EARNED_STATUSES.includes(rewards.kitStatus) && <KitEarnedCard />}
+                {rewardsOn && rewards && <WarriorPointsCard total={rewards.total} possible={rewards.possible} />}
+
                 {/* Kiki Warrior + Armour progress */}
                 <div className="card-kiki">
                   <div className="flex flex-col items-center mb-4">
@@ -421,6 +433,16 @@ export default function CoursePage() {
                         You completed all modules and earned your armour pieces!
                       </p>
                     </div>
+
+                    {rewardsOn && user && (
+                      <WarriorCertificateButton
+                        learnerName={learnerName}
+                        streamLabel={stream.label}
+                        userId={user.id}
+                        childId={childId}
+                        lessonIds={allIds}
+                      />
+                    )}
 
                     {/* Child Survey - shows after course completion */}
                     {!surveyDismissed && user && childId && (
