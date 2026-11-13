@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/editorial";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useParentPin } from "@/components/security/ParentGate";
+import { WarriorPassUnlockCard } from "@/components/pass/WarriorPassUnlockCard";
 
 interface WarriorPassGateProps {
   learnerName: string;
   earnedPieces: string[];
+  /** Where checkout returns the parent afterwards. */
+  returnPath: string;
   onBack: () => void;
 }
 
@@ -16,9 +19,11 @@ interface WarriorPassGateProps {
  * Child-facing locked screen. No prices, payment links or external links.
  * The parent panel only opens after the parent PIN, asked every time.
  */
-export function WarriorPassGate({ learnerName, earnedPieces, onBack }: WarriorPassGateProps) {
+export function WarriorPassGate({ learnerName, earnedPieces, returnPath, onBack }: WarriorPassGateProps) {
   const { guard, dialog } = useParentPin();
   const [parentOpen, setParentOpen] = useState(false);
+  // The PIN that opened the parent panel; checkout verifies it again on the server.
+  const [pin, setPin] = useState<string | undefined>(undefined);
 
   return (
     <div className="space-y-5">
@@ -40,7 +45,7 @@ export function WarriorPassGate({ learnerName, earnedPieces, onBack }: WarriorPa
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               variant="ghost"
-              onClick={() => guard(() => setParentOpen(true), { force: true })}
+              onClick={() => guard((p) => { setPin(p); setParentOpen(true); }, { force: true })}
               className="touch-target btn-copper adventure-button py-3 px-6 text-sm uppercase tracking-widest"
             >
               <ShieldIcon size={18} className="stroke-primary-foreground mr-2" />
@@ -70,18 +75,11 @@ export function WarriorPassGate({ learnerName, earnedPieces, onBack }: WarriorPa
               {learnerName} has finished the free lessons. The Warrior Pass unlocks every lesson for every child in your family and includes one Armour Kit.
             </p>
           </div>
-          <Button
-            variant="ghost"
-            disabled
-            className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-60"
-          >
-            <Lock className="w-4 h-4 mr-2" />
-            Secure checkout opening soon
-          </Button>
+          <WarriorPassUnlockCard initialPin={pin} returnPath={returnPath} />
           <div className="text-center">
             <Button
               variant="ghost"
-              onClick={() => setParentOpen(false)}
+              onClick={() => { setPin(undefined); setParentOpen(false); }}
               className="text-sm font-body text-charcoal/70 hover:underline"
             >
               Close

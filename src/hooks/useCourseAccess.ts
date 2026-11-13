@@ -25,6 +25,13 @@ export const OPEN_ACCESS: AccessState = { paywallActive: false, hasAccess: true,
 
 const SETTING_KEYS = ["paywall_enabled", "gate_lessons", "always_free_lessons"] as const;
 
+const ACCESS_EVENT = "kw:course-access-changed";
+
+/** Tells every mounted useCourseAccess to refetch (for example after a paid order). */
+export function notifyCourseAccessChanged() {
+  try { window.dispatchEvent(new Event(ACCESS_EVENT)); } catch { /* ignore */ }
+}
+
 /** Parses app_settings rows. Returns null when anything is missing or malformed. */
 export function parseGateConfig(rows: { key: string; value: unknown }[] | null | undefined): GateConfig | null {
   if (!Array.isArray(rows)) return null;
@@ -84,6 +91,13 @@ export function useCourseAccess(userId: string | undefined, isAdmin: boolean | n
   const preview = isPreviewPaywall(isAdmin, searchParams);
   const [config, setConfig] = useState<GateConfig | null>(null);
   const [rpcResult, setRpcResult] = useState<unknown>(undefined);
+  const [version, setVersion] = useState(0);
+  const refresh = useCallback(() => setVersion((v) => v + 1), []);
+
+  useEffect(() => {
+    window.addEventListener(ACCESS_EVENT, refresh);
+    return () => window.removeEventListener(ACCESS_EVENT, refresh);
+  }, [refresh]);
 
   useEffect(() => {
     if (!userId) return;
@@ -102,7 +116,7 @@ export function useCourseAccess(userId: string | undefined, isAdmin: boolean | n
       }
     })();
     return () => { cancelled = true; };
-  }, [userId]);
+  }, [userId, version]);
 
   const state = useMemo(() => resolveAccess(config, rpcResult, preview), [config, rpcResult, preview]);
 
@@ -112,5 +126,5 @@ export function useCourseAccess(userId: string | undefined, isAdmin: boolean | n
     [state],
   );
 
-  return { paywallActive: state.paywallActive, hasAccess: state.hasAccess, isLessonLocked, isPreview: preview };
+  return { paywallActive: state.paywallActive, hasAccess: state.hasAccess, isLessonLocked, isPreview: preview, refresh };
 }

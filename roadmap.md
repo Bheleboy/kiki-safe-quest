@@ -21,3 +21,5 @@ Verification limits: admin data view requires its separate magic link; password 
 # Warrior Pass
 - [x] Phase 1a: additive database tables, policies, settings seed and has_course_access (switched off).
 - [x] Phase 1b: fail-open course gate, child locked screen, forced parent PIN, parent notification (switched off).
+- [x] Phase 2: Yoco checkout (create-checkout, yoco-webhook, unlock card, return page, parent status card), switched off.
+- [ ] Phase 2 go-live: add Yoco secret key and webhook secret, register the webhook URL with Yoco, run one real test payment.

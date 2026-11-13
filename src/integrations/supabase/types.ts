@@ -357,6 +357,65 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_profiles: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          consent_at: string | null
+          created_at: string | null
+          delivery_method: string | null
+          locker_code: string | null
+          phone: string | null
+          postal_code: string | null
+          province: string | null
+          recipient_name: string | null
+          suburb: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          consent_at?: string | null
+          created_at?: string | null
+          delivery_method?: string | null
+          locker_code?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          recipient_name?: string | null
+          suburb?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          consent_at?: string | null
+          created_at?: string | null
+          delivery_method?: string | null
+          locker_code?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          recipient_name?: string | null
+          suburb?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -627,7 +686,9 @@ export type Database = {
           child_id: string | null
           created_at: string | null
           currency: string
+          extra_kit_child_ids: string[]
           id: string
+          included_kit_child_id: string | null
           kind: string
           metadata: Json
           paid_at: string | null
@@ -643,7 +704,9 @@ export type Database = {
           child_id?: string | null
           created_at?: string | null
           currency?: string
+          extra_kit_child_ids?: string[]
           id?: string
+          included_kit_child_id?: string | null
           kind: string
           metadata?: Json
           paid_at?: string | null
@@ -659,7 +722,9 @@ export type Database = {
           child_id?: string | null
           created_at?: string | null
           currency?: string
+          extra_kit_child_ids?: string[]
           id?: string
+          included_kit_child_id?: string | null
           kind?: string
           metadata?: Json
           paid_at?: string | null
@@ -674,6 +739,13 @@ export type Database = {
           {
             foreignKeyName: "orders_child_id_fkey"
             columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_included_kit_child_id_fkey"
+            columns: ["included_kit_child_id"]
             isOneToOne: false
             referencedRelation: "children"
             referencedColumns: ["id"]
@@ -1202,6 +1274,30 @@ export type Database = {
           },
         ]
       }
+      webhook_events: {
+        Row: {
+          id: string
+          payload: Json | null
+          provider: string
+          received_at: string
+          type: string | null
+        }
+        Insert: {
+          id: string
+          payload?: Json | null
+          provider?: string
+          received_at?: string
+          type?: string | null
+        }
+        Update: {
+          id?: string
+          payload?: Json | null
+          provider?: string
+          received_at?: string
+          type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1219,6 +1315,10 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      fulfill_warrior_pass_order: {
+        Args: { _order_id: string; _payment_id: string }
+        Returns: boolean
       }
       get_public_parent_reviews: {
         Args: never

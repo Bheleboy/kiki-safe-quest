@@ -84,7 +84,18 @@ export default function CoursePage() {
     isLessonComplete,
     getModuleProgress,
     isStreamComplete,
+    loading: progressLoading,
   } = useProgress(user?.id, childId);
+
+  // Progress counts as loaded only once it has arrived for the current learner.
+  const progressKey = `${user?.id ?? ""}:${childId ?? ""}`;
+  const progressKeyRef = useRef(progressKey);
+  progressKeyRef.current = progressKey;
+  const [progressReadyKey, setProgressReadyKey] = useState<string | null>(null);
+  useEffect(() => {
+    if (!progressLoading) setProgressReadyKey(progressKeyRef.current);
+  }, [progress, progressLoading]);
+  const progressReady = !progressLoading && progressReadyKey === progressKey;
 
   const {
     earnedPieces,
@@ -98,8 +109,9 @@ export default function CoursePage() {
 
   // Warrior Pass gate. Fails open: nothing is locked unless the paywall is on.
   const access = useCourseAccess(user?.id, profile?.is_admin);
+  // While progress is still loading nothing counts as locked (fail open), so a completed lesson never flashes the gate.
   const lockedFor = (stream: AgeStream, lessonId: string) =>
-    access.isLessonLocked(stream, lessonId, isLessonComplete(lessonId));
+    progressReady && access.isLessonLocked(stream, lessonId, isLessonComplete(lessonId));
   const currentLessonLocked = (() => {
     if (view.type !== "lesson" || !access.paywallActive) return false;
     const stream = getStream(view.streamId);
@@ -509,6 +521,7 @@ export default function CoursePage() {
                   <WarriorPassGate
                     learnerName={learnerName}
                     earnedPieces={earnedPieces}
+                    returnPath={`/course${window.location.search}`}
                     onBack={() => setView({ type: "stream", streamId: view.streamId })}
                   />
                   ) : (

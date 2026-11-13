@@ -22,3 +22,6 @@ verify_jwt = false
 
 [functions.admin-stats-export]
 verify_jwt = false
+
+[functions.yoco-webhook]
+verify_jwt = false

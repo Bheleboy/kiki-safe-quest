@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Eyebrow } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
@@ -43,13 +43,15 @@ export function ParentGate({ children }: { children: React.ReactNode }) {
 }
 
 /** PIN create / unlock / reset UI. Calls onUnlocked once the server confirms. */
-export function PinPad({ onUnlocked, onCancel, message, force }: { onUnlocked: () => void; onCancel?: () => void; message?: string; force?: boolean }) {
+export function PinPad({ onUnlocked, onCancel, message, force }: { onUnlocked: (pin?: string) => void; onCancel?: () => void; message?: string; force?: boolean }) {
   const { user, session } = useAuth();
   const [mode, setMode] = useState<Mode>(() => (!force && readUnlock(user?.id) ? "unlocked" : "loading"));
   const [pin, setPin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  // The PIN the server just accepted, handed to the caller (checkout re-verifies it server-side).
+  const acceptedPin = useRef<string | undefined>(undefined);
 
   const token = session?.access_token;
 
@@ -66,7 +68,12 @@ export function PinPad({ onUnlocked, onCancel, message, force }: { onUnlocked: (
     return () => { cancelled = true; };
   }, [mode, token]);
 
-  useEffect(() => { if (mode === "unlocked") onUnlocked(); }, [mode, onUnlocked]);
+  useEffect(() => {
+    if (mode !== "unlocked") return;
+    const p = acceptedPin.current;
+    acceptedPin.current = undefined;
+    onUnlocked(p);
+  }, [mode, onUnlocked]);
 
   const submit = useCallback(async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -78,6 +85,7 @@ export function PinPad({ onUnlocked, onCancel, message, force }: { onUnlocked: (
       const r = await callFn("parent-pin", body, token);
       if (r.ok && r.data?.unlock_until) {
         writeUnlock(user.id, r.data.unlock_until);
+        acceptedPin.current = pin;
         setPin(""); setPassword("");
         setMode("unlocked");
       } else {
@@ -165,17 +173,20 @@ export function PinPad({ onUnlocked, onCancel, message, force }: { onUnlocked: (
 /** Runs an action only after the parent PIN is unlocked; renders the PIN pad in a dialog. */
 export function useParentPin() {
   const { user, profile } = useAuth();
-  const [pending, setPending] = useState<null | (() => void)>(null);
+  const [pending, setPending] = useState<null | ((pin?: string) => void)>(null);
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [force, setForce] = useState(false);
   /** Pass { force: true } to always ask for the PIN, even inside the unlock window. */
-  const guard = useCallback((action: () => void, opts?: string | { message?: string; force?: boolean }) => {
+  /** The action receives the PIN that was just entered (undefined when no PIN was asked). */
+  /** Pass { requirePin: true } to ask even admin accounts (used before paying). */
+  const guard = useCallback((action: (pin?: string) => void, opts?: string | { message?: string; force?: boolean; requirePin?: boolean }) => {
     const o = typeof opts === "string" ? { message: opts } : opts ?? {};
-    if (profile?.is_admin || (!o.force && readUnlock(user?.id))) action();
+    if (o.requirePin) { setMessage(o.message); setForce(true); setPending(() => action); return; }
+    if (profile?.is_admin || (!o.force && readUnlock(user?.id))) action(undefined);
     else { setMessage(o.message); setForce(!!o.force); setPending(() => action); }
   }, [user, profile]);
-  const onUnlocked = useCallback(() => {
-    setPending((p) => { if (p) setTimeout(p, 0); return null; });
+  const onUnlocked = useCallback((pin?: string) => {
+    setPending((p) => { if (p) setTimeout(() => p(pin), 0); return null; });
   }, []);
   const dialog = (
     <Dialog open={!!pending} onOpenChange={(o) => { if (!o) setPending(null); }}>

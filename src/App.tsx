@@ -23,6 +23,7 @@ import CookieConsent from "./components/CookieConsent";
 import VersionWatcher from "./components/VersionWatcher";
 import SecurityRevoke from "./pages/SecurityRevoke";
 import Unsubscribe from "./pages/Unsubscribe";
+import PassReturn from "./pages/PassReturn";
 import { ParentGate } from "./components/security/ParentGate";
 import { InactivityGuard } from "./components/security/InactivityGuard";
 
@@ -89,6 +90,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/course" element={<ProtectedRoute><Course /></ProtectedRoute>} />
               <Route path="/parent" element={<ProtectedRoute><ParentGate><ParentDashboard /></ParentGate></ProtectedRoute>} />
+              <Route path="/pass/return" element={<ProtectedRoute><ParentGate><PassReturn /></ParentGate></ProtectedRoute>} />
               <Route path="/admin" element={<AdminDashboard />} />
 
               <Route path="*" element={<NotFound />} />
