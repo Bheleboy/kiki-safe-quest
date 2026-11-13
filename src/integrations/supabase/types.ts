@@ -1356,6 +1356,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      redeem_bulk_code: {
+        Args: { _code: string; _user_id: string }
+        Returns: string
+      }
       revoke_auth_session: { Args: { _session_id: string }; Returns: undefined }
       session_is_registered: { Args: never; Returns: boolean }
     }

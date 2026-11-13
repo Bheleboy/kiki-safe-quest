@@ -49,6 +49,20 @@ export const EVENT_LABELS: Record<string, string> = {
   pin_reset_bad_password: "Wrong password on PIN reset",
   admin_unlock: "Unlocked by admin",
   admin_revoked: "Signed out everywhere by admin",
+  admin_wp_refund: "Order refunded by admin",
+  admin_wp_refund_failed: "Refund failed",
+  admin_wp_shipped: "Armour Kit marked sent",
+  admin_wp_delivered: "Armour Kit marked delivered",
+  admin_wp_settings: "Warrior Pass settings changed",
+  admin_wp_paywall: "Warrior Pass switched on or off",
+  admin_wp_grant_pass: "Warrior Pass given by admin",
+  admin_wp_revoke_pass: "Warrior Pass removed by admin",
+  admin_wp_batch_created: "Code batch created",
+  admin_wp_batch_exported: "Code batch exported",
+  admin_wp_batch_disabled: "Code batch disabled",
+  code_redeemed: "School or church code used",
+  code_redeem_failed: "Code did not work",
+  code_redeem_throttled: "Too many code attempts",
 };
 
 const TILES: { key: string; label: string }[] = [

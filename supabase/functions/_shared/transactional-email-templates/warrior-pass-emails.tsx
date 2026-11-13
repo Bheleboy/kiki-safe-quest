@@ -58,6 +58,38 @@ export const warriorPassReceipt = {
   },
 } satisfies TemplateEntry
 
+// Refund confirmation. FIXED copy; only a validated order number and amount are injected.
+interface RefundProps { orderNumber?: string; amount?: string; kind?: string }
+
+const Refunded = (p: RefundProps) => (
+  <Html lang="en" dir="ltr">
+    <Head />
+    <Preview>Your Kiki Warrior refund</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Heading style={h1}>Your refund is on its way</Heading>
+        <Text style={text}>We have refunded your Kiki Warrior order. Card refunds usually reach your account within 5 to 10 working days, depending on your bank.</Text>
+        <Text style={label}>Order number: {safeOrder(p.orderNumber)}</Text>
+        {safeAmount(p.amount) ? <Text style={total}>Refunded: {safeAmount(p.amount)}</Text> : null}
+        {p.kind === 'family_pass' ? (
+          <Text style={text}>The Warrior Pass on this order is no longer active. Lessons your children have already finished stay open.</Text>
+        ) : p.kind === 'book' ? (
+          <Text style={text}>The book on this order is no longer in your Family library.</Text>
+        ) : null}
+        <Text style={text}>If you did not expect this refund, reply to this email and we will help.</Text>
+        <Text style={footer}>This is a refund confirmation from Kiki Warrior. Keep it for your records.</Text>
+      </Container>
+    </Body>
+  </Html>
+)
+
+export const orderRefunded = {
+  component: Refunded,
+  subject: 'Your Kiki Warrior refund',
+  displayName: 'Warrior Pass: refund',
+  previewData: { orderNumber: 'KW-1A2B3C4D', amount: 'R249.00', kind: 'family_pass' },
+} satisfies TemplateEntry
+
 const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', Arial, sans-serif" }
 const container = { padding: '32px 28px' }
 const h1 = {

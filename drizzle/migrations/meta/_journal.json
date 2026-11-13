@@ -57,6 +57,13 @@
       "when": 1794600669786,
       "tag": "0007_warrior_pass_phase3_rewards_library",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794601717699,
+      "tag": "0008_warrior_pass_phase4_redeem_code",
+      "breakpoints": true
     }
   ]
 }

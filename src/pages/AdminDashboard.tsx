@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { sitecheckerSupabase } from "@/integrations/sitechecker/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +9,21 @@ import {
 } from "recharts";
 import { Users, Baby, BookOpen, TrendingUp, Search, LogOut, Star, Shield } from "lucide-react";
 import { SecurityPanel } from "@/components/admin/SecurityPanel";
+
+// Warrior Pass admin tabs load only when opened, so the overview tab is unaffected.
+const OrdersTab = lazy(() => import("@/components/admin/warrior/OrdersTab"));
+const RewardsTab = lazy(() => import("@/components/admin/warrior/RewardsTab"));
+const WarriorSettingsTab = lazy(() => import("@/components/admin/warrior/SettingsTab"));
+const BulkCodesTab = lazy(() => import("@/components/admin/warrior/BulkCodesTab"));
+
+const ADMIN_TABS = [
+  { id: "overview", label: "Overview" },
+  { id: "orders", label: "Orders" },
+  { id: "rewards", label: "Rewards to send" },
+  { id: "pass-settings", label: "Warrior Pass settings" },
+  { id: "codes", label: "Bulk codes" },
+] as const;
+type AdminTab = typeof ADMIN_TABS[number]["id"];
 
 const KIKI_CLIENT_ID = "7a197200-b63e-4a04-80b7-6c3bdcfd93d7";
 
@@ -130,6 +146,14 @@ function AdminLoginGate() {
 
 function AdminDashboardView() {
   const { signOut } = useAdminAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const tab: AdminTab = ADMIN_TABS.some((t) => t.id === tabParam) ? (tabParam as AdminTab) : "overview";
+  const selectTab = (id: AdminTab) => {
+    const next = new URLSearchParams(searchParams);
+    if (id === "overview") next.delete("tab"); else next.set("tab", id);
+    setSearchParams(next, { replace: true });
+  };
   const [stats, setStats] = useState<PlatformStats>({
     totalParents: 0,
     newThisWeek: 0,
@@ -228,6 +252,30 @@ function AdminDashboardView() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <nav aria-label="Admin sections" className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          {ADMIN_TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => selectTab(t.id)}
+              aria-current={tab === t.id ? "page" : undefined}
+              className={`shrink-0 min-h-11 px-4 py-2 text-xs uppercase tracking-widest font-display rounded-full border transition-colors ${
+                tab === t.id ? "bg-primary text-charcoal border-primary" : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
+
+        {tab !== "overview" ? (
+          <Suspense fallback={<div className="card-kiki border-primary/15 p-8 flex justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>}>
+            {tab === "orders" && <OrdersTab />}
+            {tab === "rewards" && <RewardsTab />}
+            {tab === "pass-settings" && <WarriorSettingsTab />}
+            {tab === "codes" && <BulkCodesTab />}
+          </Suspense>
+        ) : (<>
         {loading ? (
           <div className="card-kiki border-primary/15 p-8 flex justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -363,6 +411,7 @@ function AdminDashboardView() {
           </h2>
           <GscPanel />
         </section>
+        </>)}
       </main>
     </div>
   );

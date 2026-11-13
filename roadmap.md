@@ -25,3 +25,5 @@ Verification limits: admin data view requires its separate magic link; password 
 - [ ] Phase 2 go-live: add Yoco secret key and webhook secret, register the webhook URL with Yoco, run one real test payment.
 - [x] Phase 3: Warrior Points (award-points), Armour Kit release + save-delivery, certificate, family library (book checkout, library-link), tests. Switched off.
 - [ ] Phase 3 go-live: confirm Armour Kit contents for the reward email, upload the book PDF and set library_book_path, set prices.book_cents.
+- [x] Phase 4: admin-orders (orders, refunds, rewards, settings, master switch, passes, stats, bulk codes), redeem-code, admin tabs, parent code entry, tests. Switched off.
+- [ ] Phase 4 go-live: live Yoco key for refunds; signed-in admin walkthrough of the new tabs.

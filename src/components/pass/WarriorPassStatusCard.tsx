@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eyebrow } from "@/components/ui/editorial";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { callFn, useAuth } from "@/hooks/useAuth";
-import { useCourseAccess } from "@/hooks/useCourseAccess";
+import { notifyCourseAccessChanged, useCourseAccess } from "@/hooks/useCourseAccess";
 import { useParentPin } from "@/components/security/ParentGate";
 import { supabase } from "@/integrations/supabase/client";
 import { KIT_STATUS, checkoutErrorMessage } from "@/lib/warriorPass";
@@ -40,6 +40,11 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
+  // School or church code, entered behind a fresh parent PIN.
+  const [codePin, setCodePin] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [codeBusy, setCodeBusy] = useState(false);
+  const [codeMsg, setCodeMsg] = useState("");
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -75,6 +80,32 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
   const needsAddress = kits.some((k) => k.status === "address_needed");
 
   const openForm = () => guard((p) => { if (p) { setFormPin(p); setFormError(""); } }, { requirePin: true, message: "Enter your parent PIN to add delivery details." });
+
+  const openCode = () => guard((p) => { if (p) { setCodePin(p); setCodeMsg(""); } }, { requirePin: true, message: "Enter your parent PIN to use a school or church code." });
+
+  async function redeemCode() {
+    if (!codePin) return;
+    setCodeBusy(true);
+    setCodeMsg("");
+    try {
+      const r = await callFn("redeem-code", { pin: codePin, code }, token);
+      if (r.ok) {
+        setCodePin(null);
+        setCode("");
+        notifyCourseAccessChanged();
+        await load();
+      } else if (r.data?.error === "pin_required" || r.data?.error === "locked") {
+        setCodePin(null);
+        setCodeMsg(r.data?.message || "Please enter your parent PIN again.");
+      } else {
+        setCodeMsg(checkoutErrorMessage(r.data));
+      }
+    } catch {
+      setCodeMsg("Could not reach the server. Please try again.");
+    } finally {
+      setCodeBusy(false);
+    }
+  }
 
   async function saveDelivery() {
     if (!formPin) return;
@@ -179,6 +210,38 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
               : "The Warrior Pass unlocks every lesson for every child in your family and includes one Armour Kit."}
           </p>
           <WarriorPassUnlockCard returnPath={returnPath} />
+          {(access.paywallActive || access.isPreview) && (
+            <div className="border-t border-primary/15 pt-4 space-y-3">
+              {!codePin ? (
+                <Button variant="ghost" onClick={openCode} className="text-sm font-body text-primary hover:underline px-0 touch-target">
+                  Have a school or church code?
+                </Button>
+              ) : (
+                <form onSubmit={(e) => { e.preventDefault(); void redeemCode(); }} className="space-y-3">
+                  <label className="block font-body text-sm text-charcoal/80">
+                    Enter the code from your school or church. It unlocks every lesson for your family. An Armour Kit can still be added separately.
+                    <input
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      placeholder="KW-XXXX-XXXX"
+                      autoCapitalize="characters"
+                      autoComplete="off"
+                      maxLength={20}
+                      className="mt-2 w-full rounded-xl border border-primary/20 bg-card min-h-12 px-4 font-body text-charcoal uppercase tracking-widest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
+                    />
+                  </label>
+                  <div className="flex gap-2">
+                    <Button type="submit" variant="ghost" disabled={codeBusy || code.trim().length < 8}
+                      className="flex-1 touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50">
+                      {codeBusy ? "Checking..." : "Use code"}
+                    </Button>
+                    <Button type="button" variant="ghost" onClick={() => { setCodePin(null); setCode(""); }} className="touch-target px-4 text-sm font-body text-charcoal/70">Cancel</Button>
+                  </div>
+                </form>
+              )}
+              {codeMsg && <p className="text-sm font-body text-destructive bg-destructive/10 rounded-lg px-4 py-2">{codeMsg}</p>}
+            </div>
+          )}
         </>
       )}
     </div>

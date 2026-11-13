@@ -3,8 +3,8 @@ import {
   securityAccountLocked, securityNewSignin, securityPasswordChanged, securityPinLocked,
   securitySessionLimit, securityStepupCode,
 } from './security-emails.tsx'
-import { warriorPassReceipt } from './warrior-pass-emails.tsx'
-import { rewardUnlocked } from './reward-emails.tsx'
+import { orderRefunded, warriorPassReceipt } from './warrior-pass-emails.tsx'
+import { rewardShipped, rewardUnlocked } from './reward-emails.tsx'
 
 export interface TemplateEntry {
   component: React.ComponentType<any>
@@ -23,4 +23,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'security-pin-locked': securityPinLocked,
   'warrior-pass-receipt': warriorPassReceipt,
   'reward-unlocked': rewardUnlocked,
+  'reward-shipped': rewardShipped,
+  'order-refunded': orderRefunded,
 }
