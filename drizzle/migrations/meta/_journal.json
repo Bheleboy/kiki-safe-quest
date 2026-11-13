@@ -36,6 +36,13 @@
       "when": 1792137299802,
       "tag": "0004_kiki_admin_allowlist",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794598394003,
+      "tag": "0005_warrior_pass_phase1a",
+      "breakpoints": true
     }
   ]
 }

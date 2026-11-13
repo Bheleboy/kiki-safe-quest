@@ -14,6 +14,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          created_at: string | null
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string | null
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string | null
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      armour_kits: {
+        Row: {
+          child_id: string
+          created_at: string | null
+          earned_at: string | null
+          id: string
+          included_in_pass: boolean
+          order_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string
+          included_in_pass?: boolean
+          order_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string
+          included_in_pass?: boolean
+          order_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "armour_kits_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "armour_kits_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "armour_kits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       armour_pieces: {
         Row: {
           child_id: string | null
@@ -110,6 +189,81 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      bulk_code_batches: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          name: string
+          notes: string | null
+          organisation: string | null
+          seats: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          organisation?: string | null
+          seats: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          organisation?: string | null
+          seats?: number
+        }
+        Relationships: []
+      }
+      bulk_codes: {
+        Row: {
+          batch_id: string
+          code: string
+          created_at: string | null
+          id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+        }
+        Insert: {
+          batch_id: string
+          code: string
+          created_at?: string | null
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Update: {
+          batch_id?: string
+          code?: string
+          created_at?: string | null
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulk_codes_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "bulk_code_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bulk_codes_redeemed_by_fkey"
+            columns: ["redeemed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       child_surveys: {
         Row: {
@@ -290,6 +444,64 @@ export type Database = {
         }
         Relationships: []
       }
+      entitlements: {
+        Row: {
+          bulk_code_id: string | null
+          created_at: string | null
+          granted_at: string | null
+          id: string
+          kind: string
+          order_id: string | null
+          revoked_at: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          bulk_code_id?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          id?: string
+          kind: string
+          order_id?: string | null
+          revoked_at?: string | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          bulk_code_id?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          id?: string
+          kind?: string
+          order_id?: string | null
+          revoked_at?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlements_bulk_code_id_fkey"
+            columns: ["bulk_code_id"]
+            isOneToOne: false
+            referencedRelation: "bulk_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entitlements_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entitlements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       login_challenges: {
         Row: {
           attempts: number
@@ -405,6 +617,72 @@ export type Database = {
             columns: ["child_id"]
             isOneToOne: false
             referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount_cents: number
+          child_id: string | null
+          created_at: string | null
+          currency: string
+          id: string
+          kind: string
+          metadata: Json
+          paid_at: string | null
+          provider: string
+          provider_checkout_id: string | null
+          provider_payment_id: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          child_id?: string | null
+          created_at?: string | null
+          currency?: string
+          id?: string
+          kind: string
+          metadata?: Json
+          paid_at?: string | null
+          provider?: string
+          provider_checkout_id?: string | null
+          provider_payment_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          child_id?: string | null
+          created_at?: string | null
+          currency?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          paid_at?: string | null
+          provider?: string
+          provider_checkout_id?: string | null
+          provider_payment_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -702,6 +980,93 @@ export type Database = {
         }
         Relationships: []
       }
+      shipments: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          courier: string | null
+          created_at: string | null
+          delivered_at: string | null
+          delivery_method: string | null
+          id: string
+          kit_id: string
+          locker_code: string | null
+          phone: string | null
+          postal_code: string | null
+          province: string | null
+          recipient_name: string | null
+          shipped_at: string | null
+          status: string
+          suburb: string | null
+          tracking_url: string | null
+          updated_at: string | null
+          user_id: string
+          waybill: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          courier?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_method?: string | null
+          id?: string
+          kit_id: string
+          locker_code?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          recipient_name?: string | null
+          shipped_at?: string | null
+          status?: string
+          suburb?: string | null
+          tracking_url?: string | null
+          updated_at?: string | null
+          user_id: string
+          waybill?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          courier?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_method?: string | null
+          id?: string
+          kit_id?: string
+          locker_code?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          recipient_name?: string | null
+          shipped_at?: string | null
+          status?: string
+          suburb?: string | null
+          tracking_url?: string | null
+          updated_at?: string | null
+          user_id?: string
+          waybill?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "armour_kits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -792,6 +1157,51 @@ export type Database = {
         }
         Relationships: []
       }
+      warrior_points: {
+        Row: {
+          child_id: string
+          created_at: string | null
+          id: string
+          lesson_id: string | null
+          points: number
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string | null
+          id?: string
+          lesson_id?: string | null
+          points: number
+          reason: string
+          user_id: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string | null
+          id?: string
+          lesson_id?: string | null
+          points?: number
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warrior_points_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warrior_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -820,6 +1230,7 @@ export type Database = {
           overall_rating: number
         }[]
       }
+      has_course_access: { Args: { _user_id: string }; Returns: boolean }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_parent_of_child: {
         Args: { _child_id: string; _user_id: string }

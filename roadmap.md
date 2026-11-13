@@ -17,3 +17,6 @@ Verification limits: admin data view requires its separate magic link; password 
 - [x] Verify the four stats RPCs deny anon/authenticated and allow service_role.
 - [x] Add one SiteChecker-authenticated export function without modifying existing functions or pages.
 - [x] Test and deploy the export function.
+
+# Warrior Pass
+- [x] Phase 1a: additive database tables, policies, settings seed and has_course_access (switched off).
