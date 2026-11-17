@@ -181,7 +181,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
               <label className="flex items-start gap-3 cursor-pointer">
                 <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-0.5" />
                 <span className="font-body text-sm text-charcoal/80 leading-relaxed">
-                  I am the parent or guardian and agree to my delivery details being used to send the reward
+                  I am the parent or guardian and agree to my delivery details being used to send the Armour Kit
                 </span>
               </label>
               <div className="flex gap-2">
@@ -197,7 +197,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
 
           {childWithoutKit && !showUnlock && (
             <Button variant="ghost" onClick={() => setShowUnlock(true)} className="text-sm font-body text-primary hover:underline px-0">
-              Add an Armour Kit
+              Buy an Armour Kit
             </Button>
           )}
           {showUnlock && <WarriorPassUnlockCard returnPath={returnPath} />}
@@ -206,8 +206,8 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
         <>
           <p className="font-body text-sm text-charcoal/70 leading-relaxed">
             {access.hasAccess && !access.isPreview
-              ? "Your family already has every lesson open. The Warrior Pass adds an Armour Kit reward for your child."
-              : "The Warrior Pass unlocks every lesson for every child in your family and includes one Armour Kit."}
+              ? "Your family already has every lesson open. With the Warrior Pass you can also add an Armour Kit for each child."
+              : "The Warrior Pass unlocks every lesson for every child in your family. Armour Kits can be added per child."}
           </p>
           <WarriorPassUnlockCard returnPath={returnPath} />
           {(access.paywallActive || access.isPreview) && (

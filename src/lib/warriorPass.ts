@@ -31,10 +31,21 @@ const FIELD_MESSAGES: Record<string, string> = {
   postal_code: "Please enter a 4-digit postal code.",
 };
 
+export const KITS_SOLD_OUT = "Armour Kits are sold out for now. Lessons are still available.";
+
+/** Parent-facing description of the kit. Never shown to children. */
+export const KIT_PARENT_COPY = "The Armour Kit: a real Armour of God coin and wristband, posted to your door or a Courier Guy locker when your child finishes the course.";
+
+/** The only kit line a child may see, with no price. */
+export const KIT_CHILD_COPY = "Finish your missions to earn your real Armour Kit. Ask a grown-up.";
+
 const ERROR_MESSAGES: Record<string, string> = {
   already_has_pass: "Your family already has the Warrior Pass.",
-  included_child_required: "Choose which child gets the included Armour Kit.",
-  pass_required: "Extra Armour Kits need the Family Warrior Pass.",
+  pass_required: "Armour Kits are for families with the Warrior Pass.",
+  kits_sold_out: KITS_SOLD_OUT,
+  delivery_required: "Choose door delivery or a Courier Guy locker.",
+  delivery_unavailable: "Kit delivery is not available yet. You can still buy the Warrior Pass.",
+  invalid_kind: "Please refresh the page and try again.",
   invalid_child: "Please choose children from your family.",
   kit_exists: "One of these children already has an Armour Kit.",
   duplicate_child: "Each child can only get one Armour Kit.",

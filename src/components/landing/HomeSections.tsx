@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { courseData } from "@/data/courseData";
 import { ONLINE_SAFETY_PIECES } from "@/data/armourData";
 import { supabase } from "@/integrations/supabase/client";
+import { BookCover } from "@/components/book/BookCover";
 
 const container = "max-w-7xl mx-auto px-4 sm:px-6";
 const heading = "mt-4 font-display font-bold uppercase text-charcoal text-4xl sm:text-5xl lg:text-6xl leading-[0.95]";
@@ -71,7 +72,7 @@ export function Academy() {
     </article>
     <article className="rounded-[2rem] bg-peach p-6 sm:p-10 flex flex-col sm:flex-row lg:flex-col gap-6 min-w-0">
       <div className="min-w-0"><p className="font-display text-xs uppercase tracking-[0.3em] text-primary">The companion book</p><h3 className="font-display font-bold uppercase text-3xl sm:text-4xl leading-[0.95] text-charcoal mt-4">Kiki's Armour of God</h3><p className={`${body} mt-5`}>A Christian-themed workbook teaching the armour of God through activities, Bible verses and prayers. Available on Amazon, Kobo and Barnes &amp; Noble.</p><PrimaryPill to="/books/armour-of-god" book className="mt-6">See the book</PrimaryPill></div>
-      <img src="/images/kiki-armour-of-god.png" alt="Kiki's Armour of God workbook cover" loading="lazy" className="w-40 sm:w-48 self-center -rotate-3 rounded-lg shadow-2xl shrink-0 mt-auto" />
+      <div className="w-40 sm:w-48 self-center -rotate-3 shrink-0 mt-auto"><BookCover alt="Kiki's Armour of God book cover" className="w-full h-auto rounded-lg shadow-2xl" /></div>
     </article>
   </div></RevealSection>;
 }

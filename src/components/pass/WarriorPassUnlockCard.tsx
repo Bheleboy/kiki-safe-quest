@@ -2,23 +2,28 @@ import { useEffect, useRef, useState } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DeliveryFields, deliveryFromProfile, deliveryLooksComplete, EMPTY_DELIVERY, labelCls, type DeliveryValues } from "./DeliveryFields";
 import { callFn, useAuth } from "@/hooks/useAuth";
 import { useParentPin } from "@/components/security/ParentGate";
-import { checkoutErrorMessage, formatRand, savePassReturnPath } from "@/lib/warriorPass";
+import { checkoutErrorMessage, formatRand, KIT_PARENT_COPY, KITS_SOLD_OUT, savePassReturnPath } from "@/lib/warriorPass";
 
 interface QuoteChild { id: string; first_name: string; has_kit: boolean }
 interface Quote {
   payments_configured: boolean;
   has_pass: boolean;
-  price: { family_pass_cents: number; launch: boolean; extra_kit_cents: number; currency: string };
+  price: {
+    family_pass_cents: number; launch: boolean; kit_cents?: number; extra_kit_cents: number;
+    delivery_locker_cents?: number | null; delivery_door_cents?: number | null; currency: string;
+  };
+  kits_sold_out?: boolean;
+  kit_stock?: number | null;
   children: QuoteChild[];
   delivery: Partial<Record<string, string | null>> | null;
 }
 
 /**
  * Parent-only unlock card. Shown only behind the parent PIN or the parent area.
+ * The pass covers lessons only; Armour Kits are optional, per child, plus one delivery fee.
  * Prices come from the server quote; the server recomputes them at checkout.
  */
 export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?: string; returnPath: string }) {
@@ -30,8 +35,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "unavailable">("loading");
   const [notConfigured, setNotConfigured] = useState(false);
-  const [included, setIncluded] = useState("");
-  const [extras, setExtras] = useState<string[]>([]);
+  const [kits, setKits] = useState<string[]>([]);
   const [method, setMethod] = useState<"door" | "locker">("door");
   const [fields, setFields] = useState<DeliveryValues>(EMPTY_DELIVERY);
   const [consent, setConsent] = useState(false);
@@ -48,8 +52,6 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
         const q = r.data as Quote;
         setQuote(q);
         setNotConfigured(!q.payments_configured);
-        const eligible = q.children.filter((c) => !c.has_kit);
-        if (!q.has_pass && eligible[0]) setIncluded(eligible[0].id);
         if (q.delivery) {
           const d = deliveryFromProfile(q.delivery);
           setMethod(d.method);
@@ -73,20 +75,27 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
   }
   if (loadState === "unavailable" || !quote) return comingSoon;
 
+  const kitCents = quote.price.kit_cents ?? quote.price.extra_kit_cents;
   const names = new Map(quote.children.map((c) => [c.id, c.first_name]));
   const eligible = quote.children.filter((c) => !c.has_kit);
   const buyingPass = !quote.has_pass;
-  const extraOptions = eligible.filter((c) => c.id !== included);
-  const chosenExtras = extras.filter((id) => extraOptions.some((c) => c.id === id));
-  const lines: { label: string; cents: number }[] = [];
-  if (buyingPass && included) {
-    lines.push({ label: `Family Warrior Pass, Armour Kit for ${names.get(included)}`, cents: quote.price.family_pass_cents });
-  }
-  chosenExtras.forEach((id) => lines.push({ label: `Extra Armour Kit for ${names.get(id)}`, cents: quote.price.extra_kit_cents }));
-  const total = lines.reduce((s, l) => s + l.cents, 0);
+  const soldOut = quote.kits_sold_out === true;
+  const stock = typeof quote.kit_stock === "number" ? quote.kit_stock : null;
+  const chosenKits = soldOut ? [] : kits.filter((id) => eligible.some((c) => c.id === id));
+  const overStock = stock !== null && chosenKits.length > stock;
+  const fee = method === "locker" ? quote.price.delivery_locker_cents ?? null : quote.price.delivery_door_cents ?? null;
 
-  const deliveryOk = deliveryLooksComplete(method, fields);
-  const canPay = !busy && !notConfigured && lines.length > 0 && deliveryOk && consent;
+  const lines: { key: string; label: string; cents: number | null }[] = [];
+  if (buyingPass) lines.push({ key: "pass", label: `Family Warrior Pass${quote.price.launch ? " (Founding Family price)" : ""}`, cents: quote.price.family_pass_cents });
+  chosenKits.forEach((id) => lines.push({ key: `kit-${id}`, label: `Armour Kit for ${names.get(id)}`, cents: kitCents }));
+  if (chosenKits.length > 0) {
+    lines.push({ key: "delivery", label: method === "locker" ? "Delivery to a Courier Guy locker" : "Door delivery", cents: fee });
+  }
+  const total = lines.reduce((s, l) => s + (l.cents ?? 0), 0);
+  const hasKits = chosenKits.length > 0;
+
+  const deliveryOk = !hasKits || (deliveryLooksComplete(method, fields) && fee !== null);
+  const canPay = !busy && !notConfigured && lines.length > 0 && !overStock && deliveryOk && consent && (buyingPass || hasKits);
 
   async function pay(pin?: string) {
     setError("");
@@ -101,9 +110,8 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
         action: "checkout",
         pin: usePin,
         kind: buyingPass ? "family_pass" : "extra_kit",
-        included_kit_child_id: buyingPass ? included : null,
-        extra_kit_child_ids: chosenExtras,
-        delivery: { method, ...fields },
+        extra_kit_child_ids: chosenKits,
+        ...(hasKits ? { delivery: { method, ...fields } } : {}),
         consent,
       }, token);
       if (r.ok && typeof r.data?.redirectUrl === "string") {
@@ -113,6 +121,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
       }
       setBusy(false);
       if (r.status === 503 && r.data?.error === "payments_not_configured") { setNotConfigured(true); return; }
+      if (r.data?.error === "kits_sold_out") setQuote({ ...quote!, kits_sold_out: true });
       if (r.data?.error === "pin_required") {
         pinRef.current = undefined;
         setError(r.data?.message || "Please enter your parent PIN again.");
@@ -133,7 +142,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
         <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 flex items-start justify-between gap-3">
           <div>
             <p className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Family Warrior Pass</p>
-            <p className="font-body text-sm text-charcoal/70">Every lesson for every child, plus one Armour Kit.</p>
+            <p className="font-body text-sm text-charcoal/70">Every lesson for every child in your family.</p>
             {quote.price.launch && (
               <span className="inline-block mt-2 rounded-full bg-primary px-3 py-1 font-display text-[11px] uppercase tracking-widest text-primary-foreground">Founding Family price</span>
             )}
@@ -141,55 +150,46 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
           <p className="font-display text-2xl font-bold text-charcoal">{formatRand(quote.price.family_pass_cents)}</p>
         </div>
       ) : (
-        <p className="font-body text-sm text-charcoal/70">Your family has the Warrior Pass. You can add an Armour Kit for another child.</p>
+        <p className="font-body text-sm text-charcoal/70">Your family has the Warrior Pass. You can add an Armour Kit for a child.</p>
       )}
 
-      {buyingPass && eligible.length === 0 && (
-        <p className="font-body text-sm text-charcoal/70">Add a child on the family page first, then come back to unlock the Warrior Pass.</p>
-      )}
-
-      {buyingPass && eligible.length > 0 && (
+      {quote.children.length > 0 && (
         <fieldset className="space-y-2">
-          <legend className={labelCls}>Who gets the included Armour Kit?</legend>
-          <RadioGroup value={included} onValueChange={setIncluded} className="gap-2">
-            {eligible.map((c) => (
+          <legend className={labelCls}>{buyingPass ? "Add Armour Kits (optional)" : "Armour Kits"}, {formatRand(kitCents)} per child</legend>
+          <p className="font-body text-sm text-charcoal/70">{KIT_PARENT_COPY} Delivery is added once per order.</p>
+          {soldOut ? (
+            <p className="font-body text-sm text-charcoal/80 rounded-xl bg-muted px-4 py-3">{KITS_SOLD_OUT}</p>
+          ) : eligible.length === 0 ? (
+            <p className="font-body text-sm text-charcoal/70">Every child in your family already has an Armour Kit.</p>
+          ) : (
+            eligible.map((c) => (
               <label key={c.id} className="flex items-center gap-3 rounded-xl border border-primary/15 bg-card px-4 min-h-12 cursor-pointer">
-                <RadioGroupItem value={c.id} id={`kit-${c.id}`} />
-                <span className="font-body text-charcoal">{c.first_name}</span>
+                <Checkbox
+                  checked={kits.includes(c.id)}
+                  onCheckedChange={(v) => setKits((xs) => (v === true ? [...xs, c.id] : xs.filter((x) => x !== c.id)))}
+                />
+                <span className="font-body text-charcoal">Armour Kit for {c.first_name}</span>
               </label>
-            ))}
-          </RadioGroup>
+            ))
+          )}
+          {overStock && <p className="font-body text-sm text-destructive">Only {stock} Armour Kit{stock === 1 ? " is" : "s are"} left. Please choose fewer.</p>}
         </fieldset>
-      )}
-
-      {extraOptions.length > 0 && (
-        <fieldset className="space-y-2">
-          <legend className={labelCls}>Extra Armour Kits, {formatRand(quote.price.extra_kit_cents)} each</legend>
-          {extraOptions.map((c) => (
-            <label key={c.id} className="flex items-center gap-3 rounded-xl border border-primary/15 bg-card px-4 min-h-12 cursor-pointer">
-              <Checkbox
-                checked={extras.includes(c.id)}
-                onCheckedChange={(v) => setExtras((xs) => (v === true ? [...xs, c.id] : xs.filter((x) => x !== c.id)))}
-              />
-              <span className="font-body text-charcoal">Extra Armour Kit for {c.first_name}</span>
-            </label>
-          ))}
-        </fieldset>
-      )}
-
-      {!buyingPass && extraOptions.length === 0 && (
-        <p className="font-body text-sm text-charcoal/70">Every child in your family already has an Armour Kit.</p>
       )}
 
       {lines.length > 0 && (
         <>
-          <DeliveryFields method={method} onMethod={setMethod} values={fields} onChange={setFields} />
+          {hasKits && (
+            <>
+              <DeliveryFields method={method} onMethod={setMethod} values={fields} onChange={setFields} />
+              {fee === null && <p className="font-body text-sm text-charcoal/70">Delivery to this option is not available yet.</p>}
+            </>
+          )}
 
           <div className="rounded-2xl border border-primary/15 bg-card p-4 space-y-2">
             <p className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Order summary</p>
             {lines.map((l) => (
-              <div key={l.label} className="flex justify-between gap-3 font-body text-sm text-charcoal/80">
-                <span>{l.label}</span><span className="shrink-0">{formatRand(l.cents)}</span>
+              <div key={l.key} className="flex justify-between gap-3 font-body text-sm text-charcoal/80">
+                <span>{l.label}</span><span className="shrink-0">{l.cents === null ? "-" : formatRand(l.cents)}</span>
               </div>
             ))}
             <div className="flex justify-between gap-3 border-t border-primary/15 pt-2 font-display font-bold text-charcoal">
@@ -200,7 +200,9 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
           <label className="flex items-start gap-3 cursor-pointer">
             <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-0.5" />
             <span className="font-body text-sm text-charcoal/80 leading-relaxed">
-              I am the parent or guardian and agree to the purchase and to my delivery details being used to send the reward
+              {hasKits
+                ? "I am the parent or guardian and agree to the purchase and to my delivery details being used to send the Armour Kit"
+                : "I am the parent or guardian and agree to the purchase"}
             </span>
           </label>
         </>
@@ -208,7 +210,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
 
       {error && <p className="text-sm font-body text-destructive bg-destructive/10 rounded-lg px-4 py-2">{error}</p>}
 
-      {notConfigured ? comingSoon : lines.length > 0 && (
+      {notConfigured ? comingSoon : (buyingPass || hasKits) && (
         <Button
           variant="ghost"
           onClick={() => void pay()}

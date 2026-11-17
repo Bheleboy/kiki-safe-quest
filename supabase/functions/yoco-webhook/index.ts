@@ -2,8 +2,8 @@
 // valid Standard Webhooks signature made with YOCO_WEBHOOK_SECRET.
 // Idempotent through webhook_events. Fulfilment runs in one database transaction.
 import { admin, json, logEvent } from '../_shared/security.ts'
-import { verifyWebhookSignature } from '../_shared/warrior-pass.ts'
-import { sendAppEmail, yocoConfig } from '../_shared/warrior-pass-server.ts'
+import { lineLabel, verifyWebhookSignature } from '../_shared/warrior-pass.ts'
+import { receiptBusinessName, sendAppEmail, yocoConfig } from '../_shared/warrior-pass-server.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -25,9 +25,10 @@ async function findOrder(meta: Record<string, unknown>) {
 }
 
 async function sendReceipt(order: any) {
-  const [{ data: userRes }, { data: kids }] = await Promise.all([
+  const [{ data: userRes }, { data: kids }, businessName] = await Promise.all([
     admin.auth.admin.getUserById(order.user_id),
     admin.from('children').select('id, first_name').eq('parent_id', order.user_id),
+    receiptBusinessName(),
   ])
   const to = userRes?.user?.email
   if (!to) return
@@ -35,13 +36,13 @@ async function sendReceipt(order: any) {
   const lines: any[] = Array.isArray(order.metadata?.lines) ? order.metadata.lines : []
   const items = lines.map((l) => {
     const who = l.child_id ? names.get(l.child_id) : null
-    const label = l.type === 'family_pass'
-      ? `Family Warrior Pass${order.metadata?.launch_price ? ' (Founding Family price)' : ''}${who ? `, Armour Kit for ${who}` : ''}`
-      : l.type === 'book'
-        ? "Kiki's Armour of God, family library PDF"
-        : `Extra Armour Kit${who ? ` for ${who}` : ''}`
+    // Older orders put the included kit on the pass line.
+    const label = l.type === 'family_pass' && who
+      ? `${lineLabel(l, null, order.metadata?.launch_price === true)}, Armour Kit for ${who}`
+      : lineLabel(l, who, order.metadata?.launch_price === true)
     return { label, amount: rand(l.amount_cents) }
   })
+  const hasKits = lines.some((l) => l.type === 'extra_kit' || (l.type === 'family_pass' && l.child_id))
   sendAppEmail({
     to,
     template: 'warrior-pass-receipt',
@@ -49,6 +50,8 @@ async function sendReceipt(order: any) {
     data: {
       orderNumber: `KW-${String(order.id).slice(0, 8).toUpperCase()}`,
       kind: order.kind,
+      hasKits,
+      businessName,
       items,
       amount: rand(order.amount_cents),
       date: new Date().toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg', day: 'numeric', month: 'long', year: 'numeric' }),

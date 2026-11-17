@@ -6,5 +6,7 @@ export const BOOK_STORES = [
   { name: "Barnes & Noble", url: "https://www.barnesandnoble.com/w/kikis-armour-of-god-nonala-tose-dagada/1147336266" },
 ];
 
-export const BOOK_COVER = "/images/kiki-armour-of-god.png";
+/** Book cover: WebP for modern browsers, JPEG as the fallback and for social previews. */
+export const BOOK_COVER = "/images/kiki-armour-of-god-cover.jpg";
+export const BOOK_COVER_WEBP = "/images/kiki-armour-of-god-cover.webp";
 export const BOOK_TITLE = "Kiki's Armour of God";

@@ -6,6 +6,7 @@ import { ShieldIcon } from "@/components/course/CourseIcons";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
 import { useParentPin } from "@/components/security/ParentGate";
 import { WarriorPassUnlockCard } from "@/components/pass/WarriorPassUnlockCard";
+import { KIT_CHILD_COPY } from "@/lib/warriorPass";
 
 interface WarriorPassGateProps {
   learnerName: string;
@@ -41,6 +42,7 @@ export function WarriorPassGate({ learnerName, earnedPieces, returnPath, onBack 
             <p className="font-body text-charcoal/70 max-w-md mx-auto leading-relaxed">
               You have finished the free adventure. The next missions are part of the Warrior Pass. Ask a parent to unlock them.
             </p>
+            <p className="font-body text-sm text-charcoal/60 max-w-md mx-auto">{KIT_CHILD_COPY}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
@@ -72,7 +74,7 @@ export function WarriorPassGate({ learnerName, earnedPieces, returnPath, onBack 
               Warrior Pass
             </h2>
             <p className="font-body text-charcoal/70 max-w-md mx-auto leading-relaxed">
-              {learnerName} has finished the free lessons. The Warrior Pass unlocks every lesson for every child in your family and includes one Armour Kit.
+              {learnerName} has finished the free lessons. The Warrior Pass unlocks every lesson for every child in your family.
             </p>
           </div>
           <WarriorPassUnlockCard initialPin={pin} returnPath={returnPath} />

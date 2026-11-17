@@ -1,9 +1,10 @@
 import { Eyebrow } from "@/components/ui/editorial";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { ProgressBar } from "@/components/course/ProgressBar";
+import { KIT_CHILD_COPY } from "@/lib/warriorPass";
 
 /** Warrior Points total on the stream view. No prices or links. */
-export function WarriorPointsCard({ total, possible }: { total: number; possible: number }) {
+export function WarriorPointsCard({ total, possible, showKitHint = false }: { total: number; possible: number; showKitHint?: boolean }) {
   const progress = possible > 0 ? Math.min(1, total / possible) : 0;
   return (
     <div className="card-kiki space-y-3">
@@ -19,6 +20,7 @@ export function WarriorPointsCard({ total, possible }: { total: number; possible
         </div>
       </div>
       <ProgressBar progress={progress} label="Toward the Armour Kit" />
+      {showKitHint && <p className="font-body text-sm text-charcoal/70">{KIT_CHILD_COPY}</p>}
     </div>
   );
 }

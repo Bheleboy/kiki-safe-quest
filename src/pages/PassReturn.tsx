@@ -26,6 +26,8 @@ export default function PassReturn() {
   const state = params.get("state");
   const [status, setStatus] = useState<Status>("checking");
   const [kind, setKind] = useState<string | null>(null);
+  const [withKits, setWithKits] = useState(false);
+  const [business, setBusiness] = useState("Boss Moves Media");
   const backPath = readPassReturnPath();
 
   useEffect(() => {
@@ -36,11 +38,12 @@ export default function PassReturn() {
     const started = Date.now();
     const check = async () => {
       if (stopped) return;
-      const { data, error } = await supabase.from("orders").select("status, kind").eq("id", orderId).maybeSingle();
+      const { data, error } = await supabase.from("orders").select("status, kind, extra_kit_child_ids").eq("id", orderId).maybeSingle();
       if (stopped) return;
       if (!error && !data) { setStatus("missing"); return; }
       const s = data?.status;
       if (data?.kind) setKind(data.kind);
+      if (Array.isArray(data?.extra_kit_child_ids)) setWithKits(data.extra_kit_child_ids.length > 0);
       if (s === "paid") { setStatus("paid"); notifyCourseAccessChanged(); return; }
       if (s === "failed" || s === "cancelled" || state === "cancelled" || state === "failed") { setStatus("stopped"); return; }
       if (Date.now() - started >= MAX_MS) { setStatus("slow"); return; }
@@ -50,13 +53,20 @@ export default function PassReturn() {
     return () => { stopped = true; if (timer) window.clearTimeout(timer); };
   }, [user, orderId, state]);
 
+  // Business name shown on order screens; the default stays if the setting cannot be read.
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("app_settings").select("value").eq("key", "receipt_business_name").maybeSingle()
+      .then(({ data }) => { if (typeof data?.value === "string" && data.value.trim().length >= 2) setBusiness(data.value.trim().slice(0, 80)); });
+  }, [user]);
+
   const content = {
     checking: { title: "Confirming your payment", text: "This usually takes a few seconds. Please keep this page open." },
     paid: kind === "book"
-      ? { title: "Family library unlocked", text: "Thank you. The book is ready to download in the Family library on your parent dashboard. A receipt is on its way to your email." }
+      ? { title: "Family library unlocked", text: "Thank you. Kiki's Armour of God, Premium Edition is ready to download in the Family library on your parent dashboard. A receipt is on its way to your email." }
       : kind === "extra_kit"
-        ? { title: "Armour Kit added", text: "Thank you. The extra Armour Kit is confirmed and ships when your child finishes the course. A receipt is on its way to your email." }
-        : { title: "Warrior Pass unlocked", text: "Thank you. Every lesson is now open for every child in your family. A receipt is on its way to your email." },
+        ? { title: "Armour Kit confirmed", text: "Thank you. Each Armour Kit is posted when that child finishes the course. A receipt is on its way to your email." }
+        : { title: "Warrior Pass unlocked", text: `Thank you. Every lesson is now open for every child in your family.${withKits ? " Each Armour Kit is posted when that child finishes the course." : ""} A receipt is on its way to your email.` },
     stopped: { title: "Payment not completed", text: "No money was taken for this order. You can try again whenever you are ready." },
     slow: { title: "Still confirming", text: "We are still confirming your payment. You will get an email as soon as it is confirmed. Nothing has been lost." },
     missing: { title: "Order not found", text: "We could not find this order on your account. If you were charged, you will get an email as soon as the payment is confirmed." },
@@ -72,6 +82,9 @@ export default function PassReturn() {
           <Eyebrow>Warrior Pass</Eyebrow>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-charcoal uppercase tracking-wide">{content.title}</h1>
           <p className="font-body text-charcoal/70 leading-relaxed">{content.text}</p>
+          {status === "paid" && (
+            <p className="font-body text-xs text-charcoal/60">Order KW-{orderId.slice(0, 8).toUpperCase()}. Sold by {business}.</p>
+          )}
         </div>
         {status === "checking" ? (
           <div className="flex justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>

@@ -9,6 +9,8 @@ import { SITE_URL } from "@/data/routes";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
+import { BookCover } from "@/components/book/BookCover";
+import { BOOK_COVER } from "@/data/bookStores";
 
 const BOOK_ID = "armour-of-god";
 const BOOK_TITLE = "Kiki's Armour of God";
@@ -119,7 +121,7 @@ export default function BookArmourOfGod() {
       description:
         "A Christian workbook for children aged 4-12 that teaches the Armour of God from Ephesians 6 through activities, prayers and Bible verses.",
       url: `${SITE_URL}/books/armour-of-god`,
-      image: `${SITE_URL}/images/kiki-armour-of-god.png`,
+      image: `${SITE_URL}${BOOK_COVER}`,
     },
     {
       "@context": "https://schema.org",
@@ -169,11 +171,7 @@ export default function BookArmourOfGod() {
           >
             <div className="relative">
               <div className="editorial-book-cover w-72 md:w-80 rounded-2xl overflow-hidden shadow-none border border-primary/15">
-                <img
-                  src="/images/kiki-armour-of-god.png"
-                  alt="Kiki's Armour of God workbook cover"
-                  className="w-full h-auto object-cover"
-                />
+                <BookCover alt="Kiki's Armour of God book cover" lazy={false} className="w-full h-auto object-cover" />
               </div>
               <div className="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-none">
                 <span className="font-display text-primary-foreground text-xs text-center leading-tight uppercase font-bold">Ages<br />4–12</span>

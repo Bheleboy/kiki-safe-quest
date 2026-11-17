@@ -8,7 +8,8 @@ import { callFn, useAuth } from "@/hooks/useAuth";
 import { useCourseAccess } from "@/hooks/useCourseAccess";
 import { useParentPin } from "@/components/security/ParentGate";
 import { supabase } from "@/integrations/supabase/client";
-import { BOOK_COVER, BOOK_STORES, BOOK_TITLE } from "@/data/bookStores";
+import { BOOK_STORES, BOOK_TITLE } from "@/data/bookStores";
+import { BookCover } from "@/components/book/BookCover";
 import { checkoutErrorMessage, formatRand, savePassReturnPath } from "@/lib/warriorPass";
 
 /**
@@ -120,10 +121,10 @@ export function FamilyLibraryCard() {
         <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Family library</h2>
       </div>
       <div className="flex gap-4 items-start">
-        <img src={BOOK_COVER} alt={`${BOOK_TITLE} workbook cover`} loading="lazy" className="w-20 sm:w-24 rounded-lg shrink-0 -rotate-2" />
+        <div className="w-20 sm:w-24 shrink-0 -rotate-2"><BookCover className="w-full h-auto rounded-lg" /></div>
         <div className="space-y-1 min-w-0">
-          <p className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">{BOOK_TITLE}</p>
-          <p className="font-body text-sm text-charcoal/70">Printable PDF workbook. One purchase covers every child in your family.</p>
+          <p className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">{BOOK_TITLE}, Premium Edition</p>
+          <p className="font-body text-sm text-charcoal/70">Printable PDF. One purchase covers every child in your family.</p>
           {owned && <p className="font-body text-xs font-medium text-primary">Your family owns this book</p>}
         </div>
       </div>

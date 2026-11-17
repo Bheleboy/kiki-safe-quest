@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   BATCH_CSV_HEADER, CODE_ALPHABET, CODE_PATTERN, SHIPMENT_CSV_HEADER, batchCsv, decideRedeem, generateCode,
   generateUniqueCodes, normalizeCode, parseBatchInput, pendingShipmentsCsv, planPaywallChange, referenceRange,
-  validateSettings, type RewardRow,
+  validateSettings, decideBonusAward, validOrgTiers, type RewardRow,
 } from "../../supabase/functions/_shared/warrior-admin";
 
 describe("bulk code generator", () => {
@@ -81,7 +81,9 @@ describe("settings validation", () => {
   it("requires prices to be positive whole cents, book price may be null", () => {
     const s = goodSettings();
     expect(validateSettings({ ...s, prices: { ...s.prices, family_pass_cents: 0 } })).toMatchObject({ ok: false, field: "prices.family_pass_cents" });
-    expect(validateSettings({ ...s, prices: { ...s.prices, extra_kit_cents: 99.5 } })).toMatchObject({ ok: false, field: "prices.extra_kit_cents" });
+    expect(validateSettings({ ...s, prices: { ...s.prices, extra_kit_cents: 99.5 } })).toMatchObject({ ok: false, field: "prices.kit_cents" });
+    expect(validateSettings({ ...s, prices: { ...s.prices, kit_cents: 0 } })).toMatchObject({ ok: false, field: "prices.kit_cents" });
+    expect(validateSettings({ ...s, prices: { ...s.prices, delivery_locker_cents: -5 } })).toMatchObject({ ok: false, field: "prices.delivery_locker_cents" });
     expect(validateSettings({ ...s, prices: { ...s.prices, book_cents: -1 } })).toMatchObject({ ok: false, field: "prices.book_cents" });
     const withBook = validateSettings({ ...s, prices: { ...s.prices, book_cents: 14900 } });
     expect(withBook.ok && withBook.value.prices.book_cents).toBe(14900);
@@ -98,6 +100,46 @@ describe("settings validation", () => {
     expect(validateSettings({ ...goodSettings(), library_book_path: "" })).toMatchObject({ ok: true });
     expect(validateSettings({ ...goodSettings(), library_book_path: "../secret.pdf" })).toMatchObject({ ok: false, field: "library_book_path" });
     expect(validateSettings({ ...goodSettings(), library_book_path: 5 })).toMatchObject({ ok: false, field: "library_book_path" });
+  });
+});
+
+describe("Phase 5a settings", () => {
+  it("keeps kit_cents and extra_kit_cents equal", () => {
+    const r = validateSettings({ ...goodSettings(), prices: { ...goodSettings().prices, kit_cents: 12000 } });
+    expect(r.ok && r.value.prices.kit_cents).toBe(12000);
+    expect(r.ok && r.value.prices.extra_kit_cents).toBe(12000);
+  });
+
+  it("accepts the approved organisation tiers and refuses gaps or a middle open tier", () => {
+    expect(validOrgTiers([{ min: 1, max: 99, cents: 12900 }, { min: 100, max: 299, cents: 10900 }, { min: 300, max: null, cents: 8900 }])).toBe(true);
+    expect(validOrgTiers([{ min: 1, max: 99, cents: 12900 }, { min: 150, max: null, cents: 8900 }])).toBe(false);
+    expect(validOrgTiers([{ min: 1, max: null, cents: 12900 }, { min: 100, max: null, cents: 8900 }])).toBe(false);
+  });
+
+  it("only writes stock when it is sent, and refuses negative stock", () => {
+    const without = validateSettings(goodSettings());
+    expect(without.ok && "kits_in_stock" in without.value).toBe(false);
+    const withStock = validateSettings({ ...goodSettings(), kits_in_stock: 40 });
+    expect(withStock.ok && withStock.value.kits_in_stock).toBe(40);
+    expect(validateSettings({ ...goodSettings(), pendant_sets_in_stock: -1 })).toMatchObject({ ok: false, field: "pendant_sets_in_stock" });
+  });
+
+  it("defaults the receipt business name to Boss Moves Media and checks the support email", () => {
+    const r = validateSettings(goodSettings());
+    expect(r.ok && r.value.receipt_business_name).toBe("Boss Moves Media");
+    expect(r.ok && r.value.support_email).toBeNull();
+    expect(validateSettings({ ...goodSettings(), support_email: "not-an-email" })).toMatchObject({ ok: false, field: "support_email" });
+    const s = validateSettings({ ...goodSettings(), support_email: "Help@KikiWarrior.com" });
+    expect(s.ok && s.value.support_email).toBe("help@kikiwarrior.com");
+  });
+});
+
+describe("bonus pendant award", () => {
+  it("refuses when no pendant sets are left", () => {
+    expect(decideBonusAward(0)).toBe("sold_out");
+    expect(decideBonusAward(null)).toBe("sold_out");
+    expect(decideBonusAward(1)).toBe("ok");
+    expect(decideBonusAward(30)).toBe("ok");
   });
 });
 

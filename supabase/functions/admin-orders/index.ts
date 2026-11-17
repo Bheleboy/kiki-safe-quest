@@ -7,8 +7,9 @@ import { sendAppEmail, yocoConfig } from '../_shared/warrior-pass-server.ts'
 import { deliveryPointText } from '../_shared/warrior-rewards.ts'
 import {
   batchCsv, cleanTrackingUrl, generateUniqueCodes, orderReference, parseBatchInput, planPaywallChange,
-  referenceRange, SHIPPABLE_STATUSES, validateSettings, type RewardRow,
+  referenceRange, SHIPPABLE_STATUSES, validateSettings, DEFAULT_BUSINESS_NAME, type RewardRow,
 } from '../_shared/warrior-admin.ts'
+import { isLowStock, parseStock } from '../_shared/warrior-pass.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,7 +25,13 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const PAGE_SIZE = 25
 const ORDER_STATUSES = ['pending', 'paid', 'failed', 'cancelled', 'refunded']
 const ORDER_KINDS = ['family_pass', 'extra_kit', 'book']
-const EDITABLE_KEYS = ['gate_lessons', 'always_free_lessons', 'prices', 'library_book_path'] as const
+const EDITABLE_KEYS = ['gate_lessons', 'always_free_lessons', 'prices', 'library_book_path', 'receipt_business_name', 'support_email'] as const
+// Stock is only written when the admin changed it, so a form loaded before a sale never puts sold kits back.
+const STOCK_KEYS = ['kits_in_stock', 'pendant_sets_in_stock'] as const
+const LIBRARY_BUCKET = 'family-library'
+const BOOK_MAX_BYTES = 50 * 1024 * 1024
+const BOOK_PATH = /^books\/kikis-armour-of-god-premium-edition-\d{14}\.pdf$/
+const PENDING_SHIPMENT_STATUSES = ['draft', 'submitted', 'booked']
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -265,6 +272,9 @@ Deno.serve(async (req) => {
         byIds('orders', 'id, status', 'id', list.map((k) => k.order_id).filter(Boolean)),
       ])
       const shipFor = new Map(ships.map((s) => [s.kit_id, s]))
+      const bonuses = await byIds('bonus_awards', 'id, shipment_id, status', 'shipment_id', ships.map((s) => s.id))
+      const bonusCount = new Map<string, number>()
+      for (const b of bonuses) if (b.status === 'added_to_shipment') bonusCount.set(b.shipment_id, (bonusCount.get(b.shipment_id) ?? 0) + 1)
       const kidName = new Map(kids.map((c) => [c.id, c.first_name]))
       const dpFor = new Map(deliveries.map((d) => [d.user_id, d]))
       const orderStatus = new Map(orders.map((o) => [o.id, o.status]))
@@ -300,6 +310,7 @@ Deno.serve(async (req) => {
           delivered_at: s?.delivered_at ?? null,
           earned_at: k.earned_at,
           order_status: k.order_id ? orderStatus.get(k.order_id) ?? null : null,
+          bonus_pendants: s ? bonusCount.get(s.id) ?? 0 : 0,
         } satisfies RewardRow & Record<string, unknown>
       })
       const groups = new Map<string, typeof rows>()
@@ -395,6 +406,14 @@ Deno.serve(async (req) => {
           always_free_lessons: v('always_free_lessons') ?? [],
           prices: v('prices'),
           library_book_path: typeof v('library_book_path') === 'string' ? v('library_book_path') : null,
+          receipt_business_name: typeof v('receipt_business_name') === 'string' ? v('receipt_business_name') : DEFAULT_BUSINESS_NAME,
+          support_email: typeof v('support_email') === 'string' ? v('support_email') : null,
+          kits_in_stock: parseStock(v('kits_in_stock')),
+          pendant_sets_in_stock: parseStock(v('pendant_sets_in_stock')),
+        },
+        low_stock: {
+          kits: isLowStock(parseStock(v('kits_in_stock'))),
+          pendants: isLowStock(parseStock(v('pendant_sets_in_stock'))),
         },
         updated,
         paid_family_passes: await paidPassCount(),
@@ -408,14 +427,15 @@ Deno.serve(async (req) => {
       const by = await adminProfileId()
       const nowIso = new Date().toISOString()
       const changed: string[] = []
-      for (const key of EDITABLE_KEYS) {
+      const keys = [...EDITABLE_KEYS, ...STOCK_KEYS.filter((k) => result.value[k] !== undefined)]
+      for (const key of keys) {
         const value = result.value[key]
         if (JSON.stringify(current.get(key)?.value ?? null) === JSON.stringify(value)) continue
         const { error } = await db.from('app_settings').upsert({ key, value, updated_at: nowIso, updated_by: by }, { onConflict: 'key' })
         if (error) return json({ error: 'Update failed' }, 500)
         changed.push(key)
       }
-      if (changed.length) await log('admin_wp_settings', { changed, values: Object.fromEntries(changed.map((k) => [k, result.value[k as typeof EDITABLE_KEYS[number]]])) })
+      if (changed.length) await log('admin_wp_settings', { changed, values: Object.fromEntries(changed.map((k) => [k, (result.value as unknown as Record<string, unknown>)[k]])) })
       return json({ ok: true, changed })
     }
 
@@ -579,6 +599,116 @@ Deno.serve(async (req) => {
       if (error) return json({ error: 'Update failed' }, 500)
       if (!data?.length) return json({ error: 'not_active', message: 'This batch is already disabled or expired.' }, 409)
       await log('admin_wp_batch_disabled', { batch_id: body.batch_id })
+      return json({ ok: true })
+    }
+
+    // ================= Book file =================
+    if (action === 'book_upload_url') {
+      // A fresh path every time, so a half finished upload never replaces the live book.
+      const stamp = new Date().toISOString().replace(/\D/g, '').slice(0, 14)
+      const path = `books/kikis-armour-of-god-premium-edition-${stamp}.pdf`
+      const { data, error } = await db.storage.from(LIBRARY_BUCKET).createSignedUploadUrl(path)
+      if (error || !data) return json({ error: 'Upload link failed' }, 500)
+      await log('admin_wp_book_upload_started', { path })
+      return json({ path: data.path ?? path, token: data.token, max_bytes: BOOK_MAX_BYTES })
+    }
+
+    if (action === 'book_upload_complete') {
+      const path = typeof body.path === 'string' ? body.path : ''
+      if (!BOOK_PATH.test(path)) return json({ error: 'invalid_path' }, 400)
+      const [folder, name] = [path.slice(0, path.lastIndexOf('/')), path.slice(path.lastIndexOf('/') + 1)]
+      const { data: files, error: listErr } = await db.storage.from(LIBRARY_BUCKET).list(folder, { search: name, limit: 5 })
+      const file = (files ?? []).find((f) => f.name === name)
+      if (listErr || !file) return json({ error: 'file_missing', message: 'The upload did not arrive. Please try again.' }, 404)
+      const size = Number((file.metadata as any)?.size ?? 0)
+      // Check the first bytes really are a PDF, not just the name.
+      let isPdf = false
+      const { data: signed } = await db.storage.from(LIBRARY_BUCKET).createSignedUrl(path, 60)
+      if (signed?.signedUrl) {
+        try {
+          const head = await fetch(signed.signedUrl, { headers: { Range: 'bytes=0-4' } })
+          const bytes = new Uint8Array(await head.arrayBuffer()).slice(0, 5)
+          isPdf = new TextDecoder().decode(bytes) === '%PDF-'
+        } catch { isPdf = false }
+      }
+      if (!isPdf || size <= 0 || size > BOOK_MAX_BYTES) {
+        await db.storage.from(LIBRARY_BUCKET).remove([path])
+        return json({ error: 'invalid_file', message: 'Please upload a PDF file of 50 MB or less.' }, 400)
+      }
+      const { error } = await db.from('app_settings').upsert(
+        { key: 'library_book_path', value: path, updated_at: new Date().toISOString(), updated_by: await adminProfileId() },
+        { onConflict: 'key' },
+      )
+      if (error) return json({ error: 'Update failed' }, 500)
+      await log('admin_wp_book_uploaded', { path, size })
+      return json({ ok: true, library_book_path: path, size })
+    }
+
+    // ================= Bonus pendant sets =================
+    if (action === 'list_bonuses') {
+      const [{ data: list, error }, settings] = await Promise.all([
+        db.from('bonus_awards').select('id, user_id, note, status, shipment_id, created_at, updated_at').order('created_at', { ascending: false }).limit(500),
+        readSettings(),
+      ])
+      if (error) return json({ error: 'Query failed' }, 500)
+      const rows = list ?? []
+      const owedUsers = rows.filter((b) => b.status === 'owed').map((b) => b.user_id)
+      const [people, ships] = await Promise.all([
+        profilesMap(rows.map((b) => b.user_id)),
+        byIds('shipments', 'id, user_id, status, created_at, shipment_group_id', 'user_id', owedUsers),
+      ])
+      const openShips = ships.filter((sh) => PENDING_SHIPMENT_STATUSES.includes(sh.status))
+      return json({
+        pendant_sets_in_stock: parseStock(settings.get('pendant_sets_in_stock')?.value ?? null),
+        bonuses: rows.map((b) => ({
+          ...b,
+          parent_name: people.get(b.user_id)?.first_name ?? null,
+          parent_email: people.get(b.user_id)?.email ?? null,
+          open_shipments: b.status === 'owed'
+            ? openShips.filter((sh) => sh.user_id === b.user_id).map((sh) => ({ id: sh.id, status: sh.status, created_at: sh.created_at }))
+            : [],
+        })),
+      })
+    }
+
+    if (action === 'award_bonus') {
+      const p = await findUser(body.email)
+      if (!p) return json({ error: 'Account not found' }, 404)
+      const note = typeof body.note === 'string' ? body.note.trim().slice(0, 300) : ''
+      const { data: id, error } = await db.rpc('award_bonus_pendant', { _user_id: p.id, _note: note || null, _created_by: await adminProfileId() })
+      if (error) return json({ error: 'Update failed' }, 500)
+      if (!id) return json({ error: 'sold_out', message: 'No pendant sets are left in stock.' }, 409)
+      await log('admin_wp_bonus_awarded', { bonus_id: id }, p.id)
+      return json({ ok: true, id, email: p.email })
+    }
+
+    if (action === 'attach_bonus') {
+      if (typeof body.bonus_id !== 'string' || !UUID.test(body.bonus_id) || typeof body.shipment_id !== 'string' || !UUID.test(body.shipment_id)) {
+        return json({ error: 'Invalid input' }, 400)
+      }
+      const { data: bonus } = await db.from('bonus_awards').select('id, user_id, status').eq('id', body.bonus_id).maybeSingle()
+      if (!bonus || bonus.status !== 'owed') return json({ error: 'not_owed', message: 'This bonus is not waiting to be sent.' }, 409)
+      const { data: ship } = await db.from('shipments').select('id, user_id, status').eq('id', body.shipment_id).maybeSingle()
+      if (!ship || ship.user_id !== bonus.user_id || !PENDING_SHIPMENT_STATUSES.includes(ship.status)) {
+        return json({ error: 'invalid_shipment', message: 'Pick a parcel for this family that has not been sent yet.' }, 409)
+      }
+      const { data: done, error } = await db.from('bonus_awards')
+        .update({ status: 'added_to_shipment', shipment_id: ship.id, updated_at: new Date().toISOString() })
+        .eq('id', bonus.id).eq('status', 'owed').select('id')
+      if (error) return json({ error: 'Update failed' }, 500)
+      if (!done?.length) return json({ error: 'not_owed', message: 'This bonus is not waiting to be sent.' }, 409)
+      await log('admin_wp_bonus_attached', { bonus_id: bonus.id, shipment_id: ship.id }, bonus.user_id)
+      return json({ ok: true })
+    }
+
+    if (action === 'mark_bonus_handed_over') {
+      if (typeof body.bonus_id !== 'string' || !UUID.test(body.bonus_id)) return json({ error: 'Invalid input' }, 400)
+      const { data: done, error } = await db.from('bonus_awards')
+        .update({ status: 'handed_over', updated_at: new Date().toISOString() })
+        .eq('id', body.bonus_id).in('status', ['owed', 'added_to_shipment']).select('id, user_id')
+      if (error) return json({ error: 'Update failed' }, 500)
+      if (!done?.length) return json({ error: 'not_open', message: 'This bonus was already handed over.' }, 409)
+      await log('admin_wp_bonus_handed_over', { bonus_id: body.bonus_id }, done[0].user_id)
       return json({ ok: true })
     }
 

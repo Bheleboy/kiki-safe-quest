@@ -64,6 +64,13 @@
       "when": 1794601717699,
       "tag": "0008_warrior_pass_phase4_redeem_code",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794909107197,
+      "tag": "0009_warrior_pass_phase5a_pricing_stock_bonus",
+      "breakpoints": true
     }
   ]
 }

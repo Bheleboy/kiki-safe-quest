@@ -14,7 +14,8 @@ const safeText = (v?: string | null, max = 160) => (v ? String(v).replace(/[<>{}
 
 /** What is inside the kit. Shown as fixed copy in the email. */
 export const KIT_CONTENTS = [
-  'The Kiki Warrior Armour Kit, the physical reward for finishing every lesson',
+  'One Armour of God coin',
+  'One Armour of God wristband',
 ]
 
 const RewardUnlocked = (p: Props) => {
@@ -41,7 +42,7 @@ const RewardUnlocked = (p: Props) => {
               We need your delivery details before we can send it. Open the parent dashboard on Kiki Warrior and add them under Warrior Pass. You will get tracking details by email when it ships.
             </Text>
           )}
-          <Text style={footer}>You are receiving this because your family has the Kiki Warrior Pass.</Text>
+          <Text style={footer}>You are receiving this because you bought an Armour Kit on Kiki Warrior.</Text>
         </Container>
       </Body>
     </Html>
@@ -81,7 +82,7 @@ const RewardShipped = (p: ShippedProps) => {
           {waybill ? (<><Text style={label}>Tracking number</Text><Text style={row}>{waybill}</Text></>) : null}
           {url ? (<><Text style={label}>Track the parcel</Text><Text style={row}><a href={url} style={link}>{url}</a></Text></>) : null}
           <Text style={text}>If anything looks wrong with the delivery, reply to this email and we will help.</Text>
-          <Text style={footer}>You are receiving this because your family has the Kiki Warrior Pass.</Text>
+          <Text style={footer}>You are receiving this because you bought an Armour Kit on Kiki Warrior.</Text>
         </Container>
       </Body>
     </Html>

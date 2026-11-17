@@ -58,5 +58,5 @@ export const ORDER_STATUS_LABEL: Record<string, string> = {
   pending: "Pending", paid: "Paid", failed: "Failed", cancelled: "Cancelled", refunded: "Refunded",
 };
 export const ORDER_KIND_LABEL: Record<string, string> = {
-  family_pass: "Family Warrior Pass", extra_kit: "Extra Armour Kit", book: "Family library book",
+  family_pass: "Family Warrior Pass", extra_kit: "Armour Kit", book: "Family library book",
 };

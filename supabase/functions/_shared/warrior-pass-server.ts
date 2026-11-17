@@ -84,15 +84,35 @@ export function yocoConfig() {
   return { secretKey, webhookSecret, configured: !!secretKey && !!webhookSecret }
 }
 
-/** Sends a fixed-copy app email through send-transactional-email with internal credentials. Never blocks the caller. */
+const REPLY_TO_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[A-Za-z]{2,}$/
+
+/** app_settings.support_email when it is set to a valid address, otherwise null (replies go to the sender). */
+async function supportReplyTo(): Promise<string | null> {
+  const { data } = await admin.from('app_settings').select('value').eq('key', 'support_email').maybeSingle()
+  const v = data?.value
+  return typeof v === 'string' && v.length <= 254 && REPLY_TO_RE.test(v) ? v : null
+}
+
+/** Business name for receipts and order screens, with the default when the setting is missing. */
+export async function receiptBusinessName(): Promise<string> {
+  const { data } = await admin.from('app_settings').select('value').eq('key', 'receipt_business_name').maybeSingle()
+  const v = data?.value
+  return typeof v === 'string' && v.trim().length >= 2 ? v.trim().slice(0, 80) : 'Boss Moves Media'
+}
+
+/**
+ * Sends a fixed-copy Warrior Pass email to a parent through send-transactional-email with internal
+ * credentials. Uses app_settings.support_email as the reply-to address when set. Never blocks the caller.
+ */
 export function sendAppEmail(opts: { to: string; template: string; idempotencyKey: string; data: Record<string, unknown> }): void {
   background((async () => {
     const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     try {
+      const replyTo = await supportReplyTo().catch(() => null)
       const res = await fetch(`${SUPABASE_URL}/functions/v1/send-transactional-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, apikey: key, 'x-internal-key': key },
-        body: JSON.stringify({ templateName: opts.template, recipientEmail: opts.to, idempotencyKey: opts.idempotencyKey, templateData: opts.data }),
+        body: JSON.stringify({ templateName: opts.template, recipientEmail: opts.to, idempotencyKey: opts.idempotencyKey, templateData: opts.data, ...(replyTo ? { replyTo } : {}) }),
       })
       const text = await res.text()
       if (!res.ok) throw new Error(`HTTP ${res.status} ${text.slice(0, 300)}`)

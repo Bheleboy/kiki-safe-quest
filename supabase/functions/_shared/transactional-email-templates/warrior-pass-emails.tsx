@@ -5,11 +5,15 @@ import type { TemplateEntry } from './registry.ts'
 
 // Receipt with FIXED copy. Only validated, length-limited values are injected.
 interface Item { label?: string; amount?: string }
-interface Props { orderNumber?: string; items?: Item[]; amount?: string; date?: string; kind?: string }
+interface Props { orderNumber?: string; items?: Item[]; amount?: string; date?: string; kind?: string; hasKits?: boolean; businessName?: string }
 
 const safeOrder = (v?: string) => (v && /^KW-[A-Z0-9]{4,12}$/.test(v) ? v : 'KW-ORDER')
 const safeAmount = (v?: string) => (v && /^R\d{1,6}\.\d{2}$/.test(v) ? v : '')
 const safeText = (v?: string, max = 120) => (v ? String(v).replace(/[<>]/g, '').slice(0, max) : '')
+const safeBusiness = (v?: string) => {
+  const t = safeText(v, 80).replace(/[{}]/g, '').trim()
+  return t.length >= 2 ? t : 'Boss Moves Media'
+}
 
 const Receipt = (p: Props) => {
   const items = (Array.isArray(p.items) ? p.items : []).slice(0, 12)
@@ -22,21 +26,22 @@ const Receipt = (p: Props) => {
           <Heading style={h1}>Thank you for your order</Heading>
           <Text style={text}>
             {p.kind === 'book'
-              ? 'Your payment was received. The book is ready to download in the Family library on your parent dashboard.'
+              ? "Your payment was received. Kiki's Armour of God, Premium Edition is ready to download in the Family library on your parent dashboard."
               : p.kind === 'extra_kit'
-                ? 'Your payment was received and the extra Armour Kit is confirmed.'
+                ? 'Your payment was received and your Armour Kit order is confirmed.'
                 : 'Your payment was received and the Warrior Pass is now active for your family.'}
           </Text>
+          <Text style={label}>Sold by: {safeBusiness(p.businessName)}</Text>
           <Text style={label}>Order number: {safeOrder(p.orderNumber)}</Text>
           <Text style={label}>Date: {safeText(p.date, 40)}</Text>
           {items.map((it, i) => (
             <Text key={i} style={row}>{safeText(it.label)}: {safeAmount(it.amount)}</Text>
           ))}
           <Text style={total}>Total paid: {safeAmount(p.amount)}</Text>
-          {p.kind !== 'book' && (
-            <Text style={text}>Each Armour Kit ships when that child finishes the course. We will email you before it is sent.</Text>
+          {p.hasKits === true && (
+            <Text style={text}>Each Armour Kit holds one Armour of God coin and one Armour of God wristband. It is posted when that child finishes the course, and we will email you tracking details when it is sent.</Text>
           )}
-          <Text style={footer}>This is a receipt from Kiki Warrior. Keep it for your records.</Text>
+          <Text style={footer}>This is a receipt from {safeBusiness(p.businessName)} for Kiki Warrior. Keep it for your records.</Text>
         </Container>
       </Body>
     </Html>
@@ -49,11 +54,15 @@ export const warriorPassReceipt = {
   displayName: 'Warrior Pass: receipt',
   previewData: {
     orderNumber: 'KW-1A2B3C4D',
+    kind: 'family_pass',
+    hasKits: true,
+    businessName: 'Boss Moves Media',
     items: [
-      { label: 'Family Warrior Pass (Founding Family price), Armour Kit for Thandi', amount: 'R249.00' },
-      { label: 'Extra Armour Kit for Sipho', amount: 'R99.00' },
+      { label: 'Family Warrior Pass (Founding Family price)', amount: 'R149.00' },
+      { label: 'Armour Kit for Thandi', amount: 'R99.00' },
+      { label: 'Delivery to a Courier Guy locker', amount: 'R65.00' },
     ],
-    amount: 'R348.00',
+    amount: 'R313.00',
     date: '14 November 2026',
   },
 } satisfies TemplateEntry

@@ -2,7 +2,7 @@
 // action "checkout" verifies the parent PIN, creates or reuses a pending order
 // and opens a Yoco hosted checkout. Prices are only ever computed here.
 import { admin, clientIp, cors, getClaimsFrom, hitLimit, isRegisteredSession, json, logEvent, userAgent } from '../_shared/security.ts'
-import { computeCheckout, parseDelivery, parsePrices, quotePrices, sameOrderContents, type CheckoutKind } from '../_shared/warrior-pass.ts'
+import { computeCheckout, hasKitStock, lineLabel, parseDelivery, parsePrices, parseStock, quotePrices, sameOrderContents, type CheckoutKind } from '../_shared/warrior-pass.ts'
 import { allowedReturnOrigin, isAdminUser, verifyParentPin, yocoConfig } from '../_shared/warrior-pass-server.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
 
   const [isAdmin, settingsRes] = await Promise.all([
     isAdminUser(userId),
-    admin.from('app_settings').select('key, value').in('key', ['paywall_enabled', 'prices']),
+    admin.from('app_settings').select('key, value').in('key', ['paywall_enabled', 'prices', 'kits_in_stock']),
   ])
   const settings = new Map((settingsRes.data ?? []).map((r) => [r.key, r.value]))
   // Shipped switched off: only admins (preview) can use checkout until the paywall is enabled.
@@ -38,6 +38,7 @@ Deno.serve(async (req) => {
   if (limit.blocked) return json({ error: 'too_many', message: 'Too many attempts. Please wait a few minutes and try again.' }, 429)
 
   const prices = parsePrices(settings.get('prices'))
+  const kitsInStock = parseStock(settings.get('kits_in_stock'))
   const [childrenRes, passRes, paidRes, bookRes] = await Promise.all([
     admin.from('children').select('id, first_name').eq('parent_id', userId).order('created_at'),
     admin.from('entitlements').select('id, granted_at').eq('user_id', userId).eq('kind', 'family_pass').is('revoked_at', null).maybeSingle(),
@@ -68,6 +69,9 @@ Deno.serve(async (req) => {
       has_book: hasBook,
       pass_since: passRes.data?.granted_at ?? null,
       price: quotePrices(prices, paidCount),
+      // Stock is only exposed as availability; the pass itself is never blocked by stock.
+      kits_sold_out: !hasKitStock(kitsInStock, 1),
+      kit_stock: kitsInStock,
       children: children.map((c) => ({ id: c.id, first_name: c.first_name, has_kit: withKits.includes(c.id) })),
       delivery: delivery ?? null,
     })
@@ -84,26 +88,23 @@ Deno.serve(async (req) => {
     return json({ error: 'invalid_child' }, 400)
   }
   if (body?.consent !== true) return json({ error: 'consent_required' }, 400)
-  // A book order has no Armour Kit, so it needs no delivery details.
-  if (kind === 'book') {
-    if (!prices || prices.book_cents === null) return json({ error: 'book_not_available' }, 409)
-    if (hasBook) return json({ error: 'already_has_book' }, 400)
-  }
-  const delivery = kind === 'book' ? null : parseDelivery(body?.delivery)
+  // Only Armour Kits are posted, so only a checkout with kits needs delivery details.
+  const delivery = extras.length > 0 ? parseDelivery(body?.delivery) : null
   if (delivery && !delivery.ok) return json({ error: 'invalid_delivery', field: delivery.field }, 400)
+
+  const result = computeCheckout(
+    { kind, includedKitChildId: included, extraKitChildIds: extras, deliveryMethod: delivery?.ok ? delivery.value.delivery_method : null },
+    { prices, paidFamilyPassCount: paidCount, hasActivePass: hasPass, ownedChildIds: childIds, childrenWithKits: withKits, hasBook, kitsInStock },
+  )
+  if (!result.ok) {
+    const status = result.error === 'prices_unavailable' || result.error === 'delivery_unavailable' ? 503
+      : result.error === 'book_not_available' || result.error === 'kits_sold_out' ? 409 : 400
+    return json({ error: result.error }, status)
+  }
 
   // Paying always needs a fresh parent PIN, admin accounts included.
   const pin = await verifyParentPin(userId, email, body?.pin, { ip, ua })
   if (!pin.ok) return json({ error: pin.error, message: pin.message }, pin.status)
-
-  const result = computeCheckout(
-    { kind, includedKitChildId: included, extraKitChildIds: extras },
-    { prices, paidFamilyPassCount: paidCount, hasActivePass: hasPass, ownedChildIds: childIds, childrenWithKits: withKits, hasBook },
-  )
-  if (!result.ok) {
-    const status = result.error === 'prices_unavailable' ? 503 : result.error === 'book_not_available' ? 409 : 400
-    return json({ error: result.error }, status)
-  }
 
   const now = new Date().toISOString()
   if (delivery?.ok) {
@@ -132,7 +133,10 @@ Deno.serve(async (req) => {
     orderId = existing.id
     metadata = (existing.metadata as Record<string, any>) ?? {}
   } else {
-    metadata = { lines: result.lines, launch_price: result.launch, return_origin: allowedReturnOrigin(req) }
+    metadata = {
+      lines: result.lines, launch_price: result.launch, return_origin: allowedReturnOrigin(req),
+      delivery_method: result.delivery_method, delivery_cents: result.delivery_cents,
+    }
     const { data: order, error } = await admin.from('orders').insert({
       user_id: userId,
       kind: result.kind,
@@ -152,6 +156,7 @@ Deno.serve(async (req) => {
   const origin = typeof metadata.return_origin === 'string' ? metadata.return_origin : allowedReturnOrigin(req)
   const back = (state: string) => `${origin}/pass/return?order=${orderId}&state=${state}`
   const lines = Array.isArray(metadata.lines) ? metadata.lines : result.lines
+  const names = new Map(children.map((c) => [c.id, c.first_name]))
   let yoco: Response
   try {
     yoco = await fetch('https://payments.yoco.com/api/checkouts', {
@@ -166,7 +171,7 @@ Deno.serve(async (req) => {
         metadata: { order_id: orderId, user_id: userId },
         externalId: orderId,
         lineItems: lines.map((l: any) => ({
-          displayName: l.type === 'family_pass' ? 'Family Warrior Pass' : l.type === 'book' ? "Kiki's Armour of God (PDF)" : 'Extra Armour Kit',
+          displayName: lineLabel(l, l.child_id ? names.get(l.child_id) : null, l.type === 'family_pass' && metadata.launch_price === true),
           quantity: 1,
           pricingDetails: { price: l.amount_cents },
         })),

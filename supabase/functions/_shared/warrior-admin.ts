@@ -103,17 +103,48 @@ export interface EditableSettings {
     family_pass_cents: number
     launch_family_pass_cents: number
     launch_limit: number
+    kit_cents: number
+    /** Alias of kit_cents, written so older readers keep working. */
     extra_kit_cents: number
     book_cents: number | null
+    delivery_locker_cents: number | null
+    delivery_door_cents: number | null
+    org_tiers: { min: number; max: number | null; cents: number }[]
     currency: 'ZAR'
   }
   library_book_path: string | null
+  receipt_business_name: string
+  support_email: string | null
+  /** Only present when the admin changed it, so a stale form never overwrites a sale. */
+  kits_in_stock?: number
+  pendant_sets_in_stock?: number
 }
 
 const posInt = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v) && v > 0
+const countInt = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 1_000_000
+const optCents = (v: unknown) => v === null || v === undefined || posInt(v)
+
+export const DEFAULT_BUSINESS_NAME = 'Boss Moves Media'
+const EMAIL_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[A-Za-z]{2,}$/
 
 export function allLessonIds(): Set<string> {
   return new Set([...streamLessonIds('6-9'), ...streamLessonIds('10-13')])
+}
+
+/** Validates org tiers: whole learner counts, sorted, no gaps or overlaps, only the last open-ended. */
+export function validOrgTiers(v: unknown): v is { min: number; max: number | null; cents: number }[] {
+  if (!Array.isArray(v) || v.length > 10) return false
+  let next = 1
+  for (let i = 0; i < v.length; i++) {
+    const t = v[i]
+    if (!t || typeof t !== 'object' || !posInt(t.min) || !posInt(t.cents)) return false
+    if (t.min !== next) return false
+    const last = i === v.length - 1
+    if (t.max === null) { if (!last) return false; next = Infinity; continue }
+    if (!posInt(t.max) || t.max < t.min) return false
+    next = t.max + 1
+  }
+  return true
 }
 
 /** Validates the editable Warrior Pass settings. Returns the cleaned value or the first problem. */
@@ -134,15 +165,19 @@ export function validateSettings(input: any): { ok: true; value: EditableSetting
   }
   const p = input.prices
   if (!p || typeof p !== 'object') return { ok: false, error: 'invalid_prices', field: 'prices' }
-  for (const k of ['family_pass_cents', 'launch_family_pass_cents', 'extra_kit_cents'] as const) {
-    if (!posInt(p[k])) return { ok: false, error: 'invalid_price', field: `prices.${k}` }
+  // Older forms send extra_kit_cents only; it is the same price.
+  const kit = p.kit_cents ?? p.extra_kit_cents
+  for (const [k, v] of [['family_pass_cents', p.family_pass_cents], ['launch_family_pass_cents', p.launch_family_pass_cents], ['kit_cents', kit]] as const) {
+    if (!posInt(v)) return { ok: false, error: 'invalid_price', field: `prices.${k}` }
   }
-  if (p.book_cents !== null && p.book_cents !== undefined && !posInt(p.book_cents)) {
-    return { ok: false, error: 'invalid_price', field: 'prices.book_cents' }
+  for (const k of ['book_cents', 'delivery_locker_cents', 'delivery_door_cents'] as const) {
+    if (!optCents(p[k])) return { ok: false, error: 'invalid_price', field: `prices.${k}` }
   }
   if (typeof p.launch_limit !== 'number' || !Number.isInteger(p.launch_limit) || p.launch_limit < 0) {
     return { ok: false, error: 'invalid_launch_limit', field: 'prices.launch_limit' }
   }
+  const tiers = p.org_tiers === undefined || p.org_tiers === null ? [] : p.org_tiers
+  if (!validOrgTiers(tiers)) return { ok: false, error: 'invalid_org_tiers', field: 'prices.org_tiers' }
   let path: string | null = null
   if (input.library_book_path !== null && input.library_book_path !== undefined && input.library_book_path !== '') {
     if (typeof input.library_book_path !== 'string') return { ok: false, error: 'invalid_path', field: 'library_book_path' }
@@ -151,23 +186,52 @@ export function validateSettings(input: any): { ok: true; value: EditableSetting
       return { ok: false, error: 'invalid_path', field: 'library_book_path' }
     }
   }
-  return {
-    ok: true,
-    value: {
-      gate_lessons: { young: g.young, teen: g.teen },
-      always_free_lessons: Array.from(new Set(free as string[])),
-      prices: {
-        family_pass_cents: p.family_pass_cents,
-        launch_family_pass_cents: p.launch_family_pass_cents,
-        launch_limit: p.launch_limit,
-        extra_kit_cents: p.extra_kit_cents,
-        book_cents: posInt(p.book_cents) ? p.book_cents : null,
-        currency: 'ZAR',
-      },
-      library_book_path: path,
-    },
+  const nameRaw = input.receipt_business_name === undefined ? DEFAULT_BUSINESS_NAME : input.receipt_business_name
+  const name = typeof nameRaw === 'string' ? nameRaw.trim() : ''
+  if (name.length < 2 || name.length > 80 || /[<>{}]/.test(name)) return { ok: false, error: 'invalid_business_name', field: 'receipt_business_name' }
+  let support: string | null = null
+  if (input.support_email !== null && input.support_email !== undefined && input.support_email !== '') {
+    const email: string = typeof input.support_email === 'string' ? input.support_email.trim().toLowerCase() : ''
+    if (email.length > 254 || !EMAIL_RE.test(email)) return { ok: false, error: 'invalid_email', field: 'support_email' }
+    support = email
   }
+  const value: EditableSettings = {
+    gate_lessons: { young: g.young, teen: g.teen },
+    always_free_lessons: Array.from(new Set(free as string[])),
+    prices: {
+      family_pass_cents: p.family_pass_cents,
+      launch_family_pass_cents: p.launch_family_pass_cents,
+      launch_limit: p.launch_limit,
+      kit_cents: kit,
+      extra_kit_cents: kit,
+      book_cents: posInt(p.book_cents) ? p.book_cents : null,
+      delivery_locker_cents: posInt(p.delivery_locker_cents) ? p.delivery_locker_cents : null,
+      delivery_door_cents: posInt(p.delivery_door_cents) ? p.delivery_door_cents : null,
+      org_tiers: tiers.map((t) => ({ min: t.min, max: t.max, cents: t.cents })),
+      currency: 'ZAR',
+    },
+    library_book_path: path,
+    receipt_business_name: name,
+    support_email: support,
+  }
+  for (const k of ['kits_in_stock', 'pendant_sets_in_stock'] as const) {
+    if (input[k] === undefined) continue
+    if (!countInt(input[k])) return { ok: false, error: 'invalid_stock', field: k }
+    value[k] = input[k]
+  }
+  return { ok: true, value }
 }
+
+// ---------- Bonus pendant sets ----------
+
+export type BonusDecision = 'ok' | 'sold_out'
+
+/** Mirrors public.award_bonus_pendant: an award needs at least one pendant set in stock. */
+export function decideBonusAward(stock: unknown): BonusDecision {
+  return typeof stock === 'number' && Number.isInteger(stock) && stock > 0 ? 'ok' : 'sold_out'
+}
+
+export const BONUS_STATUSES = ['owed', 'added_to_shipment', 'handed_over'] as const
 
 /**
  * Master switch rule. Turning ON when grandfather_before is still null sets it to now, so every
@@ -210,7 +274,7 @@ export function batchCsv(codes: { code: string; redeemed_at: string | null; rede
 
 export const SHIPMENT_CSV_HEADER = [
   'group', 'parent', 'email', 'child', 'recipient', 'phone', 'method', 'locker_code',
-  'address_line1', 'address_line2', 'suburb', 'city', 'province', 'postal_code', 'status',
+  'address_line1', 'address_line2', 'suburb', 'city', 'province', 'postal_code', 'status', 'bonus_pendant_sets',
 ]
 
 export interface RewardRow {
@@ -230,6 +294,8 @@ export interface RewardRow {
   postal_code: string | null
   shipment_status: string | null
   kit_status: string
+  /** Bonus pendant sets attached to this shipment, for the packer. */
+  bonus_pendants?: number
 }
 
 /** Statuses that still need packing and sending. */
@@ -240,7 +306,7 @@ export function pendingShipmentsCsv(rows: RewardRow[]): string {
   return toCsv(SHIPMENT_CSV_HEADER, pending.map((r) => [
     r.group_id.slice(0, 8), r.parent_name, r.parent_email, r.child_name, r.recipient_name, r.phone,
     r.delivery_method, r.locker_code, r.address_line1, r.address_line2, r.suburb, r.city, r.province,
-    r.postal_code, r.shipment_status,
+    r.postal_code, r.shipment_status, r.bonus_pendants ?? 0,
   ]))
 }
 

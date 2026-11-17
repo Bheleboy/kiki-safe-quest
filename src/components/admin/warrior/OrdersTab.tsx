@@ -198,7 +198,7 @@ function OrderDrawer({ orderId, onClose, onChanged }: { orderId: string | null; 
                 <ul className="space-y-1">
                   {o.metadata.lines.map((l: any, i: number) => {
                     const kit = detail.kits.find((k: any) => k.child_id === l.child_id);
-                    return <li key={i}>{l.type === "family_pass" ? "Family Warrior Pass" : l.type === "book" ? "Family library book" : "Extra Armour Kit"}{kit?.child_name ? ` (${kit.child_name})` : ""}: {rands(l.amount_cents)}</li>;
+                    return <li key={i}>{l.type === "family_pass" ? "Family Warrior Pass" : l.type === "book" ? "Family library book" : l.type === "delivery" ? (l.method === "locker" ? "Delivery to a Courier Guy locker" : "Door delivery") : "Armour Kit"}{kit?.child_name ? ` (${kit.child_name})` : ""}: {rands(l.amount_cents)}</li>;
                   })}
                 </ul>
               </div>

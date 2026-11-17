@@ -160,6 +160,54 @@ export type Database = {
           },
         ]
       }
+      bonus_awards: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          shipment_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          shipment_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          shipment_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_awards_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bonus_awards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       book_purchases: {
         Row: {
           book_id: string
@@ -1310,6 +1358,10 @@ export type Database = {
       admin_course_stats: { Args: never; Returns: Json }
       admin_signup_trend: { Args: never; Returns: Json }
       admin_user_stats: { Args: never; Returns: Json }
+      award_bonus_pendant: {
+        Args: { _created_by: string; _note: string; _user_id: string }
+        Returns: string
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean

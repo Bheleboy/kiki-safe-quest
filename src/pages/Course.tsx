@@ -370,7 +370,13 @@ export default function CoursePage() {
                 <ProgressBar progress={getModuleProgress(allIds)} label="Overall Progress" />
 
                 {rewardsOn && rewards && rewards.kitStatus && KIT_EARNED_STATUSES.includes(rewards.kitStatus) && <KitEarnedCard />}
-                {rewardsOn && rewards && <WarriorPointsCard total={rewards.total} possible={rewards.possible} />}
+                {rewardsOn && rewards && (
+                  <WarriorPointsCard
+                    total={rewards.total}
+                    possible={rewards.possible}
+                    showKitHint={!(rewards.kitStatus && KIT_EARNED_STATUSES.includes(rewards.kitStatus))}
+                  />
+                )}
 
                 {/* Kiki Warrior + Armour progress */}
                 <div className="card-kiki">

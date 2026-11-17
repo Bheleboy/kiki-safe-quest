@@ -62,6 +62,8 @@ Deno.serve(async (req) => {
   let idempotencyKey: string
   let messageId: string
   let templateData: Record<string, any> = {}
+  // Optional reply-to address. Callers are internal only; still validated strictly.
+  let replyTo: string | null = null
   try {
     const body = await req.json()
     templateName = body.templateName || body.template_name
@@ -70,6 +72,10 @@ Deno.serve(async (req) => {
     idempotencyKey = body.idempotencyKey || body.idempotency_key || messageId
     if (body.templateData && typeof body.templateData === 'object') {
       templateData = body.templateData
+    }
+    if (typeof body.replyTo === 'string' && body.replyTo.length <= 254 &&
+        /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[A-Za-z]{2,}$/.test(body.replyTo)) {
+      replyTo = body.replyTo
     }
   } catch {
     return new Response(
@@ -360,6 +366,7 @@ Deno.serve(async (req) => {
       label: templateName,
       idempotency_key: idempotencyKey,
       unsubscribe_token: unsubscribeToken,
+      ...(replyTo ? { reply_to: replyTo } : {}),
       queued_at: new Date().toISOString(),
     },
   })
