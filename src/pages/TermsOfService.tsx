@@ -21,7 +21,7 @@ export default function TermsOfService() {
           Terms of Service
         </h1>
         <p className="font-body text-sm text-charcoal/70 mb-10">
-          Last updated: March 2026
+          Last updated: November 2026
         </p>
 
         <div className="editorial-legal space-y-8 font-body text-sm text-charcoal/70 leading-relaxed">
@@ -130,10 +130,26 @@ export default function TermsOfService() {
 
           <section className="space-y-3">
             <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
-              9. Termination
+              9. Paid Features, Payments and Refunds
             </h2>
             <p>
-              You may delete your account at any time. Upon account deletion, all personal data --
+              Some lessons, the Armour Kit and the Premium Edition book are paid for. Prices are shown
+              before you pay. Payments are processed securely by Yoco, and we never see or store your
+              full card details. Armour Kits are delivered by The Courier Guy when the child finishes
+              the course. Our current prices, delivery and refund terms are set out on our{" "}
+              <Link to="/pricing-and-delivery" className="text-primary hover:underline font-semibold">
+                Prices, delivery and refunds
+              </Link>{" "}
+              page, which forms part of these terms.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
+              10. Termination
+            </h2>
+            <p>
+              You may delete your account at any time. Upon account deletion, all personal data,
               including child profiles, progress, and badges, will be permanently removed in
               accordance with our Privacy Policy. We reserve the right to terminate accounts that
               violate these terms.
@@ -142,7 +158,7 @@ export default function TermsOfService() {
 
           <section className="space-y-3">
             <h2 className="font-display text-lg font-semibold text-charcoal uppercase tracking-wider">
-              10. Contact Us
+              11. Contact Us
             </h2>
             <p>
               For questions about these Terms of Service, please contact us at{" "}

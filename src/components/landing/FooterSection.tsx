@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 const cols = [
   { h: "Adventure", links: [["Missions", "/#missions", 1], ["Academy", "/#academy", 1], ["Rewards", "/#rewards", 1], ["Free course", "/courses/internet-safety", 0]] },
   { h: "Family", links: [["For parents", "/#parents", 1], ["Create account", "/auth?mode=signup", 0], ["Login", "/auth", 0], ["Armour of God book", "/books/armour-of-god", 0]] },
-  { h: "Trust", links: [["Privacy policy", "/privacy", 0], ["Terms of service", "/terms", 0]] },
+  { h: "Trust", links: [["Privacy policy", "/privacy", 0], ["Terms of service", "/terms", 0], ["Prices, delivery and refunds", "/pricing-and-delivery", 0]] },
 ] as const;
 export default function FooterSection() {
   return (

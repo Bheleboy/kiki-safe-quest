@@ -71,6 +71,13 @@
       "when": 1794909107197,
       "tag": "0009_warrior_pass_phase5a_pricing_stock_bonus",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794910150865,
+      "tag": "0010_warrior_pass_phase5b_org_maintenance_yoco",
+      "breakpoints": true
     }
   ]
 }

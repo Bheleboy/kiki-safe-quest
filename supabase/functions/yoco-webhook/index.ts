@@ -3,7 +3,7 @@
 // Idempotent through webhook_events. Fulfilment runs in one database transaction.
 import { admin, json, logEvent } from '../_shared/security.ts'
 import { lineLabel, verifyWebhookSignature } from '../_shared/warrior-pass.ts'
-import { receiptBusinessName, sendAppEmail, yocoConfig } from '../_shared/warrior-pass-server.ts'
+import { receiptBusinessName, sendAppEmail, yocoPaymentsConfig } from '../_shared/warrior-pass-server.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -97,7 +97,7 @@ async function handleFailed(event: any) {
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
-  const { configured, webhookSecret } = yocoConfig()
+  const { configured, webhookSecret } = await yocoPaymentsConfig()
   if (!configured) return json({ error: 'payments_not_configured' }, 503)
 
   const raw = await req.text()

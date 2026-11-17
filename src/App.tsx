@@ -24,6 +24,8 @@ import VersionWatcher from "./components/VersionWatcher";
 import SecurityRevoke from "./pages/SecurityRevoke";
 import Unsubscribe from "./pages/Unsubscribe";
 import PassReturn from "./pages/PassReturn";
+import PricingDelivery from "./pages/PricingDelivery";
+import { MaintenanceGate } from "./components/MaintenanceGate";
 import { ParentGate } from "./components/security/ParentGate";
 import { InactivityGuard } from "./components/security/InactivityGuard";
 
@@ -55,7 +57,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AgeGate({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
-  const exempt = ["/verify-age", "/privacy", "/terms", "/reset-password", "/security/revoke"];
+  const exempt = ["/verify-age", "/privacy", "/terms", "/pricing-and-delivery", "/reset-password", "/security/revoke"];
   if (!loading && user && profile && !profile.is_admin && !profile.age_verified && !exempt.includes(location.pathname)) {
     return <Navigate to="/verify-age" replace />;
   }
@@ -71,6 +73,7 @@ const App = () => (
         <VersionWatcher />
         <AuthProvider>
           <AgeGate>
+            <MaintenanceGate>
             <Routes>
               {/* Public */}
               <Route path="/" element={<Index />} />
@@ -80,6 +83,7 @@ const App = () => (
               <Route path="/books/armour-of-god" element={<BookArmourOfGod />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/pricing-and-delivery" element={<PricingDelivery />} />
               <Route path="/verify-age" element={<AgeVerification />} />
               <Route path="/video-demo" element={<VideoDemo />} />
               <Route path="/security/revoke" element={<SecurityRevoke />} />
@@ -95,6 +99,7 @@ const App = () => (
 
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </MaintenanceGate>
           </AgeGate>
           <InactivityGuard />
           <CookieConsent />

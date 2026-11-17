@@ -71,12 +71,13 @@ export function parseBatchInput(b: any, now: Date = new Date()): { ok: true; val
 
 // ---------- Redeem decision ----------
 
-export type RedeemDecision = 'ok' | 'invalid' | 'already_has_pass'
+/** 'ok' unlocks the family, 'recorded' means the family already had a pass and the code is simply recorded. */
+export type RedeemDecision = 'ok' | 'recorded' | 'invalid'
 
 /**
- * Mirrors public.redeem_bulk_code. Used, expired, unknown and malformed codes all give the same
- * generic 'invalid' so a parent cannot tell them apart. An active pass is checked first, so
- * it never reveals anything about the code.
+ * Mirrors public.redeem_org_code. One code = one learner. Used, expired, unknown and malformed
+ * codes all give the same generic 'invalid'. A family that already has a pass may still use a
+ * code for another child: it is recorded against the family and changes nothing else.
  */
 export function decideRedeem(input: {
   hasActivePass: boolean
@@ -84,11 +85,105 @@ export function decideRedeem(input: {
   batchExpiresAt: string | null
   now: Date
 }): RedeemDecision {
-  if (input.hasActivePass) return 'already_has_pass'
   if (!input.code) return 'invalid'
   if (input.code.redeemed_by) return 'invalid'
   if (input.batchExpiresAt && new Date(input.batchExpiresAt).getTime() <= input.now.getTime()) return 'invalid'
-  return 'ok'
+  return input.hasActivePass ? 'recorded' : 'ok'
+}
+
+/** What a redemption changes. Codes never create Armour Kits: the organisation gets its kits up front. */
+export function planRedeem(decision: RedeemDecision): { grantPass: boolean; kitsToCreate: 0 } {
+  return { grantPass: decision === 'ok', kitsToCreate: 0 }
+}
+
+// ---------- Organisation batches ----------
+
+export type OrgTier = { min: number; max: number | null; cents: number }
+
+/** Price per learner from the tier that covers the learner count, or null when none does. */
+export function orgTierPrice(tiers: OrgTier[], learners: number): number | null {
+  if (!Array.isArray(tiers) || !Number.isInteger(learners) || learners < 1) return null
+  const t = tiers.find((x) => learners >= x.min && (x.max === null || learners <= x.max))
+  return t ? t.cents : null
+}
+
+/** Final price: the tier price, or the admin's override when given with a reason. */
+export function orgBatchPrice(tiers: OrgTier[], learners: number, overrideCents?: number | null, reason?: string | null):
+  { ok: true; per_learner_cents: number | null; amount_cents: number | null; overridden: boolean } | { ok: false; error: string } {
+  if (overrideCents !== undefined && overrideCents !== null) {
+    if (!Number.isInteger(overrideCents) || overrideCents <= 0) return { ok: false, error: 'invalid_price' }
+    if (!reason || reason.trim().length < 3) return { ok: false, error: 'override_reason_required' }
+    return { ok: true, per_learner_cents: overrideCents, amount_cents: overrideCents * learners, overridden: true }
+  }
+  const per = orgTierPrice(tiers, learners)
+  return { ok: true, per_learner_cents: per, amount_cents: per === null ? null : per * learners, overridden: false }
+}
+
+/**
+ * Stock decision when a batch is created. Enough stock: take it now. Not enough: refuse unless the
+ * admin ticked "Kits will ship after restock", then the parcel waits and takes stock when packed.
+ * A stock of null means stock is not tracked.
+ */
+export function planBatchStock(stock: number | null, quantity: number, allowBackorder: boolean):
+  { ok: true; takeNow: boolean; waiting: boolean; short: number } | { ok: false; error: 'kits_short'; short: number } {
+  if (stock === null || stock >= quantity) return { ok: true, takeNow: true, waiting: false, short: 0 }
+  const short = quantity - stock
+  if (!allowBackorder) return { ok: false, error: 'kits_short', short }
+  return { ok: true, takeNow: false, waiting: true, short }
+}
+
+/** Stock after packing a waiting parcel. Mirrors public.take_org_shipment_stock: refuses when short. */
+export function stockAfterPacking(stock: number | null, quantity: number, alreadyTaken: boolean): { ok: true; stock: number | null } | { ok: false; short: number } {
+  if (alreadyTaken || stock === null) return { ok: true, stock }
+  if (stock < quantity) return { ok: false, short: quantity - stock }
+  return { ok: true, stock: stock - quantity }
+}
+
+export type OrgBatchInput = BatchInput & {
+  contact_name: string | null
+  contact_email: string | null
+  contact_phone: string | null
+  payment_reference: string | null
+  price_override_cents: number | null
+  price_override_reason: string | null
+  allow_backorder: boolean
+  kits_included: boolean
+}
+
+/** Batch form validation for organisation codes. Seats = number of learners. */
+export function parseOrgBatchInput(b: any, now: Date = new Date()): { ok: true; value: OrgBatchInput } | { ok: false; error: string } {
+  const base = parseBatchInput(b, now)
+  if (!base.ok) return { ok: false, error: (base as { error: string }).error }
+  const opt = (v: unknown, max: number) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null)
+  const email = opt(b?.contact_email, 254)
+  if (email && !EMAIL_RE.test(email)) return { ok: false, error: 'invalid_contact_email' }
+  const phone = opt(b?.contact_phone, 30)
+  if (phone && !/^\+?[\d\s()-]{9,20}$/.test(phone)) return { ok: false, error: 'invalid_contact_phone' }
+  const override = b?.price_override_cents === undefined || b?.price_override_cents === null || b?.price_override_cents === '' ? null : b.price_override_cents
+  if (override !== null && (typeof override !== 'number' || !Number.isInteger(override) || override <= 0)) return { ok: false, error: 'invalid_price' }
+  const reason = opt(b?.price_override_reason, 300)
+  if (override !== null && (!reason || reason.length < 3)) return { ok: false, error: 'override_reason_required' }
+  return {
+    ok: true,
+    value: {
+      ...base.value,
+      contact_name: opt(b?.contact_name, 120),
+      contact_email: email ? email.toLowerCase() : null,
+      contact_phone: phone,
+      payment_reference: opt(b?.payment_reference, 120),
+      price_override_cents: override,
+      price_override_reason: override !== null ? reason : null,
+      allow_backorder: b?.allow_backorder === true,
+      kits_included: b?.kits_included !== false,
+    },
+  }
+}
+
+/** Splits codes into printable pages, 10 codes per page by default. */
+export function codeSheetPages(codes: string[], perPage = 10): string[][] {
+  const pages: string[][] = []
+  for (let i = 0; i < codes.length; i += perPage) pages.push(codes.slice(i, i + perPage))
+  return pages
 }
 
 // ---------- Settings ----------
@@ -274,7 +369,7 @@ export function batchCsv(codes: { code: string; redeemed_at: string | null; rede
 
 export const SHIPMENT_CSV_HEADER = [
   'group', 'parent', 'email', 'child', 'recipient', 'phone', 'method', 'locker_code',
-  'address_line1', 'address_line2', 'suburb', 'city', 'province', 'postal_code', 'status', 'bonus_pendant_sets',
+  'address_line1', 'address_line2', 'suburb', 'city', 'province', 'postal_code', 'status', 'bonus_pendant_sets', 'kits',
 ]
 
 export interface RewardRow {
@@ -296,17 +391,54 @@ export interface RewardRow {
   kit_status: string
   /** Bonus pendant sets attached to this shipment, for the packer. */
   bonus_pendants?: number
+  /** Kits in this line. Family lines are one kit; organisation parcels carry the whole batch. */
+  quantity?: number
+}
+
+export interface OrgShipmentRow {
+  id: string
+  organisation: string | null
+  batch_name: string | null
+  contact_email: string | null
+  quantity: number
+  pendant_sets: number
+  recipient_name: string | null
+  phone: string | null
+  address_line1: string | null
+  address_line2: string | null
+  suburb: string | null
+  city: string | null
+  province: string | null
+  postal_code: string | null
+  status: string
+}
+
+/** Organisation parcels still to send (draft or packed), as packing lines. */
+export function orgPackingRows(rows: OrgShipmentRow[]): RewardRow[] {
+  return rows.filter((r) => r.status === 'draft' || r.status === 'packed').map((r) => ({
+    group_id: `org-${r.id}`,
+    parent_name: r.organisation ?? r.batch_name,
+    parent_email: r.contact_email,
+    child_name: `Organisation: ${r.batch_name ?? ''}`.trim(),
+    recipient_name: r.recipient_name, phone: r.phone, delivery_method: 'door', locker_code: null,
+    address_line1: r.address_line1, address_line2: r.address_line2, suburb: r.suburb, city: r.city,
+    province: r.province, postal_code: r.postal_code,
+    shipment_status: r.status, kit_status: r.status, bonus_pendants: r.pendant_sets, quantity: r.quantity,
+  }))
 }
 
 /** Statuses that still need packing and sending. */
 export const PENDING_SHIPMENT_STATUSES = ['draft', 'submitted', 'booked']
 
-export function pendingShipmentsCsv(rows: RewardRow[]): string {
-  const pending = rows.filter((r) => r.shipment_status && PENDING_SHIPMENT_STATUSES.includes(r.shipment_status))
+export function pendingShipmentsCsv(rows: RewardRow[], orgRows: OrgShipmentRow[] = []): string {
+  const pending = [
+    ...rows.filter((r) => r.shipment_status && PENDING_SHIPMENT_STATUSES.includes(r.shipment_status)),
+    ...orgPackingRows(orgRows),
+  ]
   return toCsv(SHIPMENT_CSV_HEADER, pending.map((r) => [
     r.group_id.slice(0, 8), r.parent_name, r.parent_email, r.child_name, r.recipient_name, r.phone,
     r.delivery_method, r.locker_code, r.address_line1, r.address_line2, r.suburb, r.city, r.province,
-    r.postal_code, r.shipment_status, r.bonus_pendants ?? 0,
+    r.postal_code, r.shipment_status, r.bonus_pendants ?? 0, r.quantity ?? 1,
   ]))
 }
 

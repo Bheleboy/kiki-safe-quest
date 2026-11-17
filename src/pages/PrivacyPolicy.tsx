@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
           Privacy Policy
         </h1>
         <p className="font-body text-sm text-charcoal/70 mb-10">
-          Last updated: March 2026
+          Last updated: November 2026
         </p>
 
         <div className="editorial-legal space-y-8 font-body text-sm text-charcoal/70 leading-relaxed">
@@ -45,6 +45,7 @@ export default function PrivacyPolicy() {
             <p>We collect the following types of information:</p>
             <ul className="list-disc pl-6 space-y-1.5">
               <li><strong>Parent/Guardian account data:</strong> name, email address, and encrypted password.</li>
+              <li><strong>Purchase and delivery data:</strong> if you buy something, your order details, and for an Armour Kit the recipient name, phone number and delivery address or Courier Guy locker you give us. Card details are handled by Yoco and never reach us.</li>
               <li><strong>Child profile data:</strong> first name, age band (6–9 or 10–13), and avatar colour preference. No email or direct identifiers are collected from children.</li>
               <li><strong>Learning progress:</strong> lesson completion, quiz scores, time spent, and badges earned.</li>
               <li><strong>Technical data:</strong> device type, browser information, and anonymised usage analytics.</li>
@@ -110,6 +111,11 @@ export default function PrivacyPolicy() {
               only with trusted service providers who assist in operating our platform (e.g., hosting,
               email delivery), and only under strict data processing agreements that ensure equivalent
               levels of protection.
+            </p>
+            <p>
+              When you make a purchase, payments are processed by Yoco. If you buy an Armour Kit, the
+              recipient name, phone number and delivery address or locker are shared with The Courier
+              Guy only to deliver it.
             </p>
           </section>
 

@@ -3,7 +3,7 @@
 // and opens a Yoco hosted checkout. Prices are only ever computed here.
 import { admin, clientIp, cors, getClaimsFrom, hitLimit, isRegisteredSession, json, logEvent, userAgent } from '../_shared/security.ts'
 import { computeCheckout, hasKitStock, lineLabel, parseDelivery, parsePrices, parseStock, quotePrices, sameOrderContents, type CheckoutKind } from '../_shared/warrior-pass.ts'
-import { allowedReturnOrigin, isAdminUser, verifyParentPin, yocoConfig } from '../_shared/warrior-pass-server.ts'
+import { allowedReturnOrigin, isAdminUser, verifyParentPin, yocoPaymentsConfig } from '../_shared/warrior-pass-server.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const REUSE_MS = 15 * 60_000
@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
   const withKits = (kitsRes.data ?? []).map((k) => k.child_id)
   const hasPass = !!passRes.data
   const paidCount = paidRes.count ?? 0
-  const { configured, secretKey } = yocoConfig()
+  const { configured, secretKey } = await yocoPaymentsConfig()
 
   if (action === 'quote') {
     if (!prices) return json({ error: 'prices_unavailable' }, 503)

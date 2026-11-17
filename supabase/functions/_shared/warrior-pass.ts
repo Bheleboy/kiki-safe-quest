@@ -390,3 +390,33 @@ export async function verifyWebhookSignature(opts: {
   }
   return match
 }
+
+// ---------- Yoco configuration ----------
+
+export type YocoMode = 'test' | 'live'
+
+/** Mode from the secret key prefix. Never exposes the key itself. */
+export function yocoKeyMode(secretKey: string | null | undefined): YocoMode | null {
+  if (!secretKey) return null
+  if (secretKey.startsWith('sk_live_')) return 'live'
+  if (secretKey.startsWith('sk_test_')) return 'test'
+  return null
+}
+
+export const webhookSecretKeyName = (mode: YocoMode) => `yoco_webhook_secret:${mode}`
+export const webhookIdKeyName = (mode: YocoMode) => `yoco_webhook_id:${mode}`
+
+/**
+ * Webhook signing secret lookup order: YOCO_WEBHOOK_SECRET from the environment first,
+ * otherwise the secret stored by register_yoco_webhook for the current key mode. Never a secret for the other mode.
+ */
+export function pickWebhookSecret(
+  envSecret: string | null | undefined,
+  stored: { key: string; value: string; mode: string | null }[],
+  mode: YocoMode | null,
+): string {
+  if (envSecret) return envSecret
+  if (!mode) return ''
+  const row = stored.find((r) => r.key === webhookSecretKeyName(mode) && r.mode === mode)
+  return row?.value ?? ''
+}

@@ -1,6 +1,6 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
-import { Body, Container, Head, Heading, Html, Preview, Text } from 'npm:@react-email/components@0.0.22'
+import { Body, Container, Head, Heading, Html, Link, Preview, Text } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
 // Receipt with FIXED copy. Only validated, length-limited values are injected.
@@ -41,6 +41,9 @@ const Receipt = (p: Props) => {
           {p.hasKits === true && (
             <Text style={text}>Each Armour Kit holds one Armour of God coin and one Armour of God wristband. It is posted when that child finishes the course, and we will email you tracking details when it is sent.</Text>
           )}
+          <Text style={text}>
+            Prices, delivery and refunds: <Link href="https://kikiwarrior.com/pricing-and-delivery" style={link}>kikiwarrior.com/pricing-and-delivery</Link>
+          </Text>
           <Text style={footer}>This is a receipt from {safeBusiness(p.businessName)} for Kiki Warrior. Keep it for your records.</Text>
         </Container>
       </Body>
@@ -110,3 +113,4 @@ const label = { fontSize: '14px', color: '#2b3440', margin: '0 0 6px' }
 const row = { fontSize: '14px', color: '#636b75', margin: '0 0 6px', paddingLeft: '8px' }
 const total = { fontSize: '16px', fontWeight: 'bold' as const, color: '#2b3440', margin: '14px 0 20px' }
 const footer = { fontSize: '12px', color: '#999999', margin: '32px 0 0' }
+const link = { color: '#c2410c', textDecoration: 'underline' }

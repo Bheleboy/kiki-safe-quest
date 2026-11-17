@@ -240,33 +240,57 @@ export type Database = {
       }
       bulk_code_batches: {
         Row: {
+          amount_cents: number | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string | null
           created_by: string | null
           expires_at: string | null
           id: string
+          kits_included: boolean | null
           name: string
           notes: string | null
           organisation: string | null
+          payment_reference: string | null
+          price_override_reason: string | null
+          price_per_learner_cents: number | null
           seats: number
         }
         Insert: {
+          amount_cents?: number | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           created_by?: string | null
           expires_at?: string | null
           id?: string
+          kits_included?: boolean | null
           name: string
           notes?: string | null
           organisation?: string | null
+          payment_reference?: string | null
+          price_override_reason?: string | null
+          price_per_learner_cents?: number | null
           seats: number
         }
         Update: {
+          amount_cents?: number | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           created_by?: string | null
           expires_at?: string | null
           id?: string
+          kits_included?: boolean | null
           name?: string
           notes?: string | null
           organisation?: string | null
+          payment_reference?: string | null
+          price_override_reason?: string | null
+          price_per_learner_cents?: number | null
           seats?: number
         }
         Relationships: []
@@ -684,6 +708,27 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_signups: {
+        Row: {
+          consent_at: string
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          consent_at: string
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          consent_at?: string
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           child_id: string | null
@@ -807,6 +852,92 @@ export type Database = {
           },
         ]
       }
+      org_shipments: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          batch_id: string
+          city: string | null
+          courier: string | null
+          created_at: string
+          delivered_at: string | null
+          delivery_cents: number | null
+          id: string
+          pendant_sets: number
+          phone: string | null
+          postal_code: string | null
+          province: string | null
+          quantity: number
+          recipient_name: string | null
+          shipped_at: string | null
+          status: string
+          stock_taken: boolean
+          suburb: string | null
+          tracking_url: string | null
+          updated_at: string
+          waiting_for_restock: boolean
+          waybill: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          batch_id: string
+          city?: string | null
+          courier?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_cents?: number | null
+          id?: string
+          pendant_sets?: number
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          quantity: number
+          recipient_name?: string | null
+          shipped_at?: string | null
+          status?: string
+          stock_taken?: boolean
+          suburb?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          waiting_for_restock?: boolean
+          waybill?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          batch_id?: string
+          city?: string | null
+          courier?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_cents?: number | null
+          id?: string
+          pendant_sets?: number
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          quantity?: number
+          recipient_name?: string | null
+          shipped_at?: string | null
+          status?: string
+          stock_taken?: boolean
+          suburb?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          waiting_for_restock?: boolean
+          waybill?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_shipments_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "bulk_code_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parent_pins: {
         Row: {
           failed_attempts: number
@@ -908,6 +1039,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_provider_secrets: {
+        Row: {
+          created_at: string
+          key: string
+          mode: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          mode?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          mode?: string | null
+          value?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1400,6 +1552,7 @@ export type Database = {
         }
         Returns: number
       }
+      public_site_settings: { Args: never; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -1412,8 +1565,16 @@ export type Database = {
         Args: { _code: string; _user_id: string }
         Returns: string
       }
+      redeem_org_code: {
+        Args: { _code: string; _user_id: string }
+        Returns: string
+      }
       revoke_auth_session: { Args: { _session_id: string }; Returns: undefined }
       session_is_registered: { Args: never; Returns: boolean }
+      take_org_shipment_stock: {
+        Args: { _shipment_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

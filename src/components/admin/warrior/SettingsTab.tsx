@@ -6,7 +6,7 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { courseData } from "@/data/courseData";
-import { cardCls, field, fmtDateTime, h3Cls, pillDanger, pillOutline, pillPrimary, useAdminOrders } from "./adminOrdersApi";
+import { cardCls, downloadCsv, field, fmtDateTime, h3Cls, pillDanger, pillOutline, pillPrimary, useAdminOrders } from "./adminOrdersApi";
 
 type Settings = {
   paywall_enabled: boolean;
@@ -19,6 +19,7 @@ type Settings = {
   support_email: string | null;
   kits_in_stock: number | null;
   pendant_sets_in_stock: number | null;
+  maintenance_mode: boolean;
 };
 
 type TierRow = { min: string; max: string; price: string };
@@ -64,6 +65,7 @@ export default function SettingsTab() {
   const { call, ready } = useAdminOrders();
   const [loaded, setLoaded] = useState<Settings | null>(null);
   const [paid, setPaid] = useState(0);
+  const [signups, setSignups] = useState(0);
   const [error, setError] = useState("");
   const [gate, setGate] = useState({ young: "", teen: "" });
   const [free, setFree] = useState<string[]>([]);
@@ -78,12 +80,13 @@ export default function SettingsTab() {
   const [confirmGate, setConfirmGate] = useState(false);
 
   const load = useCallback(async () => {
-    const r = await call<{ settings: Settings; paid_family_passes: number }>({ action: "get_settings" });
+    const r = await call<{ settings: Settings; paid_family_passes: number; maintenance_signups: number }>({ action: "get_settings" });
     if (!r.ok) { setError(r.message); return; }
     setError("");
     const s = r.data.settings;
     setLoaded(s);
     setPaid(r.data.paid_family_passes);
+    setSignups(r.data.maintenance_signups ?? 0);
     setGate({ young: s.gate_lessons?.young ?? "", teen: s.gate_lessons?.teen ?? "" });
     setFree(Array.isArray(s.always_free_lessons) ? s.always_free_lessons : []);
     const p = s.prices ?? {};
@@ -139,6 +142,8 @@ export default function SettingsTab() {
   return (
     <div className="space-y-6">
       <MasterSwitch settings={loaded} onChanged={load} />
+      <YocoConnect />
+      <MaintenanceSwitch on={loaded.maintenance_mode} signups={signups} onChanged={load} />
 
       <div className={`${cardCls} flex flex-col sm:flex-row sm:items-center gap-3`}>
         <div className="flex-1 font-body text-sm text-charcoal/80">
@@ -391,6 +396,96 @@ function MasterSwitch({ settings, onChanged }: { settings: Settings; onChanged: 
       </div>
       {settings.grandfather_before && <p className="font-body text-xs text-charcoal/50">Cut-off saved {fmtDateTime(settings.grandfather_before)}</p>}
       {msg && <p className="font-body text-sm text-destructive">{msg}</p>}
+    </div>
+  );
+}
+
+/** "We are upgrading" page switch, with the sign-up count and export. */
+function MaintenanceSwitch({ on, signups, onChanged }: { on: boolean; signups: number; onChanged: () => void }) {
+  const { call } = useAdminOrders();
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const flip = async () => {
+    setConfirm(false); setBusy(true); setMsg("");
+    const r = await call({ action: "set_maintenance", enabled: !on, confirm: true });
+    setBusy(false);
+    if (!r.ok) { setMsg(r.message); return; }
+    onChanged();
+  };
+  const exportCsv = async () => {
+    const r = await call<{ csv: string; filename: string }>({ action: "export_maintenance_signups" });
+    if (!r.ok) { setMsg(r.message); return; }
+    downloadCsv(r.data.filename, r.data.csv);
+  };
+  return (
+    <div className={`${cardCls} space-y-3`}>
+      <div className="flex items-center gap-3">
+        <h3 className={`${h3Cls} mb-0 flex-1`}>"We are upgrading" page</h3>
+        <span className={`rounded-full px-3 py-1 font-display text-[11px] uppercase tracking-widest text-charcoal ${on ? "bg-primary/25" : "bg-muted"}`}>{on ? "On" : "Off"}</span>
+      </div>
+      <p className="font-body text-sm text-charcoal/80">
+        {on
+          ? "Every visitor who is not an admin sees the upgrade page and can leave their email. Sign-in and the admin dashboard still work. Admins browse the full site."
+          : "When on, every visitor who is not an admin sees a friendly upgrade page instead of the site, including signed-in families. Sign-in and the admin dashboard stay reachable."}
+      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <button type="button" className={on ? pillOutline : pillDanger} disabled={busy} onClick={() => setConfirm(true)}>
+          {busy ? "Saving..." : on ? "Turn the upgrade page off" : "Turn the upgrade page on"}
+        </button>
+        <p className="font-body text-sm text-charcoal/70 flex-1">{signups} email{signups === 1 ? "" : "s"} left on the upgrade page</p>
+        <button type="button" className={pillOutline} disabled={signups === 0} onClick={exportCsv}>Export emails</button>
+      </div>
+      {msg && <p className="font-body text-sm text-destructive">{msg}</p>}
+      <AlertDialog open={confirm} onOpenChange={setConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display uppercase tracking-wider">{on ? "Turn the upgrade page off?" : "Turn the upgrade page on?"}</AlertDialogTitle>
+            <AlertDialogDescription className="font-body">
+              {on ? "Everyone will see the normal site again within a minute." : "Families will see the upgrade page instead of the site within a minute, until you turn it off."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void flip()}>{on ? "Turn off" : "Turn on"}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+/** Yoco connection status and webhook registration. Never shows a key or secret. */
+function YocoConnect() {
+  const { call, ready } = useAdminOrders();
+  const [status, setStatus] = useState<{ key_set: boolean; key_mode: "test" | "live" | null; webhook_registered: boolean; webhook_source: string | null } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const load = useCallback(async () => {
+    const r = await call<typeof status>({ action: "yoco_status" });
+    if (r.ok) setStatus(r.data);
+  }, [call]);
+  useEffect(() => { if (ready) void load(); }, [ready, load]);
+  const connect = async () => {
+    setBusy(true); setMsg("");
+    const r = await call<{ already: boolean; message?: string }>({ action: "register_yoco_webhook" });
+    setBusy(false);
+    if (!r.ok) { setMsg(r.message); return; }
+    setMsg(r.data.message ?? (r.data.already ? "Yoco payments were already connected." : "Yoco payments connected."));
+    void load();
+  };
+  return (
+    <div className={`${cardCls} space-y-3`}>
+      <h3 className={`${h3Cls} mb-0`}>Yoco payments</h3>
+      <div className="grid sm:grid-cols-2 gap-2 font-body text-sm text-charcoal/80">
+        <p>Secret key: <strong className="text-charcoal">{!status ? "Checking..." : !status.key_set ? "Not added yet" : status.key_mode === "live" ? "Live" : status.key_mode === "test" ? "Test" : "Unknown format"}</strong></p>
+        <p>Webhook registered: <strong className="text-charcoal">{!status ? "Checking..." : status.webhook_registered ? "Yes" : "No"}</strong></p>
+      </div>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <button type="button" className={pillPrimary} disabled={busy || !status?.key_set} onClick={connect}>{busy ? "Connecting..." : "Connect Yoco payments"}</button>
+        {!status?.key_set && status && <p className="font-body text-xs text-charcoal/60">Add the Yoco secret key to the project secrets first.</p>}
+      </div>
+      {msg && <p className="font-body text-sm text-charcoal/80">{msg}</p>}
     </div>
   );
 }

@@ -173,9 +173,9 @@ describe("redeem decision", () => {
     expect(decideRedeem({ hasActivePass: false, code: null, batchExpiresAt: null, now })).toBe("invalid");
     expect(decideRedeem({ hasActivePass: false, code: { redeemed_by: null }, batchExpiresAt: "2026-11-30T00:00:00Z", now })).toBe("invalid");
   });
-  it("a family that already has a pass is refused before the code is checked", () => {
-    expect(decideRedeem({ hasActivePass: true, code: { redeemed_by: null }, batchExpiresAt: null, now })).toBe("already_has_pass");
-    expect(decideRedeem({ hasActivePass: true, code: null, batchExpiresAt: null, now })).toBe("already_has_pass");
+  it("a family that already has a pass can still use a valid code, which is only recorded", () => {
+    expect(decideRedeem({ hasActivePass: true, code: { redeemed_by: null }, batchExpiresAt: null, now })).toBe("recorded");
+    expect(decideRedeem({ hasActivePass: true, code: null, batchExpiresAt: null, now })).toBe("invalid");
   });
 });
 

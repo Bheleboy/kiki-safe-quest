@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Gift } from "lucide-react";
-import { PENDING_SHIPMENT_STATUSES, SHIPPABLE_STATUSES, pendingShipmentsCsv, type RewardRow } from "../../../../supabase/functions/_shared/warrior-admin";
+import { PENDING_SHIPMENT_STATUSES, SHIPPABLE_STATUSES, pendingShipmentsCsv, type OrgShipmentRow, type RewardRow } from "../../../../supabase/functions/_shared/warrior-admin";
 import { KIT_STATUS } from "@/lib/warriorPass";
 import { cardCls, downloadCsv, field, fmtDate, h3Cls, pillOutline, pillPrimary, useAdminOrders } from "./adminOrdersApi";
+
+type OrgShipment = OrgShipmentRow & {
+  batch_id: string; contact_name: string | null; contact_phone: string | null; courier: string | null; waybill: string | null;
+  tracking_url: string | null; waiting_for_restock: boolean; stock_taken: boolean; shipped_at: string | null; delivered_at: string | null; created_at: string;
+};
+const ORG_STATUS: Record<string, string> = { draft: "To pack", packed: "Packed", in_transit: "Sent", delivered: "Delivered" };
 
 type Bonus = {
   id: string; user_id: string; note: string | null; status: "owed" | "added_to_shipment" | "handed_over"; shipment_id: string | null;
@@ -28,11 +34,17 @@ export default function RewardsTab() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [orgRows, setOrgRows] = useState<OrgShipment[]>([]);
+  const [orgStock, setOrgStock] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const r = await call<{ groups: Group[]; locked_count: number }>({ action: "list_rewards" });
+    const [r, o] = await Promise.all([
+      call<{ groups: Group[]; locked_count: number }>({ action: "list_rewards" }),
+      call<{ rows: OrgShipment[]; kits_in_stock: number | null }>({ action: "list_org_shipments" }),
+    ]);
     setLoading(false);
+    if (o.ok) { setOrgRows(o.data.rows); setOrgStock(o.data.kits_in_stock); }
     if (!r.ok) { setError(r.message); return; }
     setError("");
     setGroups(r.data.groups);
@@ -44,7 +56,8 @@ export default function RewardsTab() {
   const isOpen = (g: Group) => g.items.some((i) => i.kit_status !== "delivered" && i.shipment_status !== "in_transit");
   const visible = useMemo(() => (showAll ? groups : groups.filter(isOpen)), [groups, showAll]);
   const allItems = groups.flatMap((g) => g.items);
-  const pendingCount = allItems.filter((i) => i.shipment_status && PENDING_SHIPMENT_STATUSES.includes(i.shipment_status)).length;
+  const orgPending = orgRows.filter((o) => o.status === "draft" || o.status === "packed").length;
+  const pendingCount = allItems.filter((i) => i.shipment_status && PENDING_SHIPMENT_STATUSES.includes(i.shipment_status)).length + orgPending;
 
   return (
     <div className="space-y-6">
@@ -56,10 +69,12 @@ export default function RewardsTab() {
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} className="w-4 h-4" /> Show sent and delivered
         </label>
         <button type="button" className={pillOutline} disabled={pendingCount === 0}
-          onClick={() => downloadCsv(`kiki-parcels-${new Date().toISOString().slice(0, 10)}.csv`, pendingShipmentsCsv(allItems))}>
+          onClick={() => downloadCsv(`kiki-parcels-${new Date().toISOString().slice(0, 10)}.csv`, pendingShipmentsCsv(allItems, orgRows))}>
           Export parcels to pack
         </button>
       </div>
+
+      <OrgDeliveries rows={orgRows} stock={orgStock} showAll={showAll} onChanged={load} />
 
       <BonusPanel onChanged={load} />
 
@@ -229,5 +244,71 @@ function BonusPanel({ onChanged }: { onChanged: () => void }) {
       )}
       {msg && <p className="font-body text-sm text-charcoal/80 mt-2">{msg}</p>}
     </section>
+  );
+}
+
+/** Organisation parcels: one per batch, carrying every kit for that organisation. */
+function OrgDeliveries({ rows, stock, showAll, onChanged }: { rows: OrgShipment[]; stock: number | null; showAll: boolean; onChanged: () => void }) {
+  const visible = showAll ? rows : rows.filter((o) => o.status !== "delivered" && o.status !== "in_transit");
+  return (
+    <section className={cardCls}>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+        <h3 className={`${h3Cls} mb-0 flex-1`}>Organisation deliveries</h3>
+        <p className="font-body text-sm text-charcoal/70">{stock === null ? "Kit stock not set" : `${stock} kit${stock === 1 ? "" : "s"} in stock`}</p>
+      </div>
+      {visible.length === 0 ? (
+        <p className="font-body text-sm text-charcoal/70">No organisation parcels to send.</p>
+      ) : (
+        <ul className="space-y-3">{visible.map((o) => <OrgCard key={o.id} o={o} onChanged={onChanged} />)}</ul>
+      )}
+    </section>
+  );
+}
+
+function OrgCard({ o, onChanged }: { o: OrgShipment; onChanged: () => void }) {
+  const { call } = useAdminOrders();
+  const [courier, setCourier] = useState("The Courier Guy");
+  const [waybill, setWaybill] = useState("");
+  const [tracking, setTracking] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const run = async (action: string, extra: Record<string, unknown> = {}) => {
+    setBusy(true); setMsg("");
+    const r = await call({ action, id: o.id, ...extra });
+    setBusy(false);
+    if (!r.ok) { setMsg(r.message); return; }
+    onChanged();
+  };
+  const address = [o.address_line1, o.address_line2, o.suburb, o.city, o.province, o.postal_code].filter(Boolean).join(", ");
+  return (
+    <li className="rounded-xl border border-primary/15 px-4 py-3 font-body text-sm space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-charcoal font-medium">{o.organisation || o.batch_name} <span className="text-charcoal/60 font-normal">{o.batch_name && o.organisation ? `(${o.batch_name})` : ""}</span></p>
+          <p className="text-xs text-charcoal/60 break-all">{[o.contact_name, o.contact_email, o.contact_phone].filter(Boolean).join(", ")}</p>
+        </div>
+        <div className="sm:text-right">
+          <p className="font-display uppercase text-[11px] tracking-widest text-charcoal/60">{o.quantity} Armour Kit{o.quantity === 1 ? "" : "s"}{o.pendant_sets ? `, ${o.pendant_sets} pendant set${o.pendant_sets === 1 ? "" : "s"}` : ""}</p>
+          <p className="text-charcoal/80">{o.waiting_for_restock && o.status === "draft" ? "Waiting for restock" : ORG_STATUS[o.status] ?? o.status}</p>
+          {o.waybill && <p className="text-xs text-charcoal/50">{o.courier} {o.waybill}</p>}
+        </div>
+      </div>
+      <p className="text-charcoal/80 break-words">{o.recipient_name}{o.phone ? `, ${o.phone}` : ""}<br />{address}</p>
+      {o.status === "draft" && (
+        <button type="button" className={pillPrimary} disabled={busy} onClick={() => run("org_mark_packed")}>{busy ? "Saving..." : "Mark packed"}</button>
+      )}
+      {o.status === "packed" && (
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+          <input className={field} aria-label="Courier" placeholder="Courier" value={courier} onChange={(e) => setCourier(e.target.value)} />
+          <input className={field} aria-label="Waybill number" placeholder="Waybill number" value={waybill} onChange={(e) => setWaybill(e.target.value)} />
+          <input className={field} aria-label="Tracking link" placeholder="https://tracking link" value={tracking} onChange={(e) => setTracking(e.target.value)} />
+          <button type="button" className={pillPrimary} disabled={busy || !courier || !waybill} onClick={() => run("org_mark_sent", { courier, waybill, tracking_url: tracking || null })}>Mark sent</button>
+        </div>
+      )}
+      {o.status === "in_transit" && (
+        <button type="button" className={pillOutline} disabled={busy} onClick={() => run("org_mark_delivered")}>Mark delivered</button>
+      )}
+      {msg && <p className="text-sm text-destructive">{msg}</p>}
+    </li>
   );
 }

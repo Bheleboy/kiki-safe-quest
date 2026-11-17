@@ -1,5 +1,6 @@
 // Server-only Warrior Pass helpers (Deno edge runtime).
 import { admin, background, logEvent, sendSecurityEmail, SITE_URL, SUPABASE_URL } from './security.ts'
+import { pickWebhookSecret, webhookSecretKeyName, yocoKeyMode, type YocoMode } from './warrior-pass.ts'
 
 // ---------- Parent PIN (same hashing and lockout rules as the parent-pin function) ----------
 const MAX_FAILS = 5
@@ -78,10 +79,31 @@ export function allowedReturnOrigin(req: Request): string {
   return SITE_URL
 }
 
+/** Secret key from the environment only. Use yocoPaymentsConfig() when the webhook secret matters. */
 export function yocoConfig() {
   const secretKey = Deno.env.get('YOCO_SECRET_KEY') || ''
-  const webhookSecret = Deno.env.get('YOCO_WEBHOOK_SECRET') || ''
-  return { secretKey, webhookSecret, configured: !!secretKey && !!webhookSecret }
+  return { secretKey, mode: yocoKeyMode(secretKey) }
+}
+
+/**
+ * Full payment configuration. The webhook secret comes from YOCO_WEBHOOK_SECRET when set,
+ * otherwise from the secret stored by register_yoco_webhook for the key's mode.
+ * Payments count as configured only when both the secret key and a webhook secret exist.
+ */
+export async function yocoPaymentsConfig(): Promise<{ secretKey: string; webhookSecret: string; mode: YocoMode | null; configured: boolean; webhookSource: 'env' | 'stored' | null }> {
+  const { secretKey, mode } = yocoConfig()
+  const envSecret = Deno.env.get('YOCO_WEBHOOK_SECRET') || ''
+  let stored: { key: string; value: string; mode: string | null }[] = []
+  if (!envSecret && mode) {
+    const { data } = await admin.from('payment_provider_secrets').select('key, value, mode').eq('key', webhookSecretKeyName(mode))
+    stored = data ?? []
+  }
+  const webhookSecret = pickWebhookSecret(envSecret, stored, mode)
+  return {
+    secretKey, webhookSecret, mode,
+    configured: !!secretKey && !!webhookSecret,
+    webhookSource: envSecret ? 'env' : webhookSecret ? 'stored' : null,
+  }
 }
 
 const REPLY_TO_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[A-Za-z]{2,}$/

@@ -8,4 +8,5 @@ export const publicRoutes = [
   "/books/armour-of-god",
   "/privacy",
   "/terms",
+  "/pricing-and-delivery",
 ];

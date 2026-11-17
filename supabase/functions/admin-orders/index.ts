@@ -8,8 +8,10 @@ import { deliveryPointText } from '../_shared/warrior-rewards.ts'
 import {
   batchCsv, cleanTrackingUrl, generateUniqueCodes, orderReference, parseBatchInput, planPaywallChange,
   referenceRange, SHIPPABLE_STATUSES, validateSettings, DEFAULT_BUSINESS_NAME, type RewardRow,
+  orgBatchPrice, parseOrgBatchInput, planBatchStock, toCsv,
 } from '../_shared/warrior-admin.ts'
-import { isLowStock, parseStock } from '../_shared/warrior-pass.ts'
+import { isLowStock, parseDelivery, parseOrgTiers, parseStock, webhookIdKeyName, webhookSecretKeyName, yocoKeyMode } from '../_shared/warrior-pass.ts'
+import { yocoPaymentsConfig } from '../_shared/warrior-pass-server.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -410,7 +412,9 @@ Deno.serve(async (req) => {
           support_email: typeof v('support_email') === 'string' ? v('support_email') : null,
           kits_in_stock: parseStock(v('kits_in_stock')),
           pendant_sets_in_stock: parseStock(v('pendant_sets_in_stock')),
+          maintenance_mode: v('maintenance_mode') === true,
         },
+        maintenance_signups: (await db.from('maintenance_signups').select('id', { count: 'exact', head: true })).count ?? 0,
         low_stock: {
           kits: isLowStock(parseStock(v('kits_in_stock'))),
           pendants: isLowStock(parseStock(v('pendant_sets_in_stock'))),
@@ -528,39 +532,244 @@ Deno.serve(async (req) => {
     }
 
     // ================= Bulk codes =================
+    /** Inserts `seats` unique codes for a batch. Throws on failure. */
+    const generateCodesFor = async (batchId: string, seats: number) => {
+      let remaining = seats
+      const taken = new Set<string>()
+      let attempts = 0
+      while (remaining > 0) {
+        if (++attempts > 20) throw new Error('too_many_collisions')
+        const chunk = generateUniqueCodes(Math.min(remaining, 500), taken)
+        const { data: clashes } = await db.from('bulk_codes').select('code').in('code', chunk.slice(0, 250))
+        const { data: clashes2 } = chunk.length > 250 ? await db.from('bulk_codes').select('code').in('code', chunk.slice(250)) : { data: [] }
+        const clash = new Set([...(clashes ?? []), ...(clashes2 ?? [])].map((c) => c.code))
+        const fresh = chunk.filter((c) => !clash.has(c))
+        chunk.forEach((c) => taken.add(c))
+        if (!fresh.length) continue
+        const { error: insErr } = await db.from('bulk_codes').insert(fresh.map((code) => ({ batch_id: batchId, code })))
+        if (insErr) {
+          if (insErr.code === '23505') continue
+          throw insErr
+        }
+        remaining -= fresh.length
+      }
+    }
+
+    const kitsShort = (short: number) => json({
+      error: 'kits_short', short,
+      message: `There are not enough Armour Kits in stock: ${short} short. Tick "Kits will ship after restock" to continue.`,
+    }, 409)
+
+    if (action === 'org_quote') {
+      const learners = Number(body.learners)
+      const s = await readSettings()
+      const tiers = parseOrgTiers((s.get('prices')?.value as any)?.org_tiers)
+      const price = orgBatchPrice(tiers, learners)
+      const stock = parseStock(s.get('kits_in_stock')?.value ?? null)
+      return json({
+        per_learner_cents: price.ok ? price.per_learner_cents : null,
+        amount_cents: price.ok ? price.amount_cents : null,
+        kits_in_stock: stock,
+        short: stock !== null && Number.isInteger(learners) && learners > stock ? learners - stock : 0,
+      })
+    }
+
     if (action === 'create_batch') {
-      const parsed = parseBatchInput(body)
+      const parsed = parseOrgBatchInput(body)
       if (!parsed.ok) return json({ error: parsed.error }, 400)
+      const v = parsed.value
+      let address: Record<string, string | null> | null = null
+      if (v.kits_included) {
+        const d = parseDelivery({ ...(body.delivery ?? {}), method: 'door' })
+        if (!d.ok) return json({ error: 'invalid_delivery', field: d.field }, 400)
+        const { delivery_method: _m, locker_code: _l, ...rest } = d.value
+        address = rest
+      }
+      const settings = await readSettings()
+      const tiers = parseOrgTiers((settings.get('prices')?.value as any)?.org_tiers)
+      const price = orgBatchPrice(tiers, v.seats, v.price_override_cents, v.price_override_reason)
+      if (!price.ok) return json({ error: price.error }, 400)
+      const stock = parseStock(settings.get('kits_in_stock')?.value ?? null)
+      const plan = v.kits_included ? planBatchStock(stock, v.seats, v.allow_backorder) : { ok: true as const, takeNow: false, waiting: false, short: 0 }
+      if (!plan.ok) return kitsShort(plan.short)
+
       const by = await adminProfileId()
-      const { data: batch, error } = await db.from('bulk_code_batches').insert({ ...parsed.value, created_by: by }).select('id').single()
+      const { data: batch, error } = await db.from('bulk_code_batches').insert({
+        name: v.name, organisation: v.organisation, seats: v.seats, expires_at: v.expires_at, notes: v.notes, created_by: by,
+        contact_name: v.contact_name, contact_email: v.contact_email, contact_phone: v.contact_phone,
+        price_per_learner_cents: price.per_learner_cents, amount_cents: price.amount_cents,
+        payment_reference: v.payment_reference, price_override_reason: v.price_override_reason, kits_included: v.kits_included,
+      }).select('id').single()
       if (error || !batch) return json({ error: 'Create failed' }, 500)
+      let waiting = false
       try {
-        let remaining = parsed.value.seats
-        const taken = new Set<string>()
-        let attempts = 0
-        while (remaining > 0) {
-          if (++attempts > 20) throw new Error('too_many_collisions')
-          const chunk = generateUniqueCodes(Math.min(remaining, 500), taken)
-          const { data: clashes } = await db.from('bulk_codes').select('code').in('code', chunk.slice(0, 250))
-          const { data: clashes2 } = chunk.length > 250 ? await db.from('bulk_codes').select('code').in('code', chunk.slice(250)) : { data: [] }
-          const clash = new Set([...(clashes ?? []), ...(clashes2 ?? [])].map((c) => c.code))
-          const fresh = chunk.filter((c) => !clash.has(c))
-          chunk.forEach((c) => taken.add(c))
-          if (!fresh.length) continue
-          const { error: insErr } = await db.from('bulk_codes').insert(fresh.map((code) => ({ batch_id: batch.id, code })))
-          if (insErr) {
-            if (insErr.code === '23505') continue
-            throw insErr
+        await generateCodesFor(batch.id, v.seats)
+        if (v.kits_included && address) {
+          const { data: ship, error: shipErr } = await db.from('org_shipments').insert({
+            batch_id: batch.id, quantity: v.seats, ...address, status: 'draft', waiting_for_restock: plan.waiting,
+          }).select('id').single()
+          if (shipErr || !ship) throw shipErr ?? new Error('shipment_failed')
+          waiting = plan.waiting
+          if (plan.takeNow) {
+            const { data: taken, error: takeErr } = await db.rpc('take_org_shipment_stock', { _shipment_id: ship.id })
+            if (takeErr) throw takeErr
+            if (taken === 'short') {
+              // Stock changed since the form was checked.
+              if (!v.allow_backorder) {
+                await db.from('bulk_code_batches').delete().eq('id', batch.id)
+                return kitsShort(Math.max(1, v.seats - (parseStock((await readSettings()).get('kits_in_stock')?.value ?? null) ?? 0)))
+              }
+              await db.from('org_shipments').update({ waiting_for_restock: true, updated_at: new Date().toISOString() }).eq('id', ship.id)
+              waiting = true
+            }
           }
-          remaining -= fresh.length
         }
       } catch (e) {
-        console.error('bulk code generation failed', e)
+        console.error('bulk batch creation failed', e)
         await db.from('bulk_code_batches').delete().eq('id', batch.id)
         return json({ error: 'Create failed' }, 500)
       }
-      await log('admin_wp_batch_created', { batch_id: batch.id, seats: parsed.value.seats, name: parsed.value.name })
-      return json({ ok: true, batch_id: batch.id })
+      await log('admin_wp_batch_created', {
+        batch_id: batch.id, seats: v.seats, name: v.name, kits_included: v.kits_included, waiting_for_restock: waiting,
+        price_per_learner_cents: price.per_learner_cents, overridden: price.overridden,
+      })
+      return json({ ok: true, batch_id: batch.id, waiting_for_restock: waiting })
+    }
+
+    // ================= Organisation deliveries =================
+    if (action === 'list_org_shipments') {
+      const [{ data: ships, error }, settings] = await Promise.all([
+        db.from('org_shipments').select('*').order('created_at', { ascending: false }).limit(500),
+        readSettings(),
+      ])
+      if (error) return json({ error: 'Query failed' }, 500)
+      const batches = await byIds('bulk_code_batches', 'id, name, organisation, contact_name, contact_email, contact_phone', 'id', (ships ?? []).map((x) => x.batch_id))
+      const bFor = new Map(batches.map((b) => [b.id, b]))
+      return json({
+        kits_in_stock: parseStock(settings.get('kits_in_stock')?.value ?? null),
+        rows: (ships ?? []).map((x) => {
+          const b = bFor.get(x.batch_id)
+          return {
+            ...x, batch_name: b?.name ?? null, organisation: b?.organisation ?? null,
+            contact_name: b?.contact_name ?? null, contact_email: b?.contact_email ?? null, contact_phone: b?.contact_phone ?? null,
+          }
+        }),
+      })
+    }
+
+    if (action === 'org_mark_packed' || action === 'org_mark_sent' || action === 'org_mark_delivered') {
+      if (typeof body.id !== 'string' || !UUID.test(body.id)) return json({ error: 'Invalid input' }, 400)
+      const { data: ship } = await db.from('org_shipments').select('*').eq('id', body.id).maybeSingle()
+      if (!ship) return json({ error: 'Not found' }, 404)
+      const nowIso = new Date().toISOString()
+      if (action === 'org_mark_packed') {
+        if (ship.status !== 'draft') return json({ error: 'bad_status', message: 'Only parcels that are not packed yet can be marked packed.' }, 409)
+        if (!ship.stock_taken) {
+          const { data: taken, error: takeErr } = await db.rpc('take_org_shipment_stock', { _shipment_id: ship.id })
+          if (takeErr) return json({ error: 'Update failed' }, 500)
+          if (taken === 'short') {
+            const stock = parseStock((await readSettings()).get('kits_in_stock')?.value ?? null) ?? 0
+            return json({ error: 'kits_short', short: ship.quantity - stock, message: `Not enough Armour Kits in stock to pack this parcel: ${ship.quantity - stock} short. Update the stock in Settings after restocking.` }, 409)
+          }
+        }
+        const { error } = await db.from('org_shipments').update({ status: 'packed', waiting_for_restock: false, updated_at: nowIso }).eq('id', ship.id).eq('status', 'draft')
+        if (error) return json({ error: 'Update failed' }, 500)
+        await log('admin_wp_org_packed', { shipment_id: ship.id, quantity: ship.quantity })
+        return json({ ok: true })
+      }
+      if (action === 'org_mark_sent') {
+        if (ship.status !== 'packed') return json({ error: 'bad_status', message: 'Mark the parcel packed first.' }, 409)
+        const courier = typeof body.courier === 'string' ? body.courier.trim().slice(0, 60) : ''
+        const waybill = typeof body.waybill === 'string' ? body.waybill.trim().slice(0, 60) : ''
+        const url = cleanTrackingUrl(body.tracking_url)
+        if (courier.length < 2) return json({ error: 'invalid_courier', message: 'Enter the courier name.' }, 400)
+        if (!/^[A-Za-z0-9][A-Za-z0-9 -]{1,59}$/.test(waybill)) return json({ error: 'invalid_waybill', message: 'Enter a valid waybill number.' }, 400)
+        if (url === false) return json({ error: 'invalid_tracking_url', message: 'The tracking link must start with https://' }, 400)
+        const { error } = await db.from('org_shipments').update({ status: 'in_transit', courier, waybill, tracking_url: url, shipped_at: nowIso, updated_at: nowIso }).eq('id', ship.id).eq('status', 'packed')
+        if (error) return json({ error: 'Update failed' }, 500)
+        await log('admin_wp_org_sent', { shipment_id: ship.id, waybill })
+        return json({ ok: true })
+      }
+      if (ship.status !== 'in_transit') return json({ error: 'bad_status', message: 'Only sent parcels can be marked delivered.' }, 409)
+      const { error } = await db.from('org_shipments').update({ status: 'delivered', delivered_at: nowIso, updated_at: nowIso }).eq('id', ship.id).eq('status', 'in_transit')
+      if (error) return json({ error: 'Update failed' }, 500)
+      await log('admin_wp_org_delivered', { shipment_id: ship.id })
+      return json({ ok: true })
+    }
+
+    // ================= Maintenance mode =================
+    if (action === 'set_maintenance') {
+      if (typeof body.enabled !== 'boolean' || body.confirm !== true) return json({ error: 'Invalid input' }, 400)
+      const { error } = await db.from('app_settings').upsert(
+        { key: 'maintenance_mode', value: body.enabled, updated_at: new Date().toISOString(), updated_by: await adminProfileId() },
+        { onConflict: 'key' },
+      )
+      if (error) return json({ error: 'Update failed' }, 500)
+      await log('admin_wp_maintenance', { enabled: body.enabled })
+      return json({ ok: true, maintenance_mode: body.enabled })
+    }
+
+    if (action === 'export_maintenance_signups') {
+      const { data, error } = await db.from('maintenance_signups').select('email, consent_at, created_at').order('created_at').limit(10000)
+      if (error) return json({ error: 'Query failed' }, 500)
+      await log('admin_wp_maintenance_export', { count: data?.length ?? 0 })
+      return json({
+        csv: toCsv(['email', 'consent_at', 'created_at'], (data ?? []).map((r) => [r.email, r.consent_at, r.created_at])),
+        filename: `kiki-upgrade-signups-${new Date().toISOString().slice(0, 10)}.csv`,
+      })
+    }
+
+    // ================= Yoco connection =================
+    if (action === 'yoco_status') {
+      const cfg = await yocoPaymentsConfig()
+      return json({ key_set: !!cfg.secretKey, key_mode: cfg.mode, webhook_registered: !!cfg.webhookSecret, webhook_source: cfg.webhookSource })
+    }
+
+    if (action === 'register_yoco_webhook') {
+      const cfg = await yocoPaymentsConfig()
+      if (!cfg.secretKey) return json({ error: 'yoco_key_missing', message: 'Add the Yoco secret key in the project secrets first.' }, 409)
+      const mode = yocoKeyMode(cfg.secretKey)
+      if (!mode) return json({ error: 'yoco_key_invalid', message: 'The Yoco secret key should start with sk_test_ or sk_live_.' }, 409)
+      if (cfg.webhookSource === 'env') {
+        return json({ ok: true, already: true, key_mode: mode, webhook_registered: true, message: 'A webhook secret is already set in the project secrets, so it is used as it is.' })
+      }
+      const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/yoco-webhook`
+      const headers = { Authorization: `Bearer ${cfg.secretKey}`, 'Content-Type': 'application/json' }
+      const yocoFail = (status: number, text: string) => {
+        console.error('yoco webhook api error', status, text.slice(0, 300))
+        return json({ error: 'yoco_failed', message: status === 403 ? 'Yoco refused the request. Check the secret key.' : 'Yoco could not register the webhook. Please try again.' }, 502)
+      }
+      const listRes = await fetch('https://payments.yoco.com/api/webhooks', { headers })
+      const listText = await listRes.text()
+      if (!listRes.ok) return yocoFail(listRes.status, listText)
+      let subs: { id: string; url: string; mode?: string }[] = []
+      try { subs = (JSON.parse(listText)?.subscriptions ?? []).filter((x: any) => typeof x?.id === 'string' && typeof x?.url === 'string') } catch { subs = [] }
+      const ours = subs.filter((x) => x.url === webhookUrl)
+      const { data: storedId } = await db.from('payment_provider_secrets').select('value').eq('key', webhookIdKeyName(mode)).maybeSingle()
+      if (cfg.webhookSecret && storedId?.value && ours.some((x) => x.id === storedId.value)) {
+        return json({ ok: true, already: true, key_mode: mode, webhook_registered: true })
+      }
+      // Yoco only shows a webhook secret once, so a webhook we have no secret for is replaced.
+      for (const x of ours) {
+        const del = await fetch(`https://payments.yoco.com/api/webhooks/${encodeURIComponent(x.id)}`, { method: 'DELETE', headers })
+        if (!del.ok) return yocoFail(del.status, await del.text())
+      }
+      const regRes = await fetch('https://payments.yoco.com/api/webhooks', {
+        method: 'POST', headers, body: JSON.stringify({ name: 'kiki-warrior-payments', url: webhookUrl }),
+      })
+      const regText = await regRes.text()
+      if (!regRes.ok) return yocoFail(regRes.status, regText)
+      let reg: any = {}
+      try { reg = JSON.parse(regText) } catch { /* handled below */ }
+      if (typeof reg?.secret !== 'string' || typeof reg?.id !== 'string') return yocoFail(regRes.status, 'missing secret or id')
+      const nowIso = new Date().toISOString()
+      const { error: sErr } = await db.from('payment_provider_secrets').upsert([
+        { key: webhookSecretKeyName(mode), value: reg.secret, mode, created_at: nowIso },
+        { key: webhookIdKeyName(mode), value: reg.id, mode, created_at: nowIso },
+      ], { onConflict: 'key' })
+      if (sErr) return json({ error: 'Update failed' }, 500)
+      await log('admin_wp_yoco_webhook_registered', { mode, webhook_id: reg.id, replaced: ours.length })
+      return json({ ok: true, already: false, key_mode: mode, webhook_registered: true })
     }
 
     if (action === 'list_batches') {
@@ -570,8 +779,10 @@ Deno.serve(async (req) => {
       const rows = await Promise.all((batches ?? []).map(async (b) => {
         const { count } = await db.from('bulk_codes').select('id', { count: 'exact', head: true }).eq('batch_id', b.id).not('redeemed_by', 'is', null)
         const used = count ?? 0
+        const { data: ship } = await db.from('org_shipments').select('id, status, waiting_for_restock, quantity').eq('batch_id', b.id).maybeSingle()
         return {
           ...b,
+          shipment: ship ?? null,
           seats_used: used,
           seats_remaining: Math.max(0, b.seats - used),
           active: !b.expires_at || new Date(b.expires_at).getTime() > now,
@@ -588,7 +799,7 @@ Deno.serve(async (req) => {
       if (error) return json({ error: 'Query failed' }, 500)
       const slug = batch.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'batch'
       await log('admin_wp_batch_exported', { batch_id: batch.id })
-      return json({ csv: batchCsv(codes ?? []), filename: `kiki-codes-${slug}.csv` })
+      return json({ csv: batchCsv(codes ?? []), filename: `kiki-codes-${slug}.csv`, name: batch.name, codes: (codes ?? []).filter((c) => !c.redeemed_by).map((c) => c.code) })
     }
 
     if (action === 'disable_batch') {

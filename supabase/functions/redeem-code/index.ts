@@ -1,8 +1,9 @@
-// Redeems a school or church bulk code for the signed-in parent. Needs a registered
-// session and a fresh parent PIN (like checkout), is rate limited per user and per IP,
-// and gives one generic error for any unknown, used or expired code. The code is marked
-// redeemed and the family pass granted atomically by public.redeem_bulk_code.
-// A bulk code unlocks lessons only; it never includes an Armour Kit.
+// Redeems a school, church or club code for the signed-in parent. One code = one learner.
+// Needs a registered session and a fresh parent PIN (like checkout), is rate limited per user
+// and per IP, and gives one generic error for any unknown, used or expired code. The code is
+// marked redeemed atomically by public.redeem_org_code: the first code unlocks the family,
+// extra codes for other children are recorded. Codes never create Armour Kits; the
+// organisation receives its kits up front.
 import { admin, clientIp, cors, getClaimsFrom, hitLimit, isRegisteredSession, json, logEvent, userAgent } from '../_shared/security.ts'
 import { isAdminUser, verifyParentPin } from '../_shared/warrior-pass-server.ts'
 import { normalizeCode } from '../_shared/warrior-admin.ts'
@@ -48,13 +49,15 @@ Deno.serve(async (req) => {
     return json(GENERIC, 400)
   }
 
-  const { data: result, error } = await admin.rpc('redeem_bulk_code', { _user_id: userId, _code: code })
+  const { data: result, error } = await admin.rpc('redeem_org_code', { _user_id: userId, _code: code })
   if (error) {
-    if (String(error.message).includes('already_has_pass')) return json({ error: 'already_has_pass' }, 409)
-    console.error('redeem_bulk_code failed', error)
+    console.error('redeem_org_code failed', error)
     return json({ error: 'server_error' }, 500)
   }
-  if (result === 'already_has_pass') return json({ error: 'already_has_pass' }, 409)
+  if (result === 'recorded') {
+    logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'code_recorded' })
+    return json({ ok: true, recorded: true })
+  }
   if (result !== 'ok') {
     logEvent({ user_id: userId, ip, user_agent: ua, event_type: 'code_redeem_failed' })
     return json(GENERIC, 400)

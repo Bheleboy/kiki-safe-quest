@@ -208,6 +208,10 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
         </>
       )}
 
+      <p className="font-body text-xs text-charcoal/60">
+        <a href="/pricing-and-delivery" target="_blank" rel="noopener" className="text-primary hover:underline">Prices, delivery and refunds</a>
+      </p>
+
       {error && <p className="text-sm font-body text-destructive bg-destructive/10 rounded-lg px-4 py-2">{error}</p>}
 
       {notConfigured ? comingSoon : (buyingPass || hasKits) && (
