@@ -34,6 +34,7 @@ import { useWarriorRewards } from "@/hooks/useWarriorRewards";
 import { KitEarnedCard, WarriorPointsCard } from "@/components/pass/WarriorRewardsCards";
 import { WarriorCertificateButton } from "@/components/pass/WarriorCertificate";
 import { KIT_EARNED_STATUSES } from "@/lib/warriorPass";
+import { lessonPosition, missionLessonRows, missionStrip, nextLessonId } from "@/lib/courseWayfinding";
 
 type View =
   | { type: "home" }
@@ -49,6 +50,11 @@ export default function CoursePage() {
     setUpdateBlocked(view.type === "lesson");
     return () => setUpdateBlocked(false);
   }, [view.type]);
+  // Start each lesson (and each screen) at the top, so a lesson opened from far down a list is readable.
+  const viewKey = view.type === "lesson" ? `lesson:${view.moduleId}:${view.lessonIndex}` : view.type;
+  useEffect(() => {
+    try { window.scrollTo({ top: 0 }); } catch { /* ignore */ }
+  }, [viewKey]);
   const { user, profile, signOut } = useAuth();
   const [searchParams] = useSearchParams();
   const childId = searchParams.get("child");
@@ -395,7 +401,10 @@ export default function CoursePage() {
                 </div>
 
                 <div className="grid gap-4">
-                  {stream.modules.map((mod, i) => {
+                  {(() => {
+                    const lockCheck = (id: string) => lockedFor(stream, id);
+                    const nextId = nextLessonId(stream, isLessonComplete, lockCheck);
+                    return stream.modules.map((mod, i) => {
                     const armourPieces = getArmourPiecesForModule(view.streamId, mod.id);
                     const firstOpen = mod.lessons.findIndex((l) => !lockedFor(stream, l.id));
                     const moduleLocked = access.paywallActive && firstOpen === -1;
@@ -408,6 +417,12 @@ export default function CoursePage() {
                           armourPieces={armourPieces}
                           isPieceEarned={isPieceEarned}
                           {...(moduleLocked ? { locked: true } : {})}
+                          missionNumber={i + 1}
+                          missionCount={stream.modules.length}
+                          lessons={missionLessonRows(mod, isLessonComplete, lockCheck, nextId)}
+                          onSelectLesson={(lessonIndex) =>
+                            setView({ type: "lesson", streamId: stream.id, moduleId: mod.id, lessonIndex })
+                          }
                           onClick={() =>
                             setView({
                               type: "lesson",
@@ -419,7 +434,8 @@ export default function CoursePage() {
                         />
                       </div>
                     );
-                  })}
+                  });
+                  })()}
                 </div>
 
                 {complete && (
@@ -560,6 +576,17 @@ export default function CoursePage() {
                     totalLessons={allStreamLessons.length}
                     isComplete={isLessonComplete(current.lesson.id)}
                     canAdvance={isLessonComplete(current.lesson.id)}
+                    position={lessonPosition(stream, current.lesson.id)}
+                    strip={missionStrip(current.module, current.lesson.id, isLessonComplete)}
+                    renderAllLessons={(close) => (
+                      <LessonSidebar
+                        stream={stream}
+                        currentLessonId={current.lesson.id}
+                        isLessonComplete={isLessonComplete}
+                        onSelectLesson={(moduleId, lessonIndex) => { close(); handleSelectLesson(moduleId, lessonIndex); }}
+                        {...(access.paywallActive ? { isLessonLocked: (id: string) => lockedFor(stream, id) } : {})}
+                      />
+                    )}
                     onComplete={(score, timeSeconds) =>
                       handleLessonComplete(current.lesson.id, score, timeSeconds, current.module.id)
                     }

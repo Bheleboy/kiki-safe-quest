@@ -58,13 +58,13 @@ export function LessonSidebar({
                   <Button variant="ghost"
                     key={lesson.id}
                     onClick={() => onSelectLesson(mod.id, lessonIdx)}
-                    className={`w-full text-left rounded-lg p-3 transition-all group ${
+                    className={`w-full h-auto justify-start whitespace-normal text-left rounded-lg p-3 transition-all group ${
                       isCurrent
                         ? "bg-primary/15 border border-primary/30"
                         : "hover:bg-primary/10 border border-transparent"
                     }`}
                   >
-                    <div className="flex items-start gap-2.5">
+                    <div className="flex w-full items-start gap-2.5">
                       <span
                         className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-display font-bold shrink-0 mt-0.5 ${
                           isCurrent

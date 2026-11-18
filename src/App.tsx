@@ -26,6 +26,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import PassReturn from "./pages/PassReturn";
 import PricingDelivery from "./pages/PricingDelivery";
 import { MaintenanceGate } from "./components/MaintenanceGate";
+import { PreviewBanner } from "./components/PreviewBanner";
 import { ParentGate } from "./components/security/ParentGate";
 import { InactivityGuard } from "./components/security/InactivityGuard";
 
@@ -72,6 +73,7 @@ const App = () => (
       <>
         <VersionWatcher />
         <AuthProvider>
+          <PreviewBanner />
           <AgeGate>
             <MaintenanceGate>
             <Routes>

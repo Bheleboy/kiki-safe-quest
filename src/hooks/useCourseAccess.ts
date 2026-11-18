@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { usePreviewPaywall } from "@/lib/previewPaywall";
 import { supabase } from "@/integrations/supabase/client";
 import type { AgeStream } from "@/data/courseData";
 
@@ -48,11 +48,8 @@ export function parseGateConfig(rows: { key: string; value: unknown }[] | null |
   return { paywallEnabled: paywall, gateLessons: gateValues as string[], alwaysFree: free as string[] };
 }
 
-export function isPreviewPaywall(isAdmin: boolean | null | undefined, search: string | URLSearchParams): boolean {
-  if (isAdmin !== true) return false;
-  const params = typeof search === "string" ? new URLSearchParams(search) : search;
-  return params.get("previewPaywall") === "1";
-}
+// Admin preview lives in one shared helper (URL plus remembered tab flag, admins only).
+export { isPreviewPaywall } from "@/lib/previewPaywall";
 
 /** Combines loaded settings, the access RPC result and admin preview into one state. */
 export function resolveAccess(
@@ -87,8 +84,7 @@ export function computeLessonLocked(
 }
 
 export function useCourseAccess(userId: string | undefined, isAdmin: boolean | null | undefined) {
-  const [searchParams] = useSearchParams();
-  const preview = isPreviewPaywall(isAdmin, searchParams);
+  const { preview } = usePreviewPaywall(isAdmin);
   const [config, setConfig] = useState<GateConfig | null>(null);
   const [rpcResult, setRpcResult] = useState<unknown>(undefined);
   const [version, setVersion] = useState(0);

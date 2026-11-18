@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ListOrdered } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
 import { NarrationToggle } from "./NarrationToggle";
 import { QuizBlock } from "./QuizBlock";
 import type { Lesson, Module } from "@/data/courseData";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import type { LessonPosition, StripState } from "@/lib/courseWayfinding";
 
 interface LessonViewProps {
   lesson: Lesson;
@@ -18,6 +20,12 @@ interface LessonViewProps {
   onPrev: () => void;
   onBack: () => void;
   canAdvance: boolean;
+  /** Mission and lesson position for the header. */
+  position?: LessonPosition | null;
+  /** This mission's lessons for the thin progress strip. */
+  strip?: StripState[];
+  /** Renders the full lesson list for the small-screen sheet; call close after choosing a lesson. */
+  renderAllLessons?: (close: () => void) => ReactNode;
 }
 
 export function LessonView({
@@ -31,8 +39,13 @@ export function LessonView({
   onPrev,
   onBack,
   canAdvance,
+  position,
+  strip,
+  renderAllLessons,
 }: LessonViewProps) {
   const [showParentTip, setShowParentTip] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
+  const doneCount = strip?.filter((s) => s === "done").length ?? 0;
   const startTimeRef = useRef(Date.now());
 
   // Reset timer when lesson changes
@@ -53,11 +66,16 @@ export function LessonView({
       className="space-y-5"
     >
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <Button variant="ghost" onClick={onBack} className="touch-target p-2 rounded-lg hover:bg-primary/10 transition-colors">
           <ArrowLeft className="w-6 h-6 text-charcoal" />
         </Button>
         <div className="flex-1 min-w-0">
+          {position ? (
+            <p className="text-xs text-primary font-display font-medium uppercase tracking-wide">
+              Mission {position.missionNumber} of {position.missionCount} · Lesson {position.lessonNumber} of {position.lessonCount}
+            </p>
+          ) : null}
           <p className="text-xs text-charcoal/70 font-display font-medium uppercase tracking-wide break-words">
             {module.title}
           </p>
@@ -65,10 +83,43 @@ export function LessonView({
           <p className="text-xs text-charcoal/70 font-body mt-0.5">
             🎬 {lesson.videoDurationMinutes} min video · ⏱ ~{lesson.estimatedMinutes} min total
           </p>
+          {strip && strip.length > 0 && (
+            <div
+              className="mt-2 flex gap-1"
+              role="img"
+              aria-label={`Mission progress: ${doneCount} of ${strip.length} lessons done`}
+            >
+              {strip.map((s, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 flex-1 rounded-full ${
+                    s === "done" ? "bg-success" : s === "current" ? "bg-primary" : "bg-primary/15"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+          <p className="text-[11px] text-charcoal/60 font-body mt-1">
+            Lesson {lessonIndex + 1} of {totalLessons}
+          </p>
         </div>
-        <span className="text-xs font-display font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-          {lessonIndex + 1}/{totalLessons}
-        </span>
+        {renderAllLessons && (
+          <Sheet open={listOpen} onOpenChange={setListOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                className="lg:hidden shrink-0 h-auto gap-1.5 px-3 py-2 font-display text-[11px] uppercase tracking-wide text-primary bg-primary/10 hover:bg-primary/15"
+              >
+                <ListOrdered className="w-4 h-4" />
+                All lessons
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" aria-describedby={undefined} className="editorial-page h-[85dvh] p-0 flex flex-col rounded-t-2xl">
+              <SheetTitle className="sr-only">All lessons</SheetTitle>
+              <div className="flex-1 min-h-0">{renderAllLessons(() => setListOpen(false))}</div>
+            </SheetContent>
+          </Sheet>
+        )}
       </div>
 
       {/* Video */}
