@@ -527,7 +527,7 @@ export default function CoursePage() {
                 <div className="hidden lg:block w-48 shrink-0 pt-2">
                   <Button variant="ghost"
                     onClick={() => setView({ type: "stream", streamId: view.streamId })}
-                    className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-charcoal transition-colors font-display uppercase tracking-wide"
+                    className="flex w-full justify-start text-left items-center gap-2 text-sm text-charcoal/70 hover:text-charcoal transition-colors font-display uppercase tracking-wide"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Back to modules
