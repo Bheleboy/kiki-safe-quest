@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eyebrow } from "@/components/ui/editorial";
 import { callFn, useAuth } from "@/hooks/useAuth";
 import { useCourseAccess } from "@/hooks/useCourseAccess";
-import { useParentPin } from "@/components/security/ParentGate";
+import { usePurchaseLock } from "@/components/security/usePurchaseLock";
 import { supabase } from "@/integrations/supabase/client";
 import { BOOK_STORES, BOOK_TITLE } from "@/data/bookStores";
 import { BookCover } from "@/components/book/BookCover";
@@ -15,13 +15,14 @@ import { checkoutErrorMessage, formatRand, savePassReturnPath } from "@/lib/warr
 /**
  * Parent-only Family library. Renders nothing unless the paywall is on, an admin is
  * previewing, or the family already owns the book. One purchase covers every child.
+ * The price and Buy button only show after a fresh parent PIN (admins too).
  */
 export function FamilyLibraryCard() {
   const { user, profile, session } = useAuth();
   const token = session?.access_token;
   const location = useLocation();
   const access = useCourseAccess(user?.id, profile?.is_admin);
-  const { guard, dialog } = useParentPin();
+  const lock = usePurchaseLock();
   const [owned, setOwned] = useState<boolean | undefined>(undefined);
   const [price, setPrice] = useState<number | null>(null);
   const [paymentsReady, setPaymentsReady] = useState(false);
@@ -60,6 +61,8 @@ export function FamilyLibraryCard() {
     }
   }, [visible, location.hash]);
 
+  useEffect(() => { if (!lock.unlocked) { setConsent(false); setError(""); } }, [lock.unlocked]);
+
   if (!visible || owned === undefined) return null;
 
   async function download() {
@@ -78,12 +81,10 @@ export function FamilyLibraryCard() {
     }
   }
 
-  async function buy(pin?: string) {
+  async function buy(freshPin?: string) {
     setError("");
-    if (!pin) {
-      guard((p) => { void buy(p); }, { requirePin: true, message: "Enter your parent PIN to pay securely." });
-      return;
-    }
+    const pin = freshPin ?? lock.pin;
+    if (!pin) return;
     setBusy(true);
     try {
       const r = await callFn("create-checkout", { action: "checkout", kind: "book", pin, consent: true }, token);
@@ -97,7 +98,7 @@ export function FamilyLibraryCard() {
       if (r.data?.error === "book_not_available") { setPrice(null); return; }
       if (r.data?.error === "already_has_book") { setOwned(true); return; }
       if (r.data?.error === "pin_required") {
-        setError(r.data?.message || "Please enter your parent PIN again.");
+        lock.unlock(r.data?.message || "Enter your parent PIN to pay securely.", (p) => { void buy(p); });
         return;
       }
       setError(checkoutErrorMessage(r.data));
@@ -115,7 +116,7 @@ export function FamilyLibraryCard() {
 
   return (
     <div id="family-library" className="card-kiki space-y-4 scroll-mt-24">
-      {dialog}
+      {lock.dialog}
       <div>
         <Eyebrow>For the whole family</Eyebrow>
         <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Family library</h2>
@@ -133,6 +134,11 @@ export function FamilyLibraryCard() {
         <Button variant="ghost" onClick={() => void download()} disabled={busy}
           className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50">
           <Download className="w-4 h-4 mr-2" />{busy ? "Preparing download..." : "Download"}
+        </Button>
+      ) : !lock.unlocked ? (
+        <Button variant="ghost" onClick={() => lock.unlock("Enter your parent PIN to see the book price.")}
+          className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest">
+          Unlock as a parent
         </Button>
       ) : price === null ? comingSoon("Coming soon") : checkoutSoon || !paymentsReady ? comingSoon("Secure checkout opening soon") : (
         <div className="space-y-3">

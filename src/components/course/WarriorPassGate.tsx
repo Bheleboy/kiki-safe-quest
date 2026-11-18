@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/editorial";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { KikiWarriorAvatar } from "@/components/armour/KikiWarriorAvatar";
-import { useParentPin } from "@/components/security/ParentGate";
+import { usePurchaseLock } from "@/components/security/usePurchaseLock";
 import { WarriorPassUnlockCard } from "@/components/pass/WarriorPassUnlockCard";
 import { KIT_CHILD_COPY } from "@/lib/warriorPass";
 
@@ -18,18 +17,17 @@ interface WarriorPassGateProps {
 
 /**
  * Child-facing locked screen. No prices, payment links or external links.
- * The parent panel only opens after the parent PIN, asked every time.
+ * The parent panel only opens after the parent PIN, asked every time (admins too),
+ * and re-locks after 2 minutes idle, a hidden tab or navigation.
  */
 export function WarriorPassGate({ learnerName, earnedPieces, returnPath, onBack }: WarriorPassGateProps) {
-  const { guard, dialog } = useParentPin();
-  const [parentOpen, setParentOpen] = useState(false);
-  // The PIN that opened the parent panel; checkout verifies it again on the server.
-  const [pin, setPin] = useState<string | undefined>(undefined);
+  // The PIN that opened the parent panel is kept in memory only and reused at checkout.
+  const lock = usePurchaseLock();
 
   return (
     <div className="space-y-5">
-      {dialog}
-      {!parentOpen ? (
+      {lock.dialog}
+      {!lock.unlocked ? (
         <div className="card-kiki text-center space-y-5">
           <div className="flex flex-col items-center">
             <KikiWarriorAvatar earnedPieces={earnedPieces} size="md" />
@@ -47,7 +45,7 @@ export function WarriorPassGate({ learnerName, earnedPieces, returnPath, onBack 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               variant="ghost"
-              onClick={() => guard((p) => { setPin(p); setParentOpen(true); }, { force: true })}
+              onClick={() => lock.unlock("This area is for parents. Enter your 4-digit PIN.")}
               className="touch-target btn-copper adventure-button py-3 px-6 text-sm uppercase tracking-widest"
             >
               <ShieldIcon size={18} className="stroke-primary-foreground mr-2" />
@@ -77,11 +75,11 @@ export function WarriorPassGate({ learnerName, earnedPieces, returnPath, onBack 
               {learnerName} has finished the free lessons. The Warrior Pass unlocks every lesson for every child in your family.
             </p>
           </div>
-          <WarriorPassUnlockCard initialPin={pin} returnPath={returnPath} />
+          <WarriorPassUnlockCard pin={lock.pin} onPinExpired={lock.unlock} returnPath={returnPath} />
           <div className="text-center">
             <Button
               variant="ghost"
-              onClick={() => { setPin(undefined); setParentOpen(false); }}
+              onClick={lock.relock}
               className="text-sm font-body text-charcoal/70 hover:underline"
             >
               Close

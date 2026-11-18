@@ -7,7 +7,7 @@ import { Eyebrow } from "@/components/ui/editorial";
 import { ShieldIcon } from "@/components/course/CourseIcons";
 import { callFn, useAuth } from "@/hooks/useAuth";
 import { notifyCourseAccessChanged, useCourseAccess } from "@/hooks/useCourseAccess";
-import { useParentPin } from "@/components/security/ParentGate";
+import { usePurchaseLock } from "@/components/security/usePurchaseLock";
 import { supabase } from "@/integrations/supabase/client";
 import { KIT_STATUS, checkoutErrorMessage } from "@/lib/warriorPass";
 import { WarriorPassUnlockCard } from "./WarriorPassUnlockCard";
@@ -22,26 +22,27 @@ const safeTracking = (url: string | null | undefined) => (url && /^https:\/\//i.
 /**
  * Parent dashboard Warrior Pass card. Renders nothing unless the paywall is on,
  * an admin is previewing (?previewPaywall=1), or an admin account holds a pass.
+ * Until a fresh parent PIN is entered (admins too) it shows only a neutral title and
+ * an "Unlock as a parent" button. That one PIN is reused for checkout, codes and delivery.
  */
 export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
   const { user, profile, session } = useAuth();
   const token = session?.access_token;
   const location = useLocation();
   const access = useCourseAccess(user?.id, profile?.is_admin);
-  const { guard, dialog } = useParentPin();
+  const lock = usePurchaseLock();
   const [pass, setPass] = useState<{ granted_at: string | null } | null | undefined>(undefined);
   const [kits, setKits] = useState<Kit[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [showUnlock, setShowUnlock] = useState(false);
-  // Delivery form, opened behind a fresh parent PIN.
-  const [formPin, setFormPin] = useState<string | null>(null);
+  // Delivery form and code entry, both inside the PIN-unlocked panel.
+  const [formOpen, setFormOpen] = useState(false);
   const [method, setMethod] = useState<DeliveryMethod>("door");
   const [values, setValues] = useState<DeliveryValues>(EMPTY_DELIVERY);
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
-  // School or church code, entered behind a fresh parent PIN.
-  const [codePin, setCodePin] = useState<string | null>(null);
+  const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
   const [codeBusy, setCodeBusy] = useState(false);
   const [codeOk, setCodeOk] = useState("");
@@ -71,6 +72,13 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
 
   useEffect(() => { void load(); }, [load]);
 
+  // Re-locking closes every open form so nothing is left on screen for a child.
+  useEffect(() => {
+    if (lock.unlocked) return;
+    setShowUnlock(false); setFormOpen(false); setCodeOpen(false);
+    setCode(""); setConsent(false); setFormError(""); setCodeMsg(""); setCodeOk("");
+  }, [lock.unlocked]);
+
   const visible = access.paywallActive || access.isPreview || (!!pass && profile?.is_admin === true);
   if (!visible || pass === undefined) return null;
 
@@ -80,24 +88,25 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
   const childWithoutKit = children.some((c) => !kitFor.has(c.id));
   const needsAddress = kits.some((k) => k.status === "address_needed");
 
-  const openForm = () => guard((p) => { if (p) { setFormPin(p); setFormError(""); } }, { requirePin: true, message: "Enter your parent PIN to add delivery details." });
+  const openForm = () => { setFormOpen(true); setFormError(""); };
+  const openCode = () => { setCodeOpen(true); setCodeMsg(""); };
 
-  const openCode = () => guard((p) => { if (p) { setCodePin(p); setCodeMsg(""); } }, { requirePin: true, message: "Enter your parent PIN to use a school, church or club code." });
-
-  async function redeemCode() {
-    if (!codePin) return;
+  async function redeemCode(freshPin?: string) {
+    const pin = freshPin ?? lock.pin;
+    if (!pin) return;
     setCodeBusy(true);
     setCodeMsg("");
     try {
-      const r = await callFn("redeem-code", { pin: codePin, code }, token);
+      const r = await callFn("redeem-code", { pin, code }, token);
       if (r.ok) {
-        setCodePin(null);
+        setCodeOpen(false);
         setCode("");
         setCodeOk(r.data?.recorded ? "Code recorded. Your family already has every lesson open." : "Your code worked. Every lesson is now open.");
         notifyCourseAccessChanged();
         await load();
-      } else if (r.data?.error === "pin_required" || r.data?.error === "locked") {
-        setCodePin(null);
+      } else if (r.data?.error === "pin_required") {
+        lock.unlock(r.data?.message || "Enter your parent PIN to use a school, church or club code.", (p) => { void redeemCode(p); });
+      } else if (r.data?.error === "locked") {
         setCodeMsg(r.data?.message || "Please enter your parent PIN again.");
       } else {
         setCodeMsg(checkoutErrorMessage(r.data));
@@ -109,19 +118,19 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
     }
   }
 
-  async function saveDelivery() {
-    if (!formPin) return;
+  async function saveDelivery(freshPin?: string) {
+    const pin = freshPin ?? lock.pin;
+    if (!pin) return;
     setBusy(true);
     setFormError("");
     try {
-      const r = await callFn("save-delivery", { pin: formPin, consent, delivery: { method, ...values } }, token);
+      const r = await callFn("save-delivery", { pin, consent, delivery: { method, ...values } }, token);
       if (r.ok) {
-        setFormPin(null);
+        setFormOpen(false);
         setConsent(false);
         await load();
       } else if (r.data?.error === "pin_required") {
-        setFormPin(null);
-        setFormError(r.data?.message || "Please enter your parent PIN again.");
+        lock.unlock(r.data?.message || "Enter your parent PIN to add delivery details.", (p) => { void saveDelivery(p); });
       } else {
         setFormError(checkoutErrorMessage(r.data));
       }
@@ -134,7 +143,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
 
   const codeEntry = (access.paywallActive || access.isPreview) ? (
             <div className="border-t border-primary/15 pt-4 space-y-3">
-              {!codePin ? (
+              {!codeOpen ? (
                 <Button variant="ghost" onClick={openCode} className="text-sm font-body text-primary hover:underline px-0 touch-target">
                   Have a school, church or club code?
                 </Button>
@@ -157,7 +166,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
                       className="flex-1 touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50">
                       {codeBusy ? "Checking..." : "Use code"}
                     </Button>
-                    <Button type="button" variant="ghost" onClick={() => { setCodePin(null); setCode(""); }} className="touch-target px-4 text-sm font-body text-charcoal/70">Cancel</Button>
+                    <Button type="button" variant="ghost" onClick={() => { setCodeOpen(false); setCode(""); }} className="touch-target px-4 text-sm font-body text-charcoal/70">Cancel</Button>
                   </div>
                 </form>
               )}
@@ -168,18 +177,22 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
 
   return (
     <div className="card-kiki space-y-4">
-      {dialog}
+      {lock.dialog}
       <div className="flex items-center gap-3">
         <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary shrink-0">
           <ShieldIcon size={20} className="stroke-primary-foreground" />
         </div>
         <div>
-          <Eyebrow>For parents</Eyebrow>
+          {lock.unlocked && <Eyebrow>For parents</Eyebrow>}
           <h2 className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Warrior Pass</h2>
         </div>
       </div>
 
-      {pass ? (
+      {!lock.unlocked ? (
+        <Button variant="ghost" onClick={() => lock.unlock()} className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest">
+          Unlock as a parent
+        </Button>
+      ) : pass ? (
         <>
           <p className="font-body text-sm text-charcoal/80">
             Active since {pass.granted_at ? new Date(pass.granted_at).toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric" }) : "today"}
@@ -206,12 +219,12 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
             </ul>
           )}
 
-          {needsAddress && !formPin && (
+          {needsAddress && !formOpen && (
             <Button variant="ghost" onClick={openForm} className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest">
               Add delivery details
             </Button>
           )}
-          {needsAddress && formPin && (
+          {needsAddress && formOpen && (
             <div className="space-y-4 rounded-2xl border border-primary/15 p-4">
               <DeliveryFields method={method} onMethod={setMethod} values={values} onChange={setValues} />
               <label className="flex items-start gap-3 cursor-pointer">
@@ -225,7 +238,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
                   className="flex-1 touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50">
                   {busy ? "Saving..." : "Save delivery details"}
                 </Button>
-                <Button variant="ghost" onClick={() => setFormPin(null)} className="touch-target px-4 text-sm font-body text-charcoal/70">Cancel</Button>
+                <Button variant="ghost" onClick={() => setFormOpen(false)} className="touch-target px-4 text-sm font-body text-charcoal/70">Cancel</Button>
               </div>
             </div>
           )}
@@ -236,7 +249,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
               Buy an Armour Kit
             </Button>
           )}
-          {showUnlock && <WarriorPassUnlockCard returnPath={returnPath} />}
+          {showUnlock && <WarriorPassUnlockCard pin={lock.pin} onPinExpired={lock.unlock} returnPath={returnPath} />}
           {codeEntry}
         </>
       ) : (
@@ -246,7 +259,7 @@ export function WarriorPassStatusCard({ children }: { children: ChildLite[] }) {
               ? "Your family already has every lesson open. With the Warrior Pass you can also add an Armour Kit for each child."
               : "The Warrior Pass unlocks every lesson for every child in your family. Armour Kits can be added per child."}
           </p>
-          <WarriorPassUnlockCard returnPath={returnPath} />
+          <WarriorPassUnlockCard pin={lock.pin} onPinExpired={lock.unlock} returnPath={returnPath} />
           {codeEntry}
         </>
       )}

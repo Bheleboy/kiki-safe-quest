@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DeliveryFields, deliveryFromProfile, deliveryLooksComplete, EMPTY_DELIVERY, labelCls, type DeliveryValues } from "./DeliveryFields";
 import { callFn, useAuth } from "@/hooks/useAuth";
-import { useParentPin } from "@/components/security/ParentGate";
 import { checkoutErrorMessage, formatRand, KIT_PARENT_COPY, KITS_SOLD_OUT, savePassReturnPath } from "@/lib/warriorPass";
 
 interface QuoteChild { id: string; first_name: string; has_kit: boolean }
@@ -22,15 +21,19 @@ interface Quote {
 }
 
 /**
- * Parent-only unlock card. Shown only behind the parent PIN or the parent area.
+ * Parent-only unlock card. Renders nothing (and fetches nothing) without a PIN the
+ * parent just entered; that same PIN is sent to checkout so the parent is asked once.
  * The pass covers lessons only; Armour Kits are optional, per child, plus one delivery fee.
  * Prices come from the server quote; the server recomputes them at checkout.
  */
-export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?: string; returnPath: string }) {
+export function WarriorPassUnlockCard({ pin, onPinExpired, returnPath }: {
+  pin: string | null;
+  /** Server said the PIN failed or expired: ask again, then retry with the new PIN. */
+  onPinExpired: (message: string, retry: (pin: string) => void) => void;
+  returnPath: string;
+}) {
   const { session } = useAuth();
   const token = session?.access_token;
-  const { guard, dialog } = useParentPin();
-  const pinRef = useRef<string | undefined>(initialPin);
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "unavailable">("loading");
@@ -42,8 +45,9 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  const hasPin = !!pin;
   useEffect(() => {
-    if (!token) return;
+    if (!token || !hasPin) return;
     let cancelled = false;
     callFn("create-checkout", { action: "quote" }, token)
       .then((r) => {
@@ -61,7 +65,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
       })
       .catch(() => !cancelled && setLoadState("unavailable"));
     return () => { cancelled = true; };
-  }, [token]);
+  }, [token, hasPin]);
 
   const comingSoon = (
     <Button variant="ghost" disabled className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-60">
@@ -70,6 +74,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
     </Button>
   );
 
+  if (!pin) return null;
   if (loadState === "loading") {
     return <div className="flex justify-center py-6"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   }
@@ -97,13 +102,10 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
   const deliveryOk = !hasKits || (deliveryLooksComplete(method, fields) && fee !== null);
   const canPay = !busy && !notConfigured && lines.length > 0 && !overStock && deliveryOk && consent && (buyingPass || hasKits);
 
-  async function pay(pin?: string) {
+  async function pay(freshPin?: string) {
     setError("");
-    const usePin = pin ?? pinRef.current;
-    if (!usePin) {
-      guard((p) => { pinRef.current = p; void pay(p); }, { requirePin: true, message: "Enter your parent PIN to pay securely." });
-      return;
-    }
+    const usePin = freshPin ?? pin;
+    if (!usePin) return;
     setBusy(true);
     try {
       const r = await callFn("create-checkout", {
@@ -123,9 +125,7 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
       if (r.status === 503 && r.data?.error === "payments_not_configured") { setNotConfigured(true); return; }
       if (r.data?.error === "kits_sold_out") setQuote({ ...quote!, kits_sold_out: true });
       if (r.data?.error === "pin_required") {
-        pinRef.current = undefined;
-        setError(r.data?.message || "Please enter your parent PIN again.");
-        guard((p) => { pinRef.current = p; void pay(p); }, { requirePin: true, message: r.data?.message || "Enter your parent PIN to pay securely." });
+        onPinExpired(r.data?.message || "Enter your parent PIN to pay securely.", (p) => { void pay(p); });
         return;
       }
       setError(checkoutErrorMessage(r.data));
@@ -137,7 +137,6 @@ export function WarriorPassUnlockCard({ initialPin, returnPath }: { initialPin?:
 
   return (
     <div className="space-y-5 text-left">
-      {dialog}
       {buyingPass ? (
         <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 flex items-start justify-between gap-3">
           <div>
