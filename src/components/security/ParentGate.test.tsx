@@ -7,6 +7,13 @@ vi.mock("@/hooks/useAuth", () => ({
   callFn: vi.fn(async () => ({ ok: true, status: 200, data: { has_pin: true } })),
 }));
 
+// The real PIN boxes start timers that outlive the test; simple stand-ins are enough here.
+vi.mock("@/components/ui/input-otp", () => ({
+  InputOTP: ({ children }: { children?: unknown }) => children,
+  InputOTPGroup: ({ children }: { children?: unknown }) => children,
+  InputOTPSlot: () => null,
+}));
+
 import { useParentPin } from "./ParentGate";
 
 // The PIN pad uses ResizeObserver, which the test browser lacks.

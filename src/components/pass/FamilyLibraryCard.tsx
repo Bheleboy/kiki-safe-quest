@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Download, ExternalLink, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,10 +56,19 @@ export function FamilyLibraryCard() {
   }, [token, visible, owned]);
 
   useEffect(() => {
-    if (visible && location.hash === "#family-library") {
+    if (visible && (location.hash === "#family-library" || location.hash === "#family-library-buy")) {
       setTimeout(() => document.getElementById("family-library")?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
     }
   }, [visible, location.hash]);
+
+  // Arriving from the book page's "Buy and download": open the parent PIN prompt once.
+  // The price and Buy button still only show after the PIN.
+  const askedFromBookPage = useRef(false);
+  useEffect(() => {
+    if (!visible || owned !== false || location.hash !== "#family-library-buy" || askedFromBookPage.current) return;
+    askedFromBookPage.current = true;
+    lock.unlock("Enter your parent PIN to see the book price.");
+  }, [visible, owned, location.hash, lock.unlock]);
 
   useEffect(() => { if (!lock.unlocked) { setConsent(false); setError(""); } }, [lock.unlocked]);
 

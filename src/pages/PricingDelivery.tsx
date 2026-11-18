@@ -50,7 +50,7 @@ export default function PricingDelivery() {
               </li>
               <li className="rounded-2xl border border-primary/15 bg-card p-4">
                 <p className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Kiki's Armour of God, Premium Edition PDF{book ? `: ${book}` : ""}</p>
-                <p>A printable PDF. One purchase covers every child in your family.</p>
+                <p>Printable PDF, instant download. One purchase covers every child in your family.</p>
               </li>
               <li className="rounded-2xl border border-primary/15 bg-card p-4">
                 <p className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Schools, churches and clubs</p>

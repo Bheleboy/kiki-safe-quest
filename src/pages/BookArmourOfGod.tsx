@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { BookCover } from "@/components/book/BookCover";
 import { BOOK_COVER } from "@/data/bookStores";
+import { BookDirectDownload, useBookDirectOption } from "@/components/book/BookDirectDownload";
 
 const BOOK_ID = "armour-of-god";
 const BOOK_TITLE = "Kiki's Armour of God";
@@ -68,6 +69,7 @@ export default function BookArmourOfGod() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [purchasedStores, setPurchasedStores] = useState<string[]>([]);
+  const directPdf = useBookDirectOption();
 
   useEffect(() => {
     if (user) {
@@ -216,9 +218,12 @@ export default function BookArmourOfGod() {
               </ul>
             </div>
 
+            {/* Direct PDF from Kiki Warrior (only when the Warrior Pass is live or an admin previews) */}
+            <BookDirectDownload option={directPdf} />
+
             {/* Buy Links */}
             <div className="space-y-3">
-              <h2 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">Get Your Copy</h2>
+              <h2 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">{directPdf.visible ? "Prefer a store? Also available on" : "Get Your Copy"}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {bookLinks.map((link) => {
                   const alreadyPurchased = purchasedStores.includes(link.name);
