@@ -24,6 +24,8 @@ export function maintenanceView(input: {
 
 export interface PublicSiteSettings {
   maintenance_mode: boolean;
+  /** Warrior Pass payments switched on. Missing or malformed means false (fail closed). */
+  paywall_enabled: boolean;
   prices: {
     family_pass_cents?: number | null; launch_family_pass_cents?: number | null; launch_limit?: number | null;
     kit_cents?: number | null; book_cents?: number | null; delivery_locker_cents?: number | null; delivery_door_cents?: number | null;
@@ -40,6 +42,7 @@ export function parsePublicSettings(data: unknown): PublicSiteSettings | null {
   const p = d.prices && typeof d.prices === "object" ? (d.prices as Record<string, unknown>) : null;
   return {
     maintenance_mode: d.maintenance_mode === true,
+    paywall_enabled: d.paywall_enabled === true,
     prices: p ? {
       family_pass_cents: num(p.family_pass_cents), launch_family_pass_cents: num(p.launch_family_pass_cents),
       launch_limit: num(p.launch_limit), kit_cents: num(p.kit_cents), book_cents: num(p.book_cents),

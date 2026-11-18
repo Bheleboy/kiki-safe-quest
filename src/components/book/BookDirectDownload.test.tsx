@@ -1,12 +1,13 @@
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import { mount } from "@/test/mount";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { mount, act } from "@/test/mount";
+import { readAuthReturn } from "@/lib/authReturn";
 
 const state = vi.hoisted(() => {
   const user = { id: "u1" };
   const s = {
-    signedIn: true, isAdmin: false, paywallActive: false, isPreview: false, bookCents: 9700 as number | null, owned: false,
+    signedIn: true, isAdmin: false, paywallActive: false, isPreview: false, bookCents: 9700 as number | null, owned: false, publicPaywall: false,
     authValue: { user, session: { access_token: "t" }, profile: { is_admin: false } } as Record<string, unknown>,
   };
   return s;
@@ -16,7 +17,7 @@ vi.mock("@/hooks/useCourseAccess", () => ({
   useCourseAccess: () => ({ paywallActive: state.paywallActive, isPreview: state.isPreview, hasAccess: true }),
 }));
 vi.mock("@/hooks/usePublicSettings", () => ({
-  usePublicSettings: () => ({ settings: { maintenance_mode: false, prices: { book_cents: state.bookCents }, receipt_business_name: null, support_email: null }, loaded: true }),
+  usePublicSettings: () => ({ settings: { maintenance_mode: false, paywall_enabled: state.publicPaywall, prices: { book_cents: state.bookCents }, receipt_business_name: null, support_email: null }, loaded: true }),
 }));
 vi.mock("@/integrations/supabase/client", () => {
   const b: Record<string, unknown> = {};
@@ -29,7 +30,8 @@ import { BookDirectDownload, useBookDirectOption } from "./BookDirectDownload";
 
 function Harness() {
   const opt = useBookDirectOption();
-  return <BookDirectDownload option={opt} />;
+  const loc = useLocation();
+  return <><span data-path={loc.pathname} /><BookDirectDownload option={opt} /></>;
 }
 const flush = async () => { await (React as unknown as { act: (cb: () => Promise<void>) => Promise<void> }).act(async () => { await Promise.resolve(); await Promise.resolve(); }); };
 let cleanup: (() => void) | null = null;
@@ -41,7 +43,8 @@ async function render() {
 }
 
 beforeEach(() => {
-  Object.assign(state, { paywallActive: false, isPreview: false, bookCents: 9700, owned: false });
+  Object.assign(state, { paywallActive: false, isPreview: false, bookCents: 9700, owned: false, publicPaywall: false });
+  localStorage.clear();
   state.authValue = { user: { id: "u1" }, session: { access_token: "t" }, profile: { is_admin: false } };
 });
 afterEach(() => { cleanup?.(); cleanup = null; });
@@ -52,11 +55,22 @@ describe("book page direct PDF option", () => {
     expect(c.textContent).toBe("");
   });
 
-  it("renders nothing for signed-out visitors (the switch cannot be read)", async () => {
+  it("renders nothing for signed-out visitors while the public switch is off", async () => {
     state.authValue = { user: null, session: null, profile: null };
-    state.paywallActive = true;
     const c = await render();
     expect(c.textContent).toBe("");
+  });
+
+  it("shows for signed-out visitors once the public switch is on, and Buy leads to sign-in with the family library return", async () => {
+    state.authValue = { user: null, session: null, profile: null };
+    state.publicPaywall = true;
+    const c = await render();
+    expect(c.textContent).toContain("Get the printable PDF from Kiki Warrior");
+    expect(c.textContent).toContain("R97");
+    const btn = Array.from(c.querySelectorAll("button")).find((b) => b.textContent?.includes("Buy and download"))!;
+    act(() => { btn.click(); });
+    expect(readAuthReturn()).toBe("/parent#family-library-buy");
+    expect(c.querySelector("[data-path]")?.getAttribute("data-path")).toBe("/auth");
   });
 
   it("shows the R97 option and Buy and download for an admin in preview", async () => {

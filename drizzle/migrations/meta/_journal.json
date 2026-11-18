@@ -78,6 +78,13 @@
       "when": 1794910150865,
       "tag": "0010_warrior_pass_phase5b_org_maintenance_yoco",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795043854296,
+      "tag": "0011_public_site_settings_paywall_flag",
+      "breakpoints": true
     }
   ]
 }

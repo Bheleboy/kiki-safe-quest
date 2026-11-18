@@ -1,4 +1,5 @@
 import SEO from "@/components/SEO";
+import { clearAuthReturn, readAuthReturn, saveAuthReturn } from "@/lib/authReturn";
 import { Eyebrow, PublicPage } from "@/components/ui/editorial";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -66,13 +67,15 @@ export default function AuthPage() {
     let stashed: string | null = null;
     try { stashed = sessionStorage.getItem("kw_oauth_return"); } catch { /* ignore */ }
     const safe = (v?: string | null) => (v && v.startsWith("/") && !v.startsWith("//") ? v : undefined);
-    return safe(fromState) || safe(stashed) || "/family";
+    // A return saved before sign-up survives the email confirmation link (new tab).
+    return safe(fromState) || safe(stashed) || readAuthReturn() || "/family";
   });
   const [oauthReturn] = useState(() => typeof window !== "undefined" && /[#&?](access_token|code)=/.test(window.location.hash + window.location.search));
 
   useEffect(() => {
     if (user) {
       try { sessionStorage.removeItem("kw_oauth_return"); } catch { /* ignore */ }
+      clearAuthReturn();
       navigate(returnTo, { replace: true });
     }
   }, [user, navigate, returnTo]);
@@ -105,7 +108,11 @@ export default function AuthPage() {
         const err = res.error;
         if (res.captchaRequired) setCaptchaNeeded(true);
         if (err) { setError(err.message); }
-        else { setMessage("Check your email for a verification link!"); }
+        else {
+          // Keep the intended page for after the confirmation link and first sign-in.
+          if (returnTo !== "/family") saveAuthReturn(returnTo);
+          setMessage("Check your email for a verification link!");
+        }
       } else if (mode === "login") {
         loginSchema.parse({ email, password });
         clearSecurityMessage();

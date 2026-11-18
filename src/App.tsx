@@ -49,7 +49,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   if (profile?.is_admin) return <>{children}</>;
   if (profile && !profile.age_verified) {
-    return <Navigate to="/verify-age" replace />;
+    // Carry the requested page through the age check so a new parent lands there afterwards.
+    return <Navigate to="/verify-age" replace state={{ returnTo: `${location.pathname}${location.search}${location.hash}` }} />;
   }
   return <>{children}</>;
 }

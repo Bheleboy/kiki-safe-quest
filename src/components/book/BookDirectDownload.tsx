@@ -8,6 +8,7 @@ import { useCourseAccess } from "@/hooks/useCourseAccess";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { formatRand } from "@/lib/warriorPass";
+import { saveAuthReturn } from "@/lib/authReturn";
 
 /** The family library purchase on /parent opens its parent PIN prompt for this hash. */
 export const FAMILY_LIBRARY_BUY_PATH = "/parent#family-library-buy";
@@ -16,7 +17,8 @@ export interface BookDirectOption { visible: boolean; owned: boolean; bookCents:
 
 /**
  * Whether the direct printable PDF option shows on the public book page: only when the
- * Warrior Pass is live or an admin is previewing, and the book has a price.
+ * Warrior Pass is live (public switch, readable signed out, or the signed-in access check)
+ * or an admin is previewing, and the book has a price.
  */
 export function useBookDirectOption(): BookDirectOption {
   const { user, profile } = useAuth();
@@ -25,7 +27,8 @@ export function useBookDirectOption(): BookDirectOption {
   const [owned, setOwned] = useState(false);
 
   const bookCents = settings?.prices?.book_cents;
-  const visible = !!user && (access.paywallActive || access.isPreview) && typeof bookCents === "number" && bookCents > 0;
+  const live = settings?.paywall_enabled === true || access.paywallActive || access.isPreview;
+  const visible = live && typeof bookCents === "number" && bookCents > 0;
 
   useEffect(() => {
     if (!user || !visible) return;
@@ -50,7 +53,7 @@ export function BookDirectDownload({ option }: { option: BookDirectOption }) {
 
   const go = () => (user
     ? navigate(FAMILY_LIBRARY_BUY_PATH)
-    : navigate("/auth", { state: { returnTo: FAMILY_LIBRARY_BUY_PATH } }));
+    : (saveAuthReturn(FAMILY_LIBRARY_BUY_PATH), navigate("/auth", { state: { returnTo: FAMILY_LIBRARY_BUY_PATH } })));
 
   return (
     <div className="card-kiki space-y-3">
