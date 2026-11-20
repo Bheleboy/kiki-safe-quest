@@ -1,3 +1,10 @@
+/**
+ * Single switch for every outside store link (book page, family library, My Books, homepage copy).
+ * While false, no store link, button, logo or "Prefer a store?" heading renders anywhere.
+ * The store data below is kept so the links come back by flipping this to true.
+ */
+export const SHOW_BOOK_STORE_LINKS = false;
+
 /** Printed and ebook store links for Kiki's Armour of God, as listed on the book page. */
 export const BOOK_STORES = [
   { name: "Amazon", url: "https://www.amazon.com/dp/B0FBX2XS3H" },

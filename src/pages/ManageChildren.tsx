@@ -15,6 +15,7 @@ import { ChildArmourAvatar } from "@/components/armour/ChildArmourAvatar";
 import { courseData } from "@/data/courseData";
 import { useCourseAccess } from "@/hooks/useCourseAccess";
 import { AskGrownUpBookCard } from "@/components/pass/AskGrownUpBookCard";
+import { SHOW_BOOK_STORE_LINKS } from "@/data/bookStores";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Child = Pick<Tables<"children">, "id" | "first_name" | "age_band" | "avatar_color">;
@@ -342,9 +343,11 @@ export default function ManageChildren() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide break-words">{title}</h3>
-                        <p className="text-xs text-charcoal/70 font-body">
-                          Purchased from {purchases.length} store{purchases.length > 1 ? "s" : ""}
-                        </p>
+                        {SHOW_BOOK_STORE_LINKS && (
+                          <p className="text-xs text-charcoal/70 font-body">
+                            Purchased from {purchases.length} store{purchases.length > 1 ? "s" : ""}
+                          </p>
+                        )}
                       </div>
                       <Link
                         to={`/books/${bookId}`}
@@ -353,6 +356,7 @@ export default function ManageChildren() {
                         View
                       </Link>
                     </div>
+                    {SHOW_BOOK_STORE_LINKS && (
                     <div className="flex flex-wrap gap-2">
                       {purchases.map((p) => (
                         <a
@@ -367,6 +371,7 @@ export default function ManageChildren() {
                         </a>
                       ))}
                     </div>
+                    )}
                   </div>
                 );
               })}

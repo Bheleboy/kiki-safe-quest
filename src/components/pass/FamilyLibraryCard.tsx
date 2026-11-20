@@ -8,13 +8,15 @@ import { callFn, useAuth } from "@/hooks/useAuth";
 import { useCourseAccess } from "@/hooks/useCourseAccess";
 import { usePurchaseLock } from "@/components/security/usePurchaseLock";
 import { supabase } from "@/integrations/supabase/client";
-import { BOOK_STORES, BOOK_TITLE } from "@/data/bookStores";
+import { BOOK_STORES, BOOK_TITLE, SHOW_BOOK_STORE_LINKS } from "@/data/bookStores";
+import { BookLaunchingSoon } from "@/components/book/BookLaunchingSoon";
 import { BookCover } from "@/components/book/BookCover";
 import { checkoutErrorMessage, formatRand, savePassReturnPath } from "@/lib/warriorPass";
 
 /**
- * Parent-only Family library. Renders nothing unless the paywall is on, an admin is
- * previewing, or the family already owns the book. One purchase covers every child.
+ * Parent-only Family library. The direct PDF purchase is offered only when the paywall is on
+ * or an admin is previewing, and the book has a price; otherwise the card says "Launching soon".
+ * A family that owns the book always gets the download. One purchase covers every child.
  * The price and Buy button only show after a fresh parent PIN (admins too).
  */
 export function FamilyLibraryCard() {
@@ -30,8 +32,11 @@ export function FamilyLibraryCard() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [checkoutSoon, setCheckoutSoon] = useState(false);
+  const [quoted, setQuoted] = useState(false);
 
-  const visible = access.paywallActive || access.isPreview || owned === true;
+  // Same rule as the book page: direct purchase only while payments are live or an admin previews.
+  const purchasable = access.paywallActive || access.isPreview;
+  const launchingSoon = owned === false && (!purchasable || (quoted && price === null));
 
   useEffect(() => {
     if (!user) return;
@@ -42,37 +47,39 @@ export function FamilyLibraryCard() {
   }, [user]);
 
   useEffect(() => {
-    if (!token || !visible || owned !== false) return;
+    if (!token || !purchasable || owned !== false) return;
     let cancelled = false;
     callFn("create-checkout", { action: "quote" }, token)
       .then((r) => {
-        if (cancelled || !r.ok) return;
+        if (cancelled) return;
+        setQuoted(true);
+        if (!r.ok) return;
         setPrice(typeof r.data?.price?.book_cents === "number" ? r.data.price.book_cents : null);
         setPaymentsReady(r.data?.payments_configured === true);
         if (r.data?.has_book === true) setOwned(true);
       })
-      .catch(() => { /* stays "Coming soon" */ });
+      .catch(() => { if (!cancelled) setQuoted(true); });
     return () => { cancelled = true; };
-  }, [token, visible, owned]);
+  }, [token, purchasable, owned]);
 
   useEffect(() => {
-    if (visible && (location.hash === "#family-library" || location.hash === "#family-library-buy")) {
+    if (user && (location.hash === "#family-library" || location.hash === "#family-library-buy")) {
       setTimeout(() => document.getElementById("family-library")?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
     }
-  }, [visible, location.hash]);
+  }, [user, location.hash]);
 
   // Arriving from the book page's "Buy and download": open the parent PIN prompt once.
   // The price and Buy button still only show after the PIN.
   const askedFromBookPage = useRef(false);
   useEffect(() => {
-    if (!visible || owned !== false || location.hash !== "#family-library-buy" || askedFromBookPage.current) return;
+    if (!purchasable || launchingSoon || owned !== false || location.hash !== "#family-library-buy" || askedFromBookPage.current) return;
     askedFromBookPage.current = true;
     lock.unlock("Enter your parent PIN to see the book price.");
-  }, [visible, owned, location.hash, lock.unlock]);
+  }, [purchasable, launchingSoon, owned, location.hash, lock.unlock]);
 
   useEffect(() => { if (!lock.unlocked) { setConsent(false); setError(""); } }, [lock.unlocked]);
 
-  if (!visible || owned === undefined) return null;
+  if (!user || owned === undefined) return null;
 
   async function download() {
     setError("");
@@ -134,7 +141,7 @@ export function FamilyLibraryCard() {
         <div className="w-20 sm:w-24 shrink-0 -rotate-2"><BookCover className="w-full h-auto rounded-lg" /></div>
         <div className="space-y-1 min-w-0">
           <p className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">{BOOK_TITLE}, Premium Edition</p>
-          <p className="font-body text-sm text-charcoal/70">Printable PDF. One purchase covers every child in your family.</p>
+          {!launchingSoon && <p className="font-body text-sm text-charcoal/70">Printable PDF. One purchase covers every child in your family.</p>}
           {owned && <p className="font-body text-xs font-medium text-primary">Your family owns this book</p>}
         </div>
       </div>
@@ -144,6 +151,8 @@ export function FamilyLibraryCard() {
           className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest disabled:opacity-50">
           <Download className="w-4 h-4 mr-2" />{busy ? "Preparing download..." : "Download"}
         </Button>
+      ) : launchingSoon ? (
+        <BookLaunchingSoon inset />
       ) : !lock.unlocked ? (
         <Button variant="ghost" onClick={() => lock.unlock("Enter your parent PIN to see the book price.")}
           className="w-full touch-target btn-copper adventure-button py-3 text-sm uppercase tracking-widest">
@@ -164,6 +173,7 @@ export function FamilyLibraryCard() {
 
       {error && <p className="text-sm font-body text-destructive bg-destructive/10 rounded-lg px-4 py-2">{error}</p>}
 
+      {SHOW_BOOK_STORE_LINKS && (
       <div className="space-y-2 border-t border-primary/15 pt-3">
         <p className="font-body text-sm text-charcoal/70">Prefer a printed copy or ebook? Buy it from a store:</p>
         <div className="flex flex-wrap gap-2">
@@ -175,6 +185,7 @@ export function FamilyLibraryCard() {
           ))}
         </div>
       </div>
+      )}
     </div>
   );
 }

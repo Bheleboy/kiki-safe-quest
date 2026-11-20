@@ -10,8 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { BookCover } from "@/components/book/BookCover";
-import { BOOK_COVER } from "@/data/bookStores";
+import { BOOK_COVER, SHOW_BOOK_STORE_LINKS } from "@/data/bookStores";
 import { BookDirectDownload, useBookDirectOption } from "@/components/book/BookDirectDownload";
+import { BookLaunchingSoon } from "@/components/book/BookLaunchingSoon";
 
 const BOOK_ID = "armour-of-god";
 const BOOK_TITLE = "Kiki's Armour of God";
@@ -218,10 +219,11 @@ export default function BookArmourOfGod() {
               </ul>
             </div>
 
-            {/* Direct PDF from Kiki Warrior (only when the Warrior Pass is live or an admin previews) */}
-            <BookDirectDownload option={directPdf} />
+            {/* Direct PDF from Kiki Warrior (only when the Warrior Pass is live or an admin previews), otherwise "Launching soon" */}
+            {directPdf.visible ? <BookDirectDownload option={directPdf} /> : <BookLaunchingSoon />}
 
-            {/* Buy Links */}
+            {/* Store links, only while SHOW_BOOK_STORE_LINKS is on */}
+            {SHOW_BOOK_STORE_LINKS && (
             <div className="space-y-3">
               <h2 className="font-display text-sm font-bold text-charcoal uppercase tracking-wide">{directPdf.visible ? "Prefer a store? Also available on" : "Get Your Copy"}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -251,6 +253,7 @@ export default function BookArmourOfGod() {
                 })}
               </div>
             </div>
+            )}
           </motion.div>
         </div>
 

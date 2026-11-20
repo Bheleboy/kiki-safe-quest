@@ -20,6 +20,8 @@ export default function PricingDelivery() {
   const limit = typeof p?.launch_limit === "number" && p.launch_limit > 0 ? p.launch_limit : null;
   const kit = price(p?.kit_cents);
   const book = price(p?.book_cents);
+  // The book line says "(launching soon)" until the public paywall switch is on.
+  const bookSoon = settings?.paywall_enabled !== true;
   const seller = settings?.receipt_business_name ?? null;
   const support = settings?.support_email ?? DEFAULT_SUPPORT_EMAIL;
   const mail = <a href={`mailto:${support}`} className="text-primary hover:underline font-semibold">{support}</a>;
@@ -49,7 +51,7 @@ export default function PricingDelivery() {
                 <p>A real Armour of God coin and wristband, posted when your child finishes the course. Armour Kits are for families with the Warrior Pass.</p>
               </li>
               <li className="rounded-2xl border border-primary/15 bg-card p-4">
-                <p className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Kiki's Armour of God, Premium Edition PDF{book ? `: ${book}` : ""}</p>
+                <p className="font-display text-base font-bold text-charcoal uppercase tracking-wide">Kiki's Armour of God, Premium Edition PDF{book ? `: ${book}` : ""}{bookSoon ? " (launching soon)" : ""}</p>
                 <p>Printable PDF, instant download. One purchase covers every child in your family.</p>
               </li>
               <li className="rounded-2xl border border-primary/15 bg-card p-4">
